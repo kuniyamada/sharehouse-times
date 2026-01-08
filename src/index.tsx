@@ -1031,47 +1031,174 @@ app.get('/', (c) => {
     </main>
     
     <!-- SEO用コンテンツ（検索エンジン向け説明文） -->
-    <section class="max-w-6xl mx-auto px-4 py-6 bg-white mt-4 rounded-lg shadow-sm" aria-labelledby="about-heading">
-        <h2 id="about-heading" class="text-lg font-bold text-gray-800 mb-4">SHARE HOUSE TIMESについて</h2>
-        <div class="text-sm text-gray-600 space-y-3 leading-relaxed">
-            <p>
-                <strong>SHARE HOUSE TIMES（シェアハウスタイムズ）</strong>は、シェアハウス・コリビングの最新ニュースをAIが自動収集してお届けする情報サイトです。
-                東京で一人暮らしを始める方、シェアハウスを探している方に向けて、毎日朝7時と夕方18時に最新情報を更新しています。
-            </p>
-            <p>
-                <strong>女性専用シェアハウス</strong>、<strong>ペット可物件</strong>、<strong>格安シェアハウス</strong>、<strong>学生向け物件</strong>など、
-                様々なニーズに合わせたカテゴリー別のニュースをご覧いただけます。東京・大阪・福岡などエリア別の情報も充実。
-            </p>
-            <p>
-                シェアハウスの家賃相場、初期費用、メリット・デメリット、入居時の注意点など、
-                <strong>東京での一人暮らし</strong>や<strong>シェアハウス選び</strong>に役立つ情報を幅広くカバーしています。
-            </p>
+    <section class="max-w-6xl mx-auto px-4 py-8 mt-6" aria-labelledby="about-heading">
+        
+        <!-- メインの説明セクション -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl shadow-lg overflow-hidden">
+            
+            <!-- ヘッダー部分 -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-house-chimney text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 id="about-heading" class="text-xl font-bold text-white m-0">SHARE HOUSE TIMESについて</h2>
+                        <p class="text-indigo-200 text-xs mt-0.5">シェアハウス・東京一人暮らし情報サイト</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツ部分 -->
+            <div class="p-6 md:p-8">
+                
+                <!-- 特徴カード -->
+                <div class="grid md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mb-3">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">AIが自動収集</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">最新のシェアハウス・コリビング情報をAIが24時間自動で収集してお届けします。</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mb-3">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">毎日2回更新</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">朝7時と夕方18時に最新情報を更新。いつでも新鮮な情報をチェックできます。</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-3">
+                            <i class="fas fa-tags text-white"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">18カテゴリー</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">女性専用・ペット可・格安など、あなたのニーズに合った情報が見つかります。</p>
+                    </div>
+                </div>
+                
+                <!-- 説明文 -->
+                <div class="bg-white/70 rounded-2xl p-5 mb-8 border border-gray-100">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-info-circle text-indigo-600 text-sm"></i>
+                        </div>
+                        <div class="text-sm text-gray-600 space-y-2 leading-relaxed">
+                            <p>
+                                <strong class="text-gray-800">SHARE HOUSE TIMES</strong>は、<span class="text-indigo-600 font-medium">東京で一人暮らしを始める方</span>、<span class="text-indigo-600 font-medium">シェアハウスを探している方</span>に向けた情報サイトです。
+                            </p>
+                            <p>
+                                家賃相場、初期費用、メリット・デメリット、入居時の注意点など、シェアハウス選びに役立つ情報を幅広くカバーしています。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- カテゴリータグ -->
+                <div class="mb-8">
+                    <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                        <i class="fas fa-th-large text-indigo-500"></i>
+                        対応カテゴリー
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">女性専用</span>
+                        <span class="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">ペット可</span>
+                        <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">格安</span>
+                        <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">学生向け</span>
+                        <span class="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">リモートワーク</span>
+                        <span class="px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">東京</span>
+                        <span class="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">大阪</span>
+                        <span class="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">コリビング</span>
+                        <span class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">+10カテゴリー</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- よくある質問（FAQセクション） -->
-        <div class="mt-6 pt-6 border-t border-gray-100">
-            <h3 class="text-base font-bold text-gray-800 mb-3">よくある質問</h3>
-            <dl class="space-y-4 text-sm">
-                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                    <dt class="font-medium text-gray-800" itemprop="name">Q. シェアハウスとは何ですか？</dt>
-                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                        <span itemprop="text">シェアハウスは、複数の入居者がキッチンやリビングなどの共用スペースを共有しながら、個室で生活する賃貸住宅です。一人暮らしより家賃を抑えられ、入居者同士の交流も楽しめます。</span>
-                    </dd>
-                </div>
-                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                    <dt class="font-medium text-gray-800" itemprop="name">Q. 東京のシェアハウスの家賃相場は？</dt>
-                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                        <span itemprop="text">東京のシェアハウスの家賃相場は月額4万円〜8万円程度です。山手線沿線など人気エリアは6万円〜10万円程度になることもあります。</span>
-                    </dd>
-                </div>
-                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                    <dt class="font-medium text-gray-800" itemprop="name">Q. シェアハウスの初期費用はいくら？</dt>
-                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                        <span itemprop="text">シェアハウスの初期費用は一般的な賃貸より低く、デポジット（保証金）1ヶ月分＋初月家賃程度で入居できることが多いです。敷金・礼金・仲介手数料が不要な物件も多くあります。</span>
-                    </dd>
-                </div>
-            </dl>
+        <div class="mt-8 bg-white rounded-3xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4">
+                <h3 class="text-lg font-bold text-white m-0 flex items-center gap-2">
+                    <i class="fas fa-circle-question"></i>
+                    よくある質問
+                </h3>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <!-- FAQ 1 -->
+                <details class="group bg-gray-50 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0">Q</span>
+                            <span class="font-medium text-gray-800 text-sm" itemprop="name">シェアハウスとは何ですか？</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="ml-11 p-4 bg-white rounded-xl border-l-4 border-indigo-500">
+                            <p class="text-sm text-gray-600 leading-relaxed" itemprop="text">
+                                シェアハウスは、複数の入居者がキッチンやリビングなどの<strong class="text-gray-800">共用スペースを共有</strong>しながら、個室で生活する賃貸住宅です。一人暮らしより<strong class="text-gray-800">家賃を抑えられ</strong>、入居者同士の交流も楽しめます。
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                
+                <!-- FAQ 2 -->
+                <details class="group bg-gray-50 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0">Q</span>
+                            <span class="font-medium text-gray-800 text-sm" itemprop="name">東京のシェアハウスの家賃相場は？</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="ml-11 p-4 bg-white rounded-xl border-l-4 border-emerald-500">
+                            <p class="text-sm text-gray-600 leading-relaxed" itemprop="text">
+                                東京のシェアハウスの家賃相場は<strong class="text-gray-800">月額4万円〜8万円程度</strong>です。山手線沿線など人気エリアは6万円〜10万円程度になることもあります。
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                
+                <!-- FAQ 3 -->
+                <details class="group bg-gray-50 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0">Q</span>
+                            <span class="font-medium text-gray-800 text-sm" itemprop="name">シェアハウスの初期費用はいくら？</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="ml-11 p-4 bg-white rounded-xl border-l-4 border-amber-500">
+                            <p class="text-sm text-gray-600 leading-relaxed" itemprop="text">
+                                シェアハウスの初期費用は一般的な賃貸より低く、<strong class="text-gray-800">デポジット1ヶ月分＋初月家賃程度</strong>で入居できることが多いです。敷金・礼金・仲介手数料が不要な物件も多くあります。
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                
+                <!-- FAQ 4 -->
+                <details class="group bg-gray-50 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0">Q</span>
+                            <span class="font-medium text-gray-800 text-sm" itemprop="name">女性専用シェアハウスのメリットは？</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="ml-11 p-4 bg-white rounded-xl border-l-4 border-pink-500">
+                            <p class="text-sm text-gray-600 leading-relaxed" itemprop="text">
+                                女性専用シェアハウスは、<strong class="text-gray-800">セキュリティ面での安心感</strong>、清潔な共用スペース、女性同士の気軽なコミュニケーションなどのメリットがあります。オートロックや防犯カメラ完備の物件も多いです。
+                            </p>
+                        </div>
+                    </div>
+                </details>
+            </div>
         </div>
+        
     </section>
 
     <!-- フッター -->
