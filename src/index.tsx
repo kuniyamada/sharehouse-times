@@ -13,7 +13,7 @@ app.get('/', (c) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>シェアハウスナビ | 全国のシェアハウス情報ポータル</title>
+    <title>シェアハウスニュース | 全国のシェアハウス最新情報</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -21,293 +21,213 @@ app.get('/', (c) => {
             transition: all 0.3s ease;
         }
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .image-container {
-            position: relative;
-            overflow: hidden;
-        }
-        .image-container img {
+        .image-zoom {
             transition: transform 0.5s ease;
         }
-        .card-hover:hover .image-container img {
-            transform: scale(1.1);
+        .card-hover:hover .image-zoom {
+            transform: scale(1.05);
         }
-        .tag {
-            backdrop-filter: blur(10px);
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        .hero-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         .fade-in {
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.5s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- ヘッダー -->
-    <header class="hero-gradient text-white">
-        <div class="container mx-auto px-4 py-8">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/20 p-3 rounded-xl">
-                        <i class="fas fa-home text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold">シェアハウスナビ</h1>
-                        <p class="text-white/80 text-sm">全国のシェアハウス情報ポータル</p>
-                    </div>
+    <header class="bg-white border-b sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-home text-2xl text-purple-600"></i>
+                    <span class="text-xl font-bold gradient-text">シェアハウスニュース</span>
                 </div>
-                <div class="text-right">
-                    <p class="text-white/70 text-sm"><i class="fas fa-calendar-alt mr-1"></i><span id="currentDate"></span></p>
-                </div>
-            </div>
-            
-            <!-- 検索バー -->
-            <div class="bg-white rounded-2xl p-4 shadow-lg">
-                <div class="flex flex-col md:flex-row gap-3">
-                    <div class="flex-1 relative">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="searchInput" placeholder="エリア・キーワードで検索" 
-                               class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none text-gray-700">
-                    </div>
-                    <select id="areaSelect" class="px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none text-gray-700 bg-white">
-                        <option value="">全国</option>
-                        <option value="tokyo">東京</option>
-                        <option value="osaka">大阪</option>
-                        <option value="fukuoka">福岡</option>
-                        <option value="nagoya">名古屋</option>
-                        <option value="hokkaido">北海道</option>
-                    </select>
-                    <button onclick="searchProperties()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:opacity-90 transition-opacity">
-                        <i class="fas fa-search mr-2"></i>検索
-                    </button>
+                <nav class="hidden md:flex items-center gap-6 text-sm">
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">ニュース</a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">トレンド</a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">生活ガイド</a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">物件情報</a>
+                </nav>
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-calendar mr-1"></i>
+                    <span id="currentDate"></span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- 統計バー -->
-    <div class="bg-white border-b">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex flex-wrap justify-center gap-8 text-center">
-                <div>
-                    <p class="text-2xl font-bold text-purple-600" id="totalCount">--</p>
-                    <p class="text-gray-500 text-sm">掲載物件数</p>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-green-600">¥35,000~</p>
-                    <p class="text-gray-500 text-sm">最低賃料</p>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-blue-600">47</p>
-                    <p class="text-gray-500 text-sm">対応エリア</p>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-orange-500">24h</p>
-                    <p class="text-gray-500 text-sm">即入居可能</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <main class="container mx-auto px-4 py-8">
+        <!-- ヒーローセクション -->
+        <section class="mb-10">
+            <div id="featuredNews" class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl overflow-hidden shadow-xl">
+                <!-- メイン記事がここに入る -->
+            </div>
+        </section>
+
         <!-- カテゴリタブ -->
-        <div class="flex flex-wrap gap-2 mb-8 justify-center">
-            <button onclick="filterCategory('all')" class="filter-btn active px-5 py-2.5 rounded-full font-medium bg-purple-600 text-white transition-all" data-category="all">
-                <i class="fas fa-th-large mr-2"></i>すべて
+        <div class="flex flex-wrap gap-2 mb-8">
+            <button onclick="filterCategory('all')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-purple-600 text-white transition-all" data-category="all">
+                <i class="fas fa-newspaper mr-1"></i>すべて
             </button>
-            <button onclick="filterCategory('new')" class="filter-btn px-5 py-2.5 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-purple-300 transition-all" data-category="new">
-                <i class="fas fa-sparkles mr-2"></i>新着物件
+            <button onclick="filterCategory('news')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-purple-300 transition-all" data-category="news">
+                <i class="fas fa-bolt mr-1"></i>最新ニュース
             </button>
-            <button onclick="filterCategory('popular')" class="filter-btn px-5 py-2.5 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-purple-300 transition-all" data-category="popular">
-                <i class="fas fa-fire mr-2"></i>人気物件
+            <button onclick="filterCategory('trend')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-purple-300 transition-all" data-category="trend">
+                <i class="fas fa-chart-line mr-1"></i>トレンド
             </button>
-            <button onclick="filterCategory('women')" class="filter-btn px-5 py-2.5 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-purple-300 transition-all" data-category="women">
-                <i class="fas fa-venus mr-2"></i>女性専用
+            <button onclick="filterCategory('guide')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-purple-300 transition-all" data-category="guide">
+                <i class="fas fa-book mr-1"></i>生活ガイド
             </button>
-            <button onclick="filterCategory('pet')" class="filter-btn px-5 py-2.5 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-purple-300 transition-all" data-category="pet">
-                <i class="fas fa-paw mr-2"></i>ペット可
+            <button onclick="filterCategory('property')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-purple-300 transition-all" data-category="property">
+                <i class="fas fa-building mr-1"></i>物件ニュース
             </button>
-            <button onclick="filterCategory('luxury')" class="filter-btn px-5 py-2.5 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-purple-300 transition-all" data-category="luxury">
-                <i class="fas fa-crown mr-2"></i>高級物件
+            <button onclick="filterCategory('interview')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-purple-300 transition-all" data-category="interview">
+                <i class="fas fa-user mr-1"></i>インタビュー
             </button>
+        </div>
+
+        <!-- 記事一覧 -->
+        <div id="newsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         </div>
 
         <!-- ローディング -->
-        <div id="loading" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md hidden md:block">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md hidden md:block">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md hidden lg:block">
-                    <div class="loading-skeleton h-48"></div>
-                    <div class="p-5">
-                        <div class="loading-skeleton h-6 w-3/4 rounded mb-3"></div>
-                        <div class="loading-skeleton h-4 w-1/2 rounded mb-2"></div>
-                        <div class="loading-skeleton h-4 w-full rounded"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 物件一覧 -->
-        <div id="propertyList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        </div>
-
-        <!-- もっと見るボタン -->
-        <div class="text-center mt-10">
-            <button onclick="loadMore()" class="bg-white text-purple-600 border-2 border-purple-600 px-8 py-3 rounded-full font-medium hover:bg-purple-600 hover:text-white transition-all">
-                <i class="fas fa-plus mr-2"></i>もっと見る
-            </button>
+        <div id="loading" class="hidden text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-purple-500 mb-4"></i>
+            <p class="text-gray-500">記事を読み込み中...</p>
         </div>
     </main>
 
-    <!-- フッター -->
-    <footer class="bg-gray-800 text-white py-12 mt-12">
+    <!-- サイドバー的なセクション -->
+    <section class="bg-white border-t py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-fire text-orange-500 mr-2"></i>人気の記事
+            </h2>
+            <div id="popularList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="bg-gray-800 text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <i class="fas fa-home text-purple-400 text-xl"></i>
-                        <span class="font-bold text-lg">シェアハウスナビ</span>
+                        <i class="fas fa-home text-purple-400"></i>
+                        <span class="font-bold">シェアハウスニュース</span>
                     </div>
-                    <p class="text-gray-400 text-sm">全国のシェアハウス情報を毎日更新。あなたにぴったりの住まいが見つかります。</p>
+                    <p class="text-gray-400 text-sm">全国のシェアハウスに関する最新ニュース、トレンド、生活情報をお届けします。</p>
                 </div>
                 <div>
-                    <h4 class="font-bold mb-4">エリアから探す</h4>
+                    <h4 class="font-bold mb-4">カテゴリ</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white">東京のシェアハウス</a></li>
-                        <li><a href="#" class="hover:text-white">大阪のシェアハウス</a></li>
-                        <li><a href="#" class="hover:text-white">福岡のシェアハウス</a></li>
-                        <li><a href="#" class="hover:text-white">名古屋のシェアハウス</a></li>
+                        <li><a href="#" class="hover:text-white">最新ニュース</a></li>
+                        <li><a href="#" class="hover:text-white">トレンド・市場動向</a></li>
+                        <li><a href="#" class="hover:text-white">生活ガイド</a></li>
+                        <li><a href="#" class="hover:text-white">インタビュー</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-bold mb-4">特集から探す</h4>
+                    <h4 class="font-bold mb-4">関連サイト</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white">女性専用物件</a></li>
-                        <li><a href="#" class="hover:text-white">ペット可物件</a></li>
-                        <li><a href="#" class="hover:text-white">個室タイプ</a></li>
-                        <li><a href="#" class="hover:text-white">即入居可能</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">お役立ち情報</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white">シェアハウスとは</a></li>
-                        <li><a href="#" class="hover:text-white">入居までの流れ</a></li>
-                        <li><a href="#" class="hover:text-white">よくある質問</a></li>
-                        <li><a href="#" class="hover:text-white">生活のコツ</a></li>
+                        <li><a href="https://www.hituji.jp/" target="_blank" class="hover:text-white">ひつじ不動産</a></li>
+                        <li><a href="https://www.oakhouse.jp/" target="_blank" class="hover:text-white">オークハウス</a></li>
+                        <li><a href="https://www.social-apartment.com/" target="_blank" class="hover:text-white">ソーシャルアパートメント</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
-                <p>© 2026 シェアハウスナビ All Rights Reserved.</p>
+            <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2026 シェアハウスニュース All Rights Reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // 現在の日付
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ja-JP', {
             year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        let allProperties = [];
+        let allNews = [];
         let currentCategory = 'all';
 
-        // 物件カードを生成
-        function createPropertyCard(property, index) {
-            const delay = index * 100;
-            const tags = property.tags || [];
+        // カテゴリラベル
+        const categoryLabels = {
+            news: { label: '最新ニュース', color: 'bg-red-500', icon: 'fa-bolt' },
+            trend: { label: 'トレンド', color: 'bg-purple-500', icon: 'fa-chart-line' },
+            guide: { label: '生活ガイド', color: 'bg-green-500', icon: 'fa-book' },
+            property: { label: '物件ニュース', color: 'bg-blue-500', icon: 'fa-building' },
+            interview: { label: 'インタビュー', color: 'bg-orange-500', icon: 'fa-user' }
+        };
+
+        // メイン記事を表示
+        function displayFeatured(article) {
+            const cat = categoryLabels[article.category];
+            document.getElementById('featuredNews').innerHTML = \`
+                <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="block md:flex">
+                    <div class="md:w-1/2 h-64 md:h-80 overflow-hidden">
+                        <img src="\${article.image}" alt="\${article.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:w-1/2 p-6 md:p-10 flex flex-col justify-center text-white">
+                        <span class="inline-flex items-center gap-1 text-sm bg-white/20 px-3 py-1 rounded-full w-fit mb-4">
+                            <i class="fas \${cat.icon}"></i> \${cat.label}
+                        </span>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-4 leading-tight">\${article.title}</h2>
+                        <p class="text-white/80 mb-4 line-clamp-3">\${article.summary}</p>
+                        <div class="flex items-center gap-4 text-sm text-white/60">
+                            <span><i class="fas fa-clock mr-1"></i>\${article.date}</span>
+                            <span><i class="fas fa-user mr-1"></i>\${article.source}</span>
+                        </div>
+                    </div>
+                </a>
+            \`;
+        }
+
+        // 記事カードを生成
+        function createNewsCard(article, index) {
+            const cat = categoryLabels[article.category];
+            const delay = index * 80;
             
             return \`
-                <article class="card-hover bg-white rounded-2xl overflow-hidden shadow-md fade-in" style="animation-delay: \${delay}ms">
-                    <a href="\${property.url}" target="_blank" rel="noopener noreferrer" class="block">
-                        <div class="image-container relative h-52">
-                            <img src="\${property.image}" alt="\${property.name}" 
-                                 class="w-full h-full object-cover"
-                                 onerror="this.src='https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'">
-                            <div class="absolute top-3 left-3 flex flex-wrap gap-2">
-                                \${property.isNew ? '<span class="tag bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium">NEW</span>' : ''}
-                                \${property.isPopular ? '<span class="tag bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-medium">人気</span>' : ''}
-                            </div>
-                            <div class="absolute bottom-3 right-3">
-                                <span class="tag bg-black/60 text-white text-sm px-3 py-1 rounded-full">
-                                    <i class="fas fa-yen-sign mr-1"></i>\${property.rent.toLocaleString()}~/月
-                                </span>
-                            </div>
+                <article class="card-hover bg-white rounded-xl overflow-hidden shadow-sm fade-in" style="animation-delay: \${delay}ms">
+                    <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="block">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="\${article.image}" alt="\${article.title}" 
+                                 class="w-full h-full object-cover image-zoom"
+                                 onerror="this.src='https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop'">
+                            <span class="absolute top-3 left-3 \${cat.color} text-white text-xs px-3 py-1 rounded-full">
+                                <i class="fas \${cat.icon} mr-1"></i>\${cat.label}
+                            </span>
                         </div>
                         <div class="p-5">
-                            <div class="flex items-start justify-between mb-2">
-                                <h3 class="font-bold text-gray-800 text-lg leading-tight flex-1">\${property.name}</h3>
-                            </div>
-                            <p class="text-gray-500 text-sm mb-3">
-                                <i class="fas fa-map-marker-alt text-purple-500 mr-1"></i>
-                                \${property.location}
-                            </p>
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">\${property.description}</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                \${tags.map(tag => \`
-                                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">\${tag}</span>
-                                \`).join('')}
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-400 border-t pt-3">
-                                <span><i class="fas fa-door-open mr-1"></i>\${property.rooms}室</span>
-                                <span><i class="fas fa-users mr-1"></i>\${property.capacity}名</span>
-                                <span><i class="fas fa-train mr-1"></i>\${property.station}</span>
+                            <h3 class="font-bold text-gray-800 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">\${article.title}</h3>
+                            <p class="text-gray-500 text-sm mb-4 line-clamp-2">\${article.summary}</p>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span><i class="fas fa-clock mr-1"></i>\${article.date}</span>
+                                <span>\${article.source}</span>
                             </div>
                         </div>
                     </a>
@@ -315,26 +235,47 @@ app.get('/', (c) => {
             \`;
         }
 
-        // 物件を表示
-        function displayProperties(properties) {
-            const container = document.getElementById('propertyList');
-            
-            if (!properties || properties.length === 0) {
-                container.innerHTML = \`
-                    <div class="col-span-full text-center py-16">
-                        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">該当する物件が見つかりませんでした</p>
+        // 人気記事カードを生成
+        function createPopularCard(article, index) {
+            return \`
+                <a href="\${article.url}" target="_blank" rel="noopener noreferrer" 
+                   class="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <span class="text-2xl font-bold text-purple-300">\${index + 1}</span>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-gray-800 text-sm line-clamp-2">\${article.title}</h4>
+                        <span class="text-xs text-gray-400">\${article.date}</span>
                     </div>
-                \`;
+                </a>
+            \`;
+        }
+
+        // 記事一覧を表示
+        function displayNews(news) {
+            const container = document.getElementById('newsList');
+            
+            if (!news || news.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">記事が見つかりませんでした</div>';
                 return;
             }
 
             const filtered = currentCategory === 'all' 
-                ? properties 
-                : properties.filter(p => p.category === currentCategory);
+                ? news 
+                : news.filter(n => n.category === currentCategory);
 
-            document.getElementById('totalCount').textContent = filtered.length;
-            container.innerHTML = filtered.map((p, i) => createPropertyCard(p, i)).join('');
+            // 最初の記事をフィーチャーに
+            if (filtered.length > 0) {
+                displayFeatured(filtered[0]);
+            }
+
+            // 残りをグリッドに
+            const remaining = filtered.slice(1);
+            container.innerHTML = remaining.map((n, i) => createNewsCard(n, i)).join('');
+        }
+
+        // 人気記事を表示
+        function displayPopular(news) {
+            const popular = news.filter(n => n.isPopular).slice(0, 4);
+            document.getElementById('popularList').innerHTML = popular.map((n, i) => createPopularCard(n, i)).join('');
         }
 
         // カテゴリフィルター
@@ -343,304 +284,247 @@ app.get('/', (c) => {
             
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 if (btn.dataset.category === category) {
-                    btn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+                    btn.classList.remove('bg-white', 'text-gray-600', 'border');
                     btn.classList.add('bg-purple-600', 'text-white');
                 } else {
                     btn.classList.remove('bg-purple-600', 'text-white');
-                    btn.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+                    btn.classList.add('bg-white', 'text-gray-600', 'border');
                 }
             });
 
-            displayProperties(allProperties);
-        }
-
-        // 検索
-        function searchProperties() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const area = document.getElementById('areaSelect').value;
-            
-            let filtered = allProperties;
-            
-            if (keyword) {
-                filtered = filtered.filter(p => 
-                    p.name.toLowerCase().includes(keyword) || 
-                    p.location.toLowerCase().includes(keyword) ||
-                    p.description.toLowerCase().includes(keyword)
-                );
-            }
-            
-            if (area) {
-                filtered = filtered.filter(p => p.area === area);
-            }
-            
-            displayProperties(filtered);
+            displayNews(allNews);
         }
 
         // データ取得
-        async function fetchProperties() {
+        async function fetchNews() {
             const loading = document.getElementById('loading');
-            const container = document.getElementById('propertyList');
-            
             loading.classList.remove('hidden');
-            container.innerHTML = '';
 
             try {
-                const response = await fetch('/api/properties');
+                const response = await fetch('/api/news');
                 const data = await response.json();
-                allProperties = data.properties || [];
+                allNews = data.news || [];
                 
-                document.getElementById('totalCount').textContent = allProperties.length;
-                displayProperties(allProperties);
+                // 日付順にソート
+                allNews.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                displayNews(allNews);
+                displayPopular(allNews);
             } catch (err) {
                 console.error('Error:', err);
-                container.innerHTML = \`
-                    <div class="col-span-full text-center py-16">
-                        <i class="fas fa-exclamation-circle text-6xl text-red-300 mb-4"></i>
-                        <p class="text-gray-500">データの取得に失敗しました</p>
-                    </div>
-                \`;
             } finally {
                 loading.classList.add('hidden');
             }
         }
 
-        // もっと見る（デモ用）
-        function loadMore() {
-            alert('実際のサービスでは、より多くの物件が読み込まれます');
-        }
-
-        // 初期化
-        document.addEventListener('DOMContentLoaded', fetchProperties);
-        
-        // Enter キーで検索
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchProperties();
-        });
+        document.addEventListener('DOMContentLoaded', fetchNews);
     </script>
 </body>
 </html>
   `)
 })
 
-// API: 物件データを取得
-app.get('/api/properties', async (c) => {
-  const properties = generateProperties()
+// API: ニュースデータを取得
+app.get('/api/news', async (c) => {
+  const news = generateNews()
   return c.json({
     success: true,
-    properties: properties,
-    total: properties.length,
+    news: news,
+    total: news.length,
     lastUpdated: new Date().toISOString()
   })
 })
 
-// 物件データを生成
-function generateProperties() {
+// ニュースデータを生成
+function generateNews() {
+  const today = new Date()
+  
   return [
+    // 最新ニュース
     {
       id: 1,
-      name: 'SOCIAL RESIDENCE 渋谷',
-      location: '東京都渋谷区神南1丁目',
-      area: 'tokyo',
-      station: '渋谷駅 徒歩8分',
-      rent: 65000,
-      rooms: 80,
-      capacity: 120,
-      description: '渋谷駅徒歩8分の好立地。コワーキングスペース、ジム、シアタールーム完備。若いクリエイターやIT系の入居者が多く、刺激的なコミュニティが魅力。',
-      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
-      url: 'https://www.social-apartment.com/',
-      tags: ['個室', 'Wi-Fi無料', 'ジム', 'コワーキング'],
-      category: 'popular',
-      isNew: false,
+      title: '2026年シェアハウス市場、過去最高の成長率を記録　コロナ後の住まい方改革が加速',
+      summary: '不動産経済研究所の調査によると、2026年のシェアハウス市場規模は前年比15%増の3,500億円に達する見込み。テレワーク定着による住まい方の多様化が背景に。',
+      category: 'news',
+      source: '不動産経済新聞',
+      date: formatDate(today),
+      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop',
+      url: 'https://www.hituji.jp/',
       isPopular: true
     },
     {
       id: 2,
-      name: 'オークハウス目黒',
-      location: '東京都目黒区目黒2丁目',
-      area: 'tokyo',
-      station: '目黒駅 徒歩5分',
-      rent: 72000,
-      rooms: 45,
-      capacity: 60,
-      description: '目黒駅から徒歩5分、閑静な住宅街に位置する落ち着いた雰囲気のシェアハウス。広々としたキッチンとリビングが自慢。',
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop',
+      title: '大手不動産3社、シェアハウス事業を本格展開へ　2026年度中に100棟計画',
+      summary: '三井不動産、三菱地所、住友不動産の大手3社がシェアハウス市場に本格参入。都心部を中心に高品質物件を展開し、新たな顧客層の開拓を目指す。',
+      category: 'news',
+      source: '日経不動産',
+      date: formatDate(addDays(today, -1)),
+      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=500&fit=crop',
       url: 'https://www.oakhouse.jp/',
-      tags: ['個室', 'オートロック', '駅近', '家具付き'],
-      category: 'new',
-      isNew: true,
-      isPopular: false
-    },
-    {
-      id: 3,
-      name: 'シェアプレイス田園調布',
-      location: '東京都大田区田園調布3丁目',
-      area: 'tokyo',
-      station: '田園調布駅 徒歩10分',
-      rent: 85000,
-      rooms: 30,
-      capacity: 35,
-      description: '高級住宅街・田園調布に位置するハイグレードシェアハウス。広い個室とホテルライクな共用部が特徴。',
-      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
-      url: 'https://www.hituji.jp/',
-      tags: ['高級', '広い個室', '防音', 'ラウンジ'],
-      category: 'luxury',
-      isNew: true,
       isPopular: true
     },
     {
+      id: 3,
+      title: '外国人居住者が急増、国際交流型シェアハウスに注目集まる',
+      summary: '円安と訪日外国人の増加を背景に、国際交流をコンセプトにしたシェアハウスの入居率が95%を超える。語学力向上を目指す日本人若者にも人気。',
+      category: 'news',
+      source: 'SUUMO NEWS',
+      date: formatDate(addDays(today, -2)),
+      image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=500&fit=crop',
+      url: 'https://tokyosharehouse.com/',
+      isPopular: false
+    },
+    
+    // トレンド
+    {
       id: 4,
-      name: 'SHARE HOUSE 福岡天神',
-      location: '福岡県福岡市中央区天神2丁目',
-      area: 'fukuoka',
-      station: '天神駅 徒歩3分',
-      rent: 42000,
-      rooms: 50,
-      capacity: 65,
-      description: '天神駅徒歩3分の好アクセス。屋上テラスからは福岡の夜景が一望できます。国際色豊かな入居者と交流できます。',
-      image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&h=400&fit=crop',
-      url: 'https://www.oakhouse.jp/',
-      tags: ['駅近', '屋上テラス', '国際交流', '格安'],
-      category: 'popular',
-      isNew: false,
+      title: '【2026年トレンド】多世代交流型シェアハウスが台頭、孤独解消の場として注目',
+      summary: '若者からシニアまでが共に暮らす多世代型シェアハウスが全国で増加。孤独死問題や高齢者の見守りニーズにも対応し、自治体からの支援も拡大している。',
+      category: 'trend',
+      source: '住まいトレンド研究所',
+      date: formatDate(today),
+      image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=500&fit=crop',
+      url: 'https://address.love/',
       isPopular: true
     },
     {
       id: 5,
-      name: 'レディースシェア新宿',
-      location: '東京都新宿区西新宿5丁目',
-      area: 'tokyo',
-      station: '西新宿駅 徒歩6分',
-      rent: 58000,
-      rooms: 35,
-      capacity: 40,
-      description: '女性専用のセキュリティ重視物件。オートロック、防犯カメラ、管理人常駐で安心。パウダールーム完備。',
-      image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&h=400&fit=crop',
-      url: 'https://www.share-apartment.com/',
-      tags: ['女性専用', 'オートロック', '管理人常駐', 'パウダールーム'],
-      category: 'women',
-      isNew: true,
+      title: 'サステナブル志向のエコシェアハウス、若年層の支持を獲得',
+      summary: '太陽光発電、雨水利用、コンポストなど環境配慮型設備を備えたシェアハウスが人気上昇。Z世代を中心に「エシカルな暮らし」への関心が高まっている。',
+      category: 'trend',
+      source: 'エコライフ通信',
+      date: formatDate(addDays(today, -1)),
+      image: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=500&fit=crop',
+      url: 'https://www.social-apartment.com/',
       isPopular: false
     },
     {
       id: 6,
-      name: 'ペットと暮らすシェアハウス中野',
-      location: '東京都中野区中野3丁目',
-      area: 'tokyo',
-      station: '中野駅 徒歩7分',
-      rent: 68000,
-      rooms: 25,
-      capacity: 30,
-      description: '愛犬・愛猫と一緒に暮らせる貴重な物件。専用ドッグラン、猫部屋完備。ペット好きの仲間と出会えます。',
-      image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&h=400&fit=crop',
+      title: 'ペット可シェアハウスが全国で300件突破、専用設備も充実化',
+      summary: 'ドッグラン、キャットウォーク、ペットシッターサービスなど、ペットとの暮らしに特化したシェアハウスが急増。ペットオーナーのコミュニティ形成にも一役。',
+      category: 'trend',
+      source: 'ペットライフジャパン',
+      date: formatDate(addDays(today, -3)),
+      image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800&h=500&fit=crop',
       url: 'https://www.hituji.jp/comret/search/pet',
-      tags: ['ペット可', 'ドッグラン', '猫部屋', 'ペットシッター'],
-      category: 'pet',
-      isNew: false,
       isPopular: true
     },
+    
+    // 生活ガイド
     {
       id: 7,
-      name: 'CROSS HOUSE 大阪梅田',
-      location: '大阪府大阪市北区梅田1丁目',
-      area: 'osaka',
-      station: '梅田駅 徒歩5分',
-      rent: 48000,
-      rooms: 60,
-      capacity: 80,
-      description: '大阪の中心・梅田駅徒歩5分。仕事にもプライベートにも便利な立地。ビジネスパーソンに人気の物件。',
-      image: 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=600&h=400&fit=crop',
-      url: 'https://www.hituji.jp/comret/info/osaka',
-      tags: ['駅近', 'ビジネス向け', 'Wi-Fi高速', '会議室'],
-      category: 'popular',
-      isNew: false,
+      title: '【完全ガイド】シェアハウス入居前に確認すべき10のポイント',
+      summary: '契約条件、共用ルール、退去時の費用まで、シェアハウス選びで失敗しないためのチェックリストを専門家が解説。初めての方必見の保存版ガイド。',
+      category: 'guide',
+      source: 'シェアライフマガジン',
+      date: formatDate(today),
+      image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=500&fit=crop',
+      url: 'https://www.hituji.jp/comret/knowledge',
       isPopular: true
     },
     {
       id: 8,
-      name: 'ADDress 鎌倉邸',
-      location: '神奈川県鎌倉市長谷2丁目',
-      area: 'tokyo',
-      station: '長谷駅 徒歩8分',
-      rent: 55000,
-      rooms: 15,
-      capacity: 20,
-      description: '古都・鎌倉で暮らす贅沢。海も山も徒歩圏内。リモートワーカーに人気の多拠点生活対応物件。',
-      image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=600&h=400&fit=crop',
-      url: 'https://address.love/',
-      tags: ['多拠点', '海近', '古民家風', 'リモートワーク'],
-      category: 'new',
-      isNew: true,
+      title: 'シェアハウスの人間関係、うまくいく人の5つの習慣',
+      summary: '100人以上のシェアハウス居住者へのアンケートから判明した、良好なコミュニティを築くためのコミュニケーション術とは。トラブル回避のヒントも。',
+      category: 'guide',
+      source: 'ルームシェアNavi',
+      date: formatDate(addDays(today, -2)),
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop',
+      url: 'https://www.share-share.jp/',
       isPopular: false
     },
     {
       id: 9,
-      name: 'グローバルシェアハウス池袋',
-      location: '東京都豊島区池袋2丁目',
-      area: 'tokyo',
-      station: '池袋駅 徒歩10分',
-      rent: 52000,
-      rooms: 70,
-      capacity: 90,
-      description: '20カ国以上からの入居者が暮らす国際色豊かなシェアハウス。毎週開催の国際交流イベントが好評。',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-      url: 'https://tokyosharehouse.com/',
-      tags: ['国際交流', '語学', 'イベント多数', 'キッチン広い'],
-      category: 'popular',
-      isNew: false,
-      isPopular: true
+      title: 'シェアハウスで食費を月2万円に抑える！料理シェアのススメ',
+      summary: '住人同士で食材や料理をシェアすることで、食費を大幅に節約できるテクニックを紹介。実践者の声と具体的なルール作りのコツを解説。',
+      category: 'guide',
+      source: '節約ライフ',
+      date: formatDate(addDays(today, -4)),
+      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=500&fit=crop',
+      url: 'https://www.oakhouse.jp/',
+      isPopular: false
     },
+    
+    // 物件ニュース
     {
       id: 10,
-      name: 'エコシェアハウス世田谷',
-      location: '東京都世田谷区三軒茶屋1丁目',
-      area: 'tokyo',
-      station: '三軒茶屋駅 徒歩12分',
-      rent: 60000,
-      rooms: 20,
-      capacity: 25,
-      description: '太陽光発電、雨水利用、コンポストなど環境に配慮した設備を完備。サステナブルな暮らしを実践できます。',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
+      title: '渋谷に過去最大級のシェアハウスオープン、全150室でコワーキング併設',
+      summary: '渋谷駅徒歩5分の好立地に、全150室の大型シェアハウスが来月オープン。24時間利用可能なコワーキングスペース、ジム、シアタールームを完備。',
+      category: 'property',
+      source: 'シェアハウスポータル',
+      date: formatDate(today),
+      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=500&fit=crop',
       url: 'https://www.social-apartment.com/',
-      tags: ['エコ', '太陽光発電', '菜園', 'サステナブル'],
-      category: 'new',
-      isNew: true,
       isPopular: false
     },
     {
       id: 11,
-      name: 'アーティストシェア下北沢',
-      location: '東京都世田谷区北沢2丁目',
-      area: 'tokyo',
-      station: '下北沢駅 徒歩5分',
-      rent: 62000,
-      rooms: 25,
-      capacity: 30,
-      description: '音楽スタジオ、アトリエ完備のクリエイター向けシェアハウス。夢を追う仲間と刺激し合える環境。',
-      image: 'https://images.unsplash.com/photo-1598928506311-c55ez5e0a4f?w=600&h=400&fit=crop',
-      url: 'https://www.hituji.jp/',
-      tags: ['音楽スタジオ', 'アトリエ', 'クリエイター', '防音'],
-      category: 'popular',
-      isNew: false,
-      isPopular: true
+      title: '福岡・天神エリアに女性専用高セキュリティシェアハウスが登場',
+      summary: '顔認証オートロック、24時間管理人常駐、防犯カメラ完備のセキュリティ特化型物件。パウダールームやヨガスタジオなど女性向け設備も充実。',
+      category: 'property',
+      source: 'SHARE LIFE',
+      date: formatDate(addDays(today, -1)),
+      image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=500&fit=crop',
+      url: 'https://www.share-apartment.com/',
+      isPopular: false
     },
     {
       id: 12,
-      name: 'シニアフレンドリーシェア吉祥寺',
-      location: '東京都武蔵野市吉祥寺本町2丁目',
-      area: 'tokyo',
-      station: '吉祥寺駅 徒歩8分',
-      rent: 70000,
-      rooms: 30,
-      capacity: 35,
-      description: '多世代交流型のシェアハウス。バリアフリー設計で、若者からシニアまで幅広い世代が共に暮らしています。',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop',
+      title: '鎌倉の古民家をリノベーション、海を望むシェアハウスが予約殺到',
+      summary: '築80年の古民家を改装したシェアハウスが話題に。海まで徒歩3分、サーファーやリモートワーカーに人気でオープン前に満室御礼。',
+      category: 'property',
+      source: 'ひつじ不動産',
+      date: formatDate(addDays(today, -3)),
+      image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800&h=500&fit=crop',
       url: 'https://address.love/',
-      tags: ['多世代交流', 'バリアフリー', '緑豊か', '見守り'],
-      category: 'new',
-      isNew: true,
+      isPopular: true
+    },
+    
+    // インタビュー
+    {
+      id: 13,
+      title: '【インタビュー】シェアハウス歴5年、フリーランスデザイナーが語る「理想の住まい方」',
+      summary: '都内のシェアハウスを転々とし、現在は下北沢のクリエイター向け物件に居住するデザイナーに密着。シェアライフの魅力と課題をリアルに語る。',
+      category: 'interview',
+      source: 'シェアライフマガジン',
+      date: formatDate(addDays(today, -1)),
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=500&fit=crop',
+      url: 'https://www.hituji.jp/',
+      isPopular: false
+    },
+    {
+      id: 14,
+      title: '【インタビュー】70歳でシェアハウスに入居した元教師「毎日が修学旅行のよう」',
+      summary: '定年退職後、一人暮らしの孤独感からシェアハウス入居を決意した田中さん（70）。若者との交流で生きがいを見つけた体験談。',
+      category: 'interview',
+      source: 'シニアライフ',
+      date: formatDate(addDays(today, -2)),
+      image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&h=500&fit=crop',
+      url: 'https://address.love/',
+      isPopular: true
+    },
+    {
+      id: 15,
+      title: '【対談】シェアハウス運営者が明かす「選ばれる物件」の条件',
+      summary: '入居率95%以上を維持する人気シェアハウス運営者3名が集結。物件選び、コミュニティ作り、トラブル対応のノウハウを惜しみなく公開。',
+      category: 'interview',
+      source: '不動産オーナーズ',
+      date: formatDate(addDays(today, -5)),
+      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=500&fit=crop',
+      url: 'https://www.oakhouse.jp/',
       isPopular: false
     }
   ]
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
+}
+
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
 }
 
 export default app
