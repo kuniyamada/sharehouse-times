@@ -5,7 +5,23 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
-    build(),
+    build({
+      outputDir: './dist',
+      external: [],
+      emptyOutDir: false,
+      entry: 'src/index.tsx',
+      // 静的ファイルをWorkerから除外
+      additionalExclude: [
+        '/static/*',
+        '/images/*',
+        '/*.ico',
+        '/*.png',
+        '/*.jpg',
+        '/*.json',
+        '/*.xml',
+        '/*.txt'
+      ]
+    }),
     devServer({
       adapter,
       entry: 'src/index.tsx'

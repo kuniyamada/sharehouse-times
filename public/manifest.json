@@ -1,0 +1,32 @@
+{
+  "name": "SHARE HOUSE TIMES",
+  "short_name": "シェアハウス",
+  "description": "シェアハウス・東京一人暮らしの最新ニュースをAIがお届け",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["news", "lifestyle"],
+  "lang": "ja",
+  "dir": "ltr"
+}

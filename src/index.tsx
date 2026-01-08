@@ -494,9 +494,21 @@ app.get('/', (c) => {
     <meta name="twitter:description" content="シェアハウス・コリビングの最新ニュースをAIが毎日更新。">
     <meta name="twitter:image" content="https://sharehouse-times.pages.dev/images/kugahara.jpg">
     
-    <!-- ファビコン -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <!-- ファビコン & アプリアイコン -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    
+    <!-- iOS（iPhone/iPad）ホーム画面アイコン -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="シェアハウス">
+    
+    <!-- Android ホーム画面アイコン & PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <!-- 構造化データ（JSON-LD） -->
     <script type="application/ld+json">
