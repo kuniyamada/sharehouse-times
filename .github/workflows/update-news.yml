@@ -1,0 +1,32 @@
+name: Update News
+
+on:
+  schedule:
+    # JST 07:00 = UTC 22:00 (前日)
+    - cron: '0 22 * * *'
+    # JST 18:00 = UTC 09:00
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    # 手動実行も可能
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install tsx
+        run: npm install -g tsx
+      
+      - name: Run news update script
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: tsx scripts/update-news.ts

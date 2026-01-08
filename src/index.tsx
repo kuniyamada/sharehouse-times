@@ -1192,17 +1192,6 @@ app.get('/', (c) => {
         </ol>
     </nav>
 
-    <!-- メインナビゲーション -->
-    <nav class="tab-nav" role="navigation" aria-label="メインナビゲーション">
-        <div class="max-w-6xl mx-auto px-4">
-            <a href="#" class="tab-item active" onclick="filterRegion('all'); return false;" data-region="all" aria-current="page">トップ</a>
-            <a href="#japan" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">国内ニュース</a>
-            <a href="#world" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">海外ニュース</a>
-            <a href="#tokyo" class="tab-item" onclick="filterCategory('tokyo_life'); return false;" data-region="tokyo">東京一人暮らし</a>
-            <a href="#trend" class="tab-item" onclick="filterCategory('trend'); return false;" data-region="trend">トレンド</a>
-        </div>
-    </nav>
-
     <!-- モバイル用カテゴリーナビゲーション -->
     <nav class="mobile-cat-menu md:hidden" role="navigation" aria-label="カテゴリーメニュー">
         <div class="px-3">
@@ -1231,7 +1220,6 @@ app.get('/', (c) => {
         <aside class="side-menu w-40 flex-shrink-0 hidden md:block" role="complementary" aria-label="カテゴリーメニュー">
             <!-- 物件タイプ -->
             <div class="side-menu-section">
-                <h2 class="side-menu-section-title">物件タイプ</h2>
                 <a href="#" class="side-menu-item active" onclick="filterCategory('all'); return false;" data-cat="all">
                     <i class="fas fa-home mr-2 text-gray-400"></i>主要ニュース
                 </a>

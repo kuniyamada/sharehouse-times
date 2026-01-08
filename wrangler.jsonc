@@ -7,15 +7,14 @@
     "nodejs_compat"
   ],
   // KVストレージ（ニュースデータ保存用）
-  // KVストレージはCloudflareダッシュボードで設定後に有効化
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "NEWS_KV",
-  //     "id": "your-kv-id"
-  //   }
-  // ],
-  // Cron Triggersは Workers で設定（Pagesでは非対応）
-  // JST 07:00 (UTC 22:00) と JST 18:00 (UTC 09:00) の1日2回更新
+  "kv_namespaces": [
+    {
+      "binding": "NEWS_KV",
+      "id": "6b596232dc464d40a8dfb2f5c5eb5fe2"
+    }
+  ],
+  // 更新スケジュール（GitHub Actionsで実行）
+  // JST 07:00 と JST 18:00 の1日2回更新
   "vars": {
     "UPDATE_SCHEDULE": "07:00 JST, 18:00 JST"
   }
