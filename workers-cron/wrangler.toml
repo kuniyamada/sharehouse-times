@@ -1,0 +1,14 @@
+name = "sharehouse-times-cron"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# KVストレージ（ニュースデータ保存用）
+[[kv_namespaces]]
+binding = "NEWS_KV"
+id = "e4882c804ce7466790808dce671a30c9"
+
+# 1日2回自動更新（日本時間）
+# UTC 22:00 = JST 07:00（朝）
+# UTC 09:00 = JST 18:00（夕方）
+[triggers]
+crons = ["0 22 * * *", "0 9 * * *"]
