@@ -524,9 +524,9 @@ app.get('/', (c) => {
                                 AI
                             </span>
                         </div>
-                        <span class="text-[11px] text-slate-500 hidden sm:flex items-center gap-1">
-                            <i class="fas fa-sparkles text-amber-400"></i>
-                            シェアハウスの最新情報をAIがお届け
+                        <span class="text-[10px] text-slate-400 hidden sm:flex items-center gap-1">
+                            <i class="fas fa-shield-halved text-indigo-400"></i>
+                            東京ディフェンス株式会社 提供
                         </span>
                     </div>
                 </a>
@@ -784,20 +784,23 @@ app.get('/', (c) => {
     </main>
 
     <!-- フッター -->
-    <footer class="yahoo-footer py-6 mt-4">
-        <div class="max-w-6xl mx-auto px-3 text-center">
-            <div class="flex flex-wrap justify-center gap-3 mb-3 text-xs">
+    <footer class="yahoo-footer py-8 mt-4">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="flex flex-wrap justify-center gap-4 mb-4 text-xs">
                 <a href="https://crann-terrace.com/" class="footer-link">クランテラス公式</a>
-                <span class="text-gray-300">|</span>
+                <span class="text-slate-600">|</span>
                 <a href="#" onclick="filterCategory('women'); return false;" class="footer-link">女性専用</a>
-                <span class="text-gray-300">|</span>
+                <span class="text-slate-600">|</span>
                 <a href="#" onclick="filterCategory('tokyo'); return false;" class="footer-link">東京</a>
-                <span class="text-gray-300">|</span>
+                <span class="text-slate-600">|</span>
                 <a href="#" onclick="filterCategory('coliving'); return false;" class="footer-link">コリビング</a>
             </div>
-            <p class="text-xs text-gray-500">
-                Presented by <a href="https://crann-terrace.com/" class="text-green-400 hover:text-green-300">クランテラス</a>
-                &copy; 2026
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <i class="fas fa-shield-halved text-indigo-400"></i>
+                <span class="text-xs text-slate-400">東京ディフェンス株式会社 提供</span>
+            </div>
+            <p class="text-xs text-slate-500">
+                &copy; 2026 ShareTimes - シェアハウスタイムズ
             </p>
         </div>
     </footer>
