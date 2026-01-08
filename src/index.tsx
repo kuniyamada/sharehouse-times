@@ -17,179 +17,227 @@ const CRANN_IMAGES = {
   lounge3: '/images/crann3.jpg',
 }
 
-// Yahoo風スタイル
+// Yahoo! JAPAN風スタイル
 const yahooStyles = `
     <style>
-        * { font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; }
+        * { 
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+            font-size: 13px;
+        }
         
-        .yahoo-red { background-color: #ff0033; }
-        .yahoo-red-text { color: #ff0033; }
+        body {
+            background-color: #fff;
+        }
         
-        .news-item {
+        /* ヘッダー */
+        .yahoo-header {
+            background: linear-gradient(180deg, #f0f0f0 0%, #e8e8e8 100%);
+            border-bottom: 1px solid #ddd;
+        }
+        
+        /* タブナビゲーション - Yahoo風 */
+        .tab-nav {
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab-item {
+            display: inline-block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            font-size: 13px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-item:hover {
+            background: #f5f5f5;
+            color: #ff0033;
+        }
+        .tab-item.active {
+            color: #ff0033;
+            border-bottom-color: #ff0033;
+            font-weight: bold;
+        }
+        
+        /* 左サイドのカテゴリメニュー */
+        .side-menu {
+            background: #f8f8f8;
+            border-right: 1px solid #e0e0e0;
+        }
+        .side-menu-item {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
             border-bottom: 1px solid #e8e8e8;
-            transition: background-color 0.15s;
+            font-size: 12px;
         }
-        .news-item:hover {
-            background-color: #f8f8f8;
+        .side-menu-item:hover {
+            background: #fff;
+            color: #ff0033;
         }
-        .news-item:last-child {
+        .side-menu-item.active {
+            background: #fff;
+            color: #ff0033;
+            font-weight: bold;
+            border-left: 3px solid #ff0033;
+        }
+        
+        /* ニュースリスト */
+        .news-list-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .news-list-item:last-child {
             border-bottom: none;
         }
-        
-        .news-title {
-            color: #1a0dab;
+        .news-link {
+            color: #333;
             text-decoration: none;
             font-size: 13px;
             line-height: 1.5;
         }
-        .news-title:hover {
+        .news-link:hover {
             color: #ff0033;
             text-decoration: underline;
         }
         
-        .category-tab {
-            padding: 8px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+        /* トピックス（メイン） */
+        .topics-box {
+            background: #fff;
+            border: 1px solid #ddd;
         }
-        .category-tab:hover {
-            background-color: #f5f5f5;
-        }
-        .category-tab.active {
-            border-bottom-color: #ff0033;
-            font-weight: bold;
-            color: #ff0033;
-        }
-        
-        .section-header {
-            background: linear-gradient(to right, #f5f5f5, #fff);
-            border-left: 4px solid #ff0033;
+        .topics-header {
+            background: linear-gradient(180deg, #f8f8f8 0%, #f0f0f0 100%);
+            border-bottom: 1px solid #ddd;
             padding: 8px 12px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
+            color: #333;
+        }
+        .topics-header-icon {
+            color: #ff0033;
+            margin-right: 5px;
         }
         
-        .sidebar-box {
-            border: 1px solid #ddd;
-            background: #fff;
+        /* 見出しリスト */
+        .headline-item {
+            padding: 6px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
         }
-        .sidebar-header {
-            background: #f5f5f5;
-            border-bottom: 1px solid #ddd;
-            padding: 10px 12px;
-            font-weight: bold;
+        .headline-item:hover {
+            background: #fafafa;
+        }
+        .headline-link {
+            color: #1a0dab;
+            text-decoration: none;
             font-size: 13px;
+            line-height: 1.4;
+            flex: 1;
+        }
+        .headline-link:hover {
+            color: #ff0033;
+            text-decoration: underline;
         }
         
-        .crann-banner {
-            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .crann-banner:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
+        /* NEWバッジ */
         .badge-new {
             background: #ff0033;
             color: white;
-            font-size: 10px;
-            padding: 2px 6px;
+            font-size: 9px;
+            padding: 1px 4px;
             border-radius: 2px;
-            margin-left: 6px;
+            margin-left: 5px;
+            vertical-align: middle;
         }
         
-        .topic-link {
-            color: #1a0dab;
-            font-size: 12px;
-        }
-        .topic-link:hover {
-            color: #ff0033;
+        /* カテゴリアイコン */
+        .cat-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 10px;
+            color: white;
         }
         
+        /* 情報元 */
+        .source-info {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        /* PR広告枠 */
+        .pr-box {
+            border: 1px solid #ddd;
+            background: #fff;
+        }
+        .pr-header {
+            background: #f5f5f5;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #666;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        /* クランテラス広告 */
+        .crann-ad {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
+            color: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .crann-ad:hover {
+            opacity: 0.95;
+        }
+        
+        /* ランキング */
+        .ranking-num {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: #ffd700; color: #333; }
+        .rank-2 { background: #c0c0c0; color: #333; }
+        .rank-3 { background: #cd7f32; color: #fff; }
+        .rank-other { background: #e8e8e8; color: #666; }
+        
+        /* 更新時刻 */
+        .update-time {
+            font-size: 10px;
+            color: #999;
+        }
+
+        /* フッター */
+        .yahoo-footer {
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
         .footer-link {
             color: #666;
+            text-decoration: none;
             font-size: 11px;
         }
         .footer-link:hover {
             text-decoration: underline;
         }
-
-        .ranking-num {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-        }
-        .ranking-1 { background: #ffd700; color: #333; }
-        .ranking-2 { background: #c0c0c0; color: #333; }
-        .ranking-3 { background: #cd7f32; color: #fff; }
-        .ranking-other { background: #eee; color: #666; }
     </style>
 `
 
-// Yahooスタイルのヘッダー
-const header = `
-    <header class="yahoo-red text-white shadow-md">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex items-center justify-between h-12">
-                <a href="/" class="flex items-center gap-2 text-white hover:opacity-90">
-                    <i class="fas fa-home text-lg"></i>
-                    <span class="text-lg font-bold tracking-tight">シェアハウスニュース</span>
-                </a>
-                <div class="flex items-center gap-4">
-                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="bg-white text-red-600 px-3 py-1.5 rounded text-xs font-bold hover:bg-gray-100 transition flex items-center gap-1">
-                        <i class="fas fa-building"></i>
-                        クランテラス
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- カテゴリータブ -->
-    <nav class="bg-white border-b shadow-sm">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex items-center overflow-x-auto">
-                <button onclick="filterRegion('all')" class="category-tab active" data-region="all">
-                    トップ
-                </button>
-                <button onclick="filterRegion('japan')" class="category-tab" data-region="japan">
-                    🇯🇵 国内
-                </button>
-                <button onclick="filterRegion('world')" class="category-tab" data-region="world">
-                    🌍 海外
-                </button>
-            </div>
-        </div>
-    </nav>
-`
-
-// Yahooスタイルのフッター
-const footer = `
-    <footer class="bg-gray-100 border-t mt-8">
-        <div class="max-w-6xl mx-auto px-4 py-6">
-            <div class="flex flex-wrap justify-center gap-4 mb-4">
-                <a href="https://crann-terrace.com/" class="footer-link">クランテラス公式サイト</a>
-                <span class="text-gray-300">|</span>
-                <a href="/" class="footer-link">トップページ</a>
-            </div>
-            <div class="text-center">
-                <p class="text-gray-500 text-xs mb-1">Presented by <a href="https://crann-terrace.com/" class="text-green-600 hover:underline font-medium">クランテラス</a></p>
-                <p class="text-gray-400 text-xs">© 2026 シェアハウスニュース</p>
-            </div>
-        </div>
-    </footer>
-`
-
-// ニュースページ（Yahoo風トップ）
+// ニュースページ（Yahoo! JAPAN風トップ）
 app.get('/', (c) => {
   return c.html(`
 <!DOCTYPE html>
@@ -197,191 +245,215 @@ app.get('/', (c) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>シェアハウスニュース - 日本・海外のシェアハウス最新情報</title>
-    <meta name="description" content="日本と世界のシェアハウス・コリビング最新ニュースをお届け。クランテラスが運営。">
+    <title>シェアハウスニュース</title>
+    <meta name="description" content="日本と世界のシェアハウス・コリビング最新ニュースをお届け。">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     ${yahooStyles}
 </head>
-<body class="bg-gray-100">
-    ${header}
-
-    <main class="max-w-6xl mx-auto px-4 py-4">
-        <div class="flex flex-col lg:flex-row gap-4">
-            
-            <!-- メインコンテンツ -->
-            <div class="lg:w-2/3">
-                
-                <!-- トピックス（トップニュース） -->
-                <section class="bg-white shadow-sm mb-4">
-                    <div class="section-header flex items-center justify-between">
-                        <span><i class="fas fa-fire-flame-curved text-red-500 mr-2"></i>トピックス</span>
-                        <span class="text-xs text-gray-400 font-normal">毎朝10時更新</span>
-                    </div>
-                    <div class="p-4">
-                        <div id="topNewsList"></div>
-                    </div>
-                </section>
-
-                <!-- 国内ニュース -->
-                <section id="japanSection" class="bg-white shadow-sm mb-4">
-                    <div class="section-header">
-                        <span>🇯🇵 国内のシェアハウスニュース</span>
-                    </div>
-                    <div class="p-4">
-                        <div id="japanNewsList"></div>
-                    </div>
-                </section>
-
-                <!-- 海外ニュース -->
-                <section id="worldSection" class="bg-white shadow-sm mb-4">
-                    <div class="section-header">
-                        <span>🌍 海外のシェアハウスニュース</span>
-                    </div>
-                    <div class="p-4">
-                        <div id="worldNewsList"></div>
-                    </div>
-                </section>
-
-            </div>
-
-            <!-- サイドバー -->
-            <div class="lg:w-1/3 space-y-4">
-                
-                <!-- クランテラス広告 -->
-                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block crann-banner rounded-lg overflow-hidden text-white">
-                    <div class="p-4">
-                        <div class="text-xs opacity-80 mb-1">PR</div>
-                        <div class="font-bold text-lg mb-2">クランテラス</div>
-                        <p class="text-sm opacity-90 mb-3">緑あふれる開放的な空間で、新しいシェアライフを始めませんか？</p>
-                        <div class="flex gap-2 mb-3">
-                            <img src="${CRANN_IMAGES.lounge1}" alt="" class="w-1/3 h-16 object-cover rounded">
-                            <img src="${CRANN_IMAGES.lounge2}" alt="" class="w-1/3 h-16 object-cover rounded">
-                            <img src="${CRANN_IMAGES.lounge3}" alt="" class="w-1/3 h-16 object-cover rounded">
-                        </div>
-                        <div class="bg-white text-green-700 text-center py-2 rounded text-sm font-bold">
-                            物件を見る →
-                        </div>
-                    </div>
+<body>
+    <!-- ヘッダー -->
+    <header class="yahoo-header">
+        <div class="max-w-5xl mx-auto px-3 py-2">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2">
+                    <span class="text-red-600 font-bold text-lg">S!</span>
+                    <span class="font-bold text-sm text-gray-700">シェアハウスニュース</span>
                 </a>
-
-                <!-- アクセスランキング -->
-                <div class="sidebar-box">
-                    <div class="sidebar-header flex items-center">
-                        <i class="fas fa-ranking-star text-yellow-500 mr-2"></i>
-                        アクセスランキング
-                    </div>
-                    <div class="p-3" id="rankingList"></div>
+                <div class="flex items-center gap-3">
+                    <span class="update-time"><i class="far fa-clock mr-1"></i>毎朝10時更新</span>
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
+                       class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700">
+                        クランテラス
+                    </a>
                 </div>
-
-                <!-- キーワード -->
-                <div class="sidebar-box">
-                    <div class="sidebar-header">
-                        <i class="fas fa-tags text-blue-500 mr-2"></i>
-                        注目キーワード
-                    </div>
-                    <div class="p-3 flex flex-wrap gap-2">
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">シェアハウス</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">コリビング</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">高齢者向け</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">女性専用</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">ペット可</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">外国人向け</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">東京</a>
-                        <a href="#" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 text-gray-700">大阪</a>
-                    </div>
-                </div>
-
-                <!-- クランテラス誘導2 -->
-                <div class="sidebar-box">
-                    <div class="sidebar-header bg-green-50">
-                        <i class="fas fa-leaf text-green-600 mr-2"></i>
-                        おすすめシェアハウス
-                    </div>
-                    <div class="p-3">
-                        <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block hover:opacity-90">
-                            <img src="${CRANN_IMAGES.lounge2}" alt="クランテラス" class="w-full h-32 object-cover rounded mb-3">
-                            <p class="text-sm font-bold text-gray-800 mb-1">クランテラスシリーズ</p>
-                            <p class="text-xs text-gray-500 mb-2">充実の共用設備・駅近・Wi-Fi完備</p>
-                            <div class="flex gap-1 flex-wrap">
-                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">高速Wi-Fi</span>
-                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">駅近</span>
-                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">共用ラウンジ</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
+    </header>
+
+    <!-- タブナビゲーション -->
+    <nav class="tab-nav">
+        <div class="max-w-5xl mx-auto px-3">
+            <a href="#" class="tab-item active" onclick="filterRegion('all'); return false;" data-region="all">トップ</a>
+            <a href="#" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">国内</a>
+            <a href="#" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">海外</a>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-5xl mx-auto flex">
+        
+        <!-- 左サイドメニュー -->
+        <aside class="side-menu w-36 flex-shrink-0 hidden md:block">
+            <a href="#" class="side-menu-item active" onclick="filterCategory('all'); return false;" data-cat="all">
+                <i class="fas fa-home mr-2 text-gray-400"></i>主要
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('new_open'); return false;" data-cat="new_open">
+                <i class="fas fa-door-open mr-2 text-blue-400"></i>新規オープン
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('senior'); return false;" data-cat="senior">
+                <i class="fas fa-user-group mr-2 text-orange-400"></i>高齢者向け
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('women'); return false;" data-cat="women">
+                <i class="fas fa-venus mr-2 text-pink-400"></i>女性専用
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('foreign'); return false;" data-cat="foreign">
+                <i class="fas fa-globe mr-2 text-green-400"></i>外国人向け
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('pet'); return false;" data-cat="pet">
+                <i class="fas fa-paw mr-2 text-amber-400"></i>ペット可
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('market'); return false;" data-cat="market">
+                <i class="fas fa-chart-line mr-2 text-purple-400"></i>市場動向
+            </a>
+            <a href="#" class="side-menu-item" onclick="filterCategory('world'); return false;" data-cat="world">
+                <i class="fas fa-earth-americas mr-2 text-cyan-400"></i>海外ニュース
+            </a>
+        </aside>
+
+        <!-- 中央メインコンテンツ -->
+        <div class="flex-1 min-w-0">
+            
+            <!-- トピックス -->
+            <section class="topics-box m-3">
+                <div class="topics-header flex items-center justify-between">
+                    <span><i class="fas fa-fire topics-header-icon"></i>トピックス</span>
+                    <span class="update-time" id="updateTime"></span>
+                </div>
+                <div id="topicsList" class="divide-y divide-gray-100"></div>
+            </section>
+
+            <!-- 国内ニュース -->
+            <section id="japanSection" class="topics-box m-3">
+                <div class="topics-header">
+                    <span>🇯🇵 国内</span>
+                </div>
+                <div id="japanNewsList" class="divide-y divide-gray-100"></div>
+            </section>
+
+            <!-- 海外ニュース -->
+            <section id="worldSection" class="topics-box m-3">
+                <div class="topics-header">
+                    <span>🌍 海外</span>
+                </div>
+                <div id="worldNewsList" class="divide-y divide-gray-100"></div>
+            </section>
+
+        </div>
+
+        <!-- 右サイドバー -->
+        <aside class="w-64 flex-shrink-0 hidden lg:block p-3 space-y-3">
+            
+            <!-- クランテラス広告 -->
+            <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block crann-ad">
+                <div class="p-3">
+                    <div class="text-xs opacity-70 mb-1">PR</div>
+                    <div class="font-bold mb-2">クランテラスシリーズ</div>
+                    <div class="grid grid-cols-3 gap-1 mb-2">
+                        <img src="${CRANN_IMAGES.lounge1}" alt="" class="w-full h-12 object-cover rounded">
+                        <img src="${CRANN_IMAGES.lounge2}" alt="" class="w-full h-12 object-cover rounded">
+                        <img src="${CRANN_IMAGES.lounge3}" alt="" class="w-full h-12 object-cover rounded">
+                    </div>
+                    <p class="text-xs opacity-90 mb-2">緑あふれる開放的な空間でシェアライフを</p>
+                    <div class="bg-white text-green-700 text-center py-1.5 rounded text-xs font-bold">
+                        物件を見る →
+                    </div>
+                </div>
+            </a>
+
+            <!-- アクセスランキング -->
+            <div class="pr-box">
+                <div class="pr-header flex items-center">
+                    <i class="fas fa-ranking-star text-yellow-500 mr-2"></i>
+                    アクセスランキング
+                </div>
+                <div class="p-2" id="rankingList"></div>
+            </div>
+
+            <!-- おすすめシェアハウス -->
+            <div class="pr-box">
+                <div class="pr-header">
+                    <i class="fas fa-leaf text-green-500 mr-2"></i>
+                    おすすめ
+                </div>
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-2 hover:bg-gray-50">
+                    <img src="${CRANN_IMAGES.lounge2}" alt="クランテラス" class="w-full h-24 object-cover rounded mb-2">
+                    <p class="text-xs font-bold text-gray-800">クランテラス</p>
+                    <p class="text-xs text-gray-500">駅近・Wi-Fi完備・共用ラウンジ</p>
+                </a>
+            </div>
+
+            <!-- 注目キーワード -->
+            <div class="pr-box">
+                <div class="pr-header">
+                    <i class="fas fa-tag text-blue-500 mr-2"></i>
+                    注目キーワード
+                </div>
+                <div class="p-2 flex flex-wrap gap-1">
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">シェアハウス</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">コリビング</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">高齢者</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">女性専用</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">ペット可</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">東京</span>
+                </div>
+            </div>
+
+        </aside>
     </main>
 
-    ${footer}
+    <!-- フッター -->
+    <footer class="yahoo-footer py-4 mt-4">
+        <div class="max-w-5xl mx-auto px-3 text-center">
+            <div class="flex justify-center gap-4 mb-2">
+                <a href="https://crann-terrace.com/" class="footer-link">クランテラス公式サイト</a>
+                <span class="text-gray-300">|</span>
+                <a href="/" class="footer-link">トップページ</a>
+            </div>
+            <p class="text-xs text-gray-400">
+                Presented by <a href="https://crann-terrace.com/" class="text-green-600 hover:underline">クランテラス</a>
+                &copy; 2026
+            </p>
+        </div>
+    </footer>
 
     <script>
         let allNews = [];
         let currentRegion = 'all';
+        let currentCategory = 'all';
 
-        // カテゴリー別アイコンとカラー
-        const categoryIcons = {
-            'new_open': { icon: 'fa-door-open', color: 'bg-blue-500', label: '新規オープン' },
-            'senior': { icon: 'fa-user-group', color: 'bg-orange-500', label: '高齢者向け' },
-            'foreign': { icon: 'fa-globe', color: 'bg-green-500', label: '外国人向け' },
-            'women': { icon: 'fa-venus', color: 'bg-pink-500', label: '女性専用' },
-            'pet': { icon: 'fa-paw', color: 'bg-amber-500', label: 'ペット可' },
-            'market': { icon: 'fa-chart-line', color: 'bg-purple-500', label: '市場動向' },
-            'policy': { icon: 'fa-landmark', color: 'bg-red-500', label: '政策' },
-            'investment': { icon: 'fa-coins', color: 'bg-yellow-500', label: '投資' },
-            'uk': { icon: 'fa-building', color: 'bg-indigo-500', label: 'イギリス' },
-            'us': { icon: 'fa-city', color: 'bg-blue-600', label: 'アメリカ' },
-            'asia': { icon: 'fa-earth-asia', color: 'bg-teal-500', label: 'アジア' },
-            'global': { icon: 'fa-earth-americas', color: 'bg-cyan-500', label: 'グローバル' },
+        // カテゴリー別アイコンと色
+        const categoryConfig = {
+            'new_open': { icon: 'fa-door-open', color: 'bg-blue-500' },
+            'senior': { icon: 'fa-user-group', color: 'bg-orange-500' },
+            'foreign': { icon: 'fa-globe', color: 'bg-green-500' },
+            'women': { icon: 'fa-venus', color: 'bg-pink-500' },
+            'pet': { icon: 'fa-paw', color: 'bg-amber-500' },
+            'market': { icon: 'fa-chart-line', color: 'bg-purple-500' },
+            'policy': { icon: 'fa-landmark', color: 'bg-red-500' },
+            'investment': { icon: 'fa-coins', color: 'bg-yellow-500' },
+            'uk': { icon: 'fa-building', color: 'bg-indigo-500' },
+            'us': { icon: 'fa-city', color: 'bg-blue-600' },
+            'asia': { icon: 'fa-earth-asia', color: 'bg-teal-500' },
+            'global': { icon: 'fa-earth-americas', color: 'bg-cyan-500' },
         };
 
-        function createNewsItem(article, showImage = false) {
+        function createHeadlineItem(article) {
             const isNew = article.date.includes('1月8日') || article.date.includes('1月7日');
             const newBadge = isNew ? '<span class="badge-new">NEW</span>' : '';
-            const regionFlag = article.region === 'japan' ? '🇯🇵' : '🌍';
-            const cat = categoryIcons[article.category] || { icon: 'fa-newspaper', color: 'bg-gray-500', label: 'ニュース' };
-            
-            if (showImage) {
-                return \`
-                    <div class="news-item py-3 flex gap-3">
-                        <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
-                            <div class="w-20 h-16 \${cat.color} rounded flex items-center justify-center">
-                                <i class="fas \${cat.icon} text-white text-2xl"></i>
-                            </div>
-                        </a>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs \${cat.color} text-white px-2 py-0.5 rounded">\${cat.label}</span>
-                            </div>
-                            <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="news-title font-bold block mb-1">
-                                \${article.title}\${newBadge}
-                            </a>
-                            <p class="text-xs text-gray-500 truncate">\${article.summary}</p>
-                            <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                                <span>\${regionFlag} \${article.source}</span>
-                                <span>\${article.date}</span>
-                            </div>
-                        </div>
-                    </div>
-                \`;
-            }
+            const cat = categoryConfig[article.category] || { icon: 'fa-newspaper', color: 'bg-gray-400' };
             
             return \`
-                <div class="news-item py-2 flex gap-3">
-                    <div class="w-8 h-8 \${cat.color} rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fas \${cat.icon} text-white text-sm"></i>
+                <div class="headline-item">
+                    <div class="cat-icon \${cat.color}">
+                        <i class="fas \${cat.icon}"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="news-title">
+                        <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="headline-link">
                             \${article.title}\${newBadge}
                         </a>
-                        <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                            <span class="\${cat.color.replace('bg-', 'text-')}">\${cat.label}</span>
-                            <span>\${regionFlag} \${article.source}</span>
-                            <span>\${article.date}</span>
+                        <div class="source-info">
+                            \${article.source} \${article.date}
                         </div>
                     </div>
                 </div>
@@ -389,12 +461,12 @@ app.get('/', (c) => {
         }
 
         function createRankingItem(article, rank) {
-            const rankClass = rank <= 3 ? \`ranking-\${rank}\` : 'ranking-other';
+            const rankClass = rank <= 3 ? \`rank-\${rank}\` : 'rank-other';
             return \`
-                <div class="flex gap-3 py-2 border-b border-gray-100 last:border-b-0">
+                <div class="flex gap-2 py-1.5 border-b border-gray-100 last:border-b-0">
                     <span class="ranking-num \${rankClass}">\${rank}</span>
                     <a href="\${article.url}" target="_blank" rel="noopener noreferrer" 
-                       class="flex-1 text-xs text-gray-700 hover:text-red-600 line-clamp-2">
+                       class="flex-1 text-xs text-gray-700 hover:text-red-600 leading-tight line-clamp-2">
                         \${article.title}
                     </a>
                 </div>
@@ -402,20 +474,36 @@ app.get('/', (c) => {
         }
 
         function displayNews(news) {
-            const japanNews = news.filter(n => n.region === 'japan');
-            const worldNews = news.filter(n => n.region === 'world');
+            // フィルタリング
+            let filteredNews = news;
+            if (currentRegion !== 'all') {
+                filteredNews = news.filter(n => n.region === currentRegion);
+            }
+            if (currentCategory !== 'all' && currentCategory !== 'world') {
+                filteredNews = filteredNews.filter(n => n.category === currentCategory);
+            } else if (currentCategory === 'world') {
+                filteredNews = news.filter(n => n.region === 'world');
+            }
+
+            const japanNews = filteredNews.filter(n => n.region === 'japan');
+            const worldNews = filteredNews.filter(n => n.region === 'world');
             
-            // トップニュース（画像付き、上位3件）
-            const topNews = news.slice(0, 3);
-            document.getElementById('topNewsList').innerHTML = 
-                topNews.map(n => createNewsItem(n, true)).join('');
+            // トピックス（上位5件）
+            const topNews = filteredNews.slice(0, 5);
+            document.getElementById('topicsList').innerHTML = 
+                topNews.map(n => createHeadlineItem(n)).join('');
+            
+            // 更新時刻
+            const now = new Date();
+            document.getElementById('updateTime').textContent = 
+                now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) + ' 更新';
             
             // 日本ニュース
             const japanSection = document.getElementById('japanSection');
             const japanContainer = document.getElementById('japanNewsList');
-            if (currentRegion === 'all' || currentRegion === 'japan') {
+            if ((currentRegion === 'all' || currentRegion === 'japan') && japanNews.length > 0) {
                 japanSection.classList.remove('hidden');
-                japanContainer.innerHTML = japanNews.map(n => createNewsItem(n, false)).join('');
+                japanContainer.innerHTML = japanNews.map(n => createHeadlineItem(n)).join('');
             } else {
                 japanSection.classList.add('hidden');
             }
@@ -423,9 +511,9 @@ app.get('/', (c) => {
             // 海外ニュース
             const worldSection = document.getElementById('worldSection');
             const worldContainer = document.getElementById('worldNewsList');
-            if (currentRegion === 'all' || currentRegion === 'world') {
+            if ((currentRegion === 'all' || currentRegion === 'world') && worldNews.length > 0) {
                 worldSection.classList.remove('hidden');
-                worldContainer.innerHTML = worldNews.map(n => createNewsItem(n, false)).join('');
+                worldContainer.innerHTML = worldNews.map(n => createHeadlineItem(n)).join('');
             } else {
                 worldSection.classList.add('hidden');
             }
@@ -438,13 +526,44 @@ app.get('/', (c) => {
 
         function filterRegion(region) {
             currentRegion = region;
-            document.querySelectorAll('.category-tab').forEach(btn => {
-                if (btn.dataset.region === region) {
-                    btn.classList.add('active');
+            currentCategory = 'all';
+            
+            // タブのアクティブ状態更新
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                if (tab.dataset.region === region) {
+                    tab.classList.add('active');
                 } else {
-                    btn.classList.remove('active');
+                    tab.classList.remove('active');
                 }
             });
+            
+            // サイドメニューのアクティブ状態リセット
+            document.querySelectorAll('.side-menu-item').forEach(item => {
+                if (item.dataset.cat === 'all') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            displayNews(allNews);
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            if (category === 'world') {
+                currentRegion = 'world';
+            }
+            
+            // サイドメニューのアクティブ状態更新
+            document.querySelectorAll('.side-menu-item').forEach(item => {
+                if (item.dataset.cat === category) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
             displayNews(allNews);
         }
 
@@ -501,11 +620,11 @@ function generateDefaultNews() {
   const formatDate = (daysAgo: number): string => {
     const date = new Date(jstNow)
     date.setDate(date.getDate() - daysAgo)
-    return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
+    return date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' }) + '(' + ['日','月','火','水','木','金','土'][date.getDay()] + ')'
   }
   
   return [
-    // 日本のニュース（実際の記事リンク）
+    // 日本のニュース
     { id: 1, title: 'シェアレジデンス「nears五反田」2026年5月入居開始', summary: 'ひとり暮らしとシェアハウスの間、ゆるくつながる心地よい暮らしを提案する新コンセプト物件が五反田にオープン予定。', region: 'japan', country: '日本', source: '大和ハウス工業', date: formatDate(0), category: 'new_open', url: 'https://www.daiwahouse.co.jp/about/release/group/20251211162546.html' },
     { id: 2, title: '高齢者シェアハウスで新しい老後生活、自由と安心を両立', summary: '70代〜90代が共同生活するシェアハウスが人気に。孤独解消と自立を両立する新しい住まいの形として注目される。', region: 'japan', country: '日本', source: 'テレ朝NEWS', date: formatDate(0), category: 'senior', url: 'https://news.tv-asahi.co.jp/news_economy/articles/900180056.html' },
     { id: 3, title: '空き家を外国人材の住まいに再生「外国人材シェアハウス」提供開始', summary: '空き家の利活用を起点に、企業向け外国人社宅サービスとして家具付き・敷金礼金ゼロの物件を提供。', region: 'japan', country: '日本', source: 'PR TIMES', date: formatDate(1), category: 'foreign', url: 'https://prtimes.jp/main/html/rd/p/000000077.000120610.html' },
@@ -514,7 +633,7 @@ function generateDefaultNews() {
     { id: 6, title: '全国でも珍しいペット共生型シェアハウス「ペミリ住之江」', summary: 'ドッグトレーナーが管理人として常駐。ペットに関するお悩みを気軽に相談できる日本で数少ないペット共生型シェアハウス。', region: 'japan', country: '日本', source: '産経ニュース', date: formatDate(2), category: 'pet', url: 'https://www.sankei.com/article/20231106-IQ2SI6RUHFMNJNSRUPWZBELAJU/' },
     { id: 7, title: 'インバウンド需要の回復でシェアハウス市場が活況に', summary: '外国人入居者が7割に達する物件も。日本シェアハウス連盟によると物件数は前年比5.4%増と拡大傾向。', region: 'japan', country: '日本', source: 'WEB翻訳', date: formatDate(3), category: 'market', url: 'https://web-honyaku.jp/2025/05/14/share-house/' },
     { id: 8, title: '政府が「高齢者シェアハウス」整備へ、2028年度までに全国100カ所目標', summary: '急増する独居高齢者の孤独死防止や生活支援を目的に、低料金で入居可能な高齢者向けシェアハウスの整備を推進。', region: 'japan', country: '日本', source: 'SUUMO', date: formatDate(3), category: 'policy', url: 'https://suumo.jp/journal/2025/11/18/212864/' },
-    // 海外のニュース（実際の記事リンク）
+    // 海外のニュース
     { id: 101, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living apartments are evolving into a key strategy for affordable housing that doesn\'t skimp on the amenities.', region: 'world', country: 'アメリカ', source: 'Business Insider', date: formatDate(0), category: 'us', url: 'https://www.businessinsider.com/co-living-apartments-cheap-rent-fix-housing-crisis-2025-8' },
     { id: 102, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living starting rents range from £1,550 to £1,750 pcm. Average tenant age has remained above 30 for third consecutive year.', region: 'world', country: 'イギリス', source: 'Savills', date: formatDate(1), category: 'uk', url: 'https://www.savills.co.uk/research_articles/229130/372282-0' },
     { id: 103, title: 'Singapore Co-living Player The Assembly Place Gears Up for Listing', summary: 'シンガポールのコリビング大手がCatalist上場に向けて目論見書を提出。市場拡大の勢いを反映。', region: 'world', country: 'シンガポール', source: 'EdgeProp', date: formatDate(1), category: 'asia', url: 'https://www.edgeprop.sg/property-news/co-living-player-assembly-place-lodges-prospectus-gears-catalist-listing' },
