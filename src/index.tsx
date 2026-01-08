@@ -913,16 +913,17 @@ app.get('/', (c) => {
                 <p class="text-xs text-gray-500" id="categoryDescription">シェアハウス・コリビングの最新ニュース</p>
             </div>
             
-            <!-- トピックス -->
+            <!-- 注目記事 -->
             <section class="topics-box m-3 md:m-3" aria-labelledby="topics-heading" itemscope itemtype="https://schema.org/ItemList">
                 <header class="topics-header flex items-center justify-between">
                     <h2 id="topics-heading" class="flex items-center m-0 text-base font-bold">
-                        <i class="fas fa-fire topics-header-icon mr-2" aria-hidden="true"></i>
-                        <span itemprop="name">シェアハウス・東京一人暮らし トピックス</span>
+                        <i class="fas fa-star topics-header-icon mr-2 text-amber-500" aria-hidden="true"></i>
+                        <span itemprop="name">注目記事</span>
+                        <span class="ml-2 text-xs font-normal text-gray-400">ピックアップ</span>
                     </h2>
                     <time class="update-time" id="updateTime" datetime=""></time>
                 </header>
-                <div id="topicsList" class="divide-y divide-gray-100" role="feed" aria-label="最新ニュース一覧"></div>
+                <div id="topicsList" class="divide-y divide-gray-100" role="feed" aria-label="注目記事一覧"></div>
             </section>
 
             <!-- 国内ニュース -->
@@ -1451,12 +1452,47 @@ app.get('/', (c) => {
                 titleEl.classList.add('hidden');
             }
             
-            // トピックス（初期5件、展開時は最大20件）
+            // 注目記事の選定（国内・海外ニュースと差別化）
+            // - 国内・海外を交互に混ぜる
+            // - カテゴリーが重複しないよう多様性を確保
+            function selectFeaturedNews(allNews, limit) {
+                const featured = [];
+                const usedCategories = new Set();
+                const japan = allNews.filter(n => n.region === 'japan');
+                const world = allNews.filter(n => n.region === 'world');
+                let japanIdx = 0, worldIdx = 0;
+                let useJapan = true;
+                
+                while (featured.length < limit && (japanIdx < japan.length || worldIdx < world.length)) {
+                    const source = useJapan ? japan : world;
+                    const idx = useJapan ? japanIdx : worldIdx;
+                    
+                    if (idx < source.length) {
+                        const article = source[idx];
+                        // カテゴリーの多様性を優先（同じカテゴリーは後回し）
+                        if (!usedCategories.has(article.category) || featured.length >= limit / 2) {
+                            featured.push(article);
+                            usedCategories.add(article.category);
+                        }
+                        if (useJapan) japanIdx++; else worldIdx++;
+                    }
+                    
+                    // 交互に切り替え（片方が尽きたらもう片方から）
+                    if (useJapan && worldIdx < world.length) useJapan = false;
+                    else if (!useJapan && japanIdx < japan.length) useJapan = true;
+                    else if (japanIdx < japan.length) useJapan = true;
+                    else useJapan = false;
+                }
+                
+                return featured;
+            }
+            
+            // 注目記事（初期5件、展開時は最大20件）- 国内・海外混合でカテゴリー多様性重視
             const topicsLimit = expandedSections.topics ? DISPLAY_LIMITS.expanded : DISPLAY_LIMITS.topics;
-            const topNews = filteredNews.slice(0, topicsLimit);
+            const featuredNews = selectFeaturedNews(filteredNews, Math.min(topicsLimit, filteredNews.length));
             const topicsContainer = document.getElementById('topicsList');
-            if (topNews.length > 0) {
-                let html = topNews.map(n => createHeadlineItem(n)).join('');
+            if (featuredNews.length > 0) {
+                let html = featuredNews.map(n => createHeadlineItem(n)).join('');
                 if (expandedSections.topics) {
                     html += createCollapseButton('topics');
                 } else {
