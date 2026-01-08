@@ -322,18 +322,40 @@ app.get('/', (c) => {
         let allNews = [];
         let currentRegion = 'all';
 
+        // カテゴリー別アイコンとカラー
+        const categoryIcons = {
+            'new_open': { icon: 'fa-door-open', color: 'bg-blue-500', label: '新規オープン' },
+            'senior': { icon: 'fa-user-group', color: 'bg-orange-500', label: '高齢者向け' },
+            'foreign': { icon: 'fa-globe', color: 'bg-green-500', label: '外国人向け' },
+            'women': { icon: 'fa-venus', color: 'bg-pink-500', label: '女性専用' },
+            'pet': { icon: 'fa-paw', color: 'bg-amber-500', label: 'ペット可' },
+            'market': { icon: 'fa-chart-line', color: 'bg-purple-500', label: '市場動向' },
+            'policy': { icon: 'fa-landmark', color: 'bg-red-500', label: '政策' },
+            'investment': { icon: 'fa-coins', color: 'bg-yellow-500', label: '投資' },
+            'uk': { icon: 'fa-building', color: 'bg-indigo-500', label: 'イギリス' },
+            'us': { icon: 'fa-city', color: 'bg-blue-600', label: 'アメリカ' },
+            'asia': { icon: 'fa-earth-asia', color: 'bg-teal-500', label: 'アジア' },
+            'global': { icon: 'fa-earth-americas', color: 'bg-cyan-500', label: 'グローバル' },
+        };
+
         function createNewsItem(article, showImage = false) {
             const isNew = article.date.includes('1月8日') || article.date.includes('1月7日');
             const newBadge = isNew ? '<span class="badge-new">NEW</span>' : '';
             const regionFlag = article.region === 'japan' ? '🇯🇵' : '🌍';
+            const cat = categoryIcons[article.category] || { icon: 'fa-newspaper', color: 'bg-gray-500', label: 'ニュース' };
             
             if (showImage) {
                 return \`
                     <div class="news-item py-3 flex gap-3">
                         <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
-                            <img src="\${article.image}" alt="" class="w-24 h-16 object-cover rounded">
+                            <div class="w-20 h-16 \${cat.color} rounded flex items-center justify-center">
+                                <i class="fas \${cat.icon} text-white text-2xl"></i>
+                            </div>
                         </a>
                         <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs \${cat.color} text-white px-2 py-0.5 rounded">\${cat.label}</span>
+                            </div>
                             <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="news-title font-bold block mb-1">
                                 \${article.title}\${newBadge}
                             </a>
@@ -348,13 +370,19 @@ app.get('/', (c) => {
             }
             
             return \`
-                <div class="news-item py-2">
-                    <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="news-title">
-                        \${article.title}\${newBadge}
-                    </a>
-                    <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                        <span>\${regionFlag} \${article.source}</span>
-                        <span>\${article.date}</span>
+                <div class="news-item py-2 flex gap-3">
+                    <div class="w-8 h-8 \${cat.color} rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fas \${cat.icon} text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="news-title">
+                            \${article.title}\${newBadge}
+                        </a>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                            <span class="\${cat.color.replace('bg-', 'text-')}">\${cat.label}</span>
+                            <span>\${regionFlag} \${article.source}</span>
+                            <span>\${article.date}</span>
+                        </div>
                     </div>
                 </div>
             \`;
@@ -478,20 +506,20 @@ function generateDefaultNews() {
   
   return [
     // 日本のニュース（実際の記事リンク）
-    { id: 1, title: 'シェアレジデンス「nears五反田」2026年5月入居開始', summary: 'ひとり暮らしとシェアハウスの間、ゆるくつながる心地よい暮らしを提案する新コンセプト物件が五反田にオープン予定。', region: 'japan', country: '日本', source: '大和ハウス工業', date: formatDate(0), image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop', url: 'https://www.daiwahouse.co.jp/about/release/group/20251211162546.html' },
-    { id: 2, title: '高齢者シェアハウスで新しい老後生活、自由と安心を両立', summary: '70代〜90代が共同生活するシェアハウスが人気に。孤独解消と自立を両立する新しい住まいの形として注目される。', region: 'japan', country: '日本', source: 'テレ朝NEWS', date: formatDate(0), image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=500&fit=crop', url: 'https://news.tv-asahi.co.jp/news_economy/articles/900180056.html' },
-    { id: 3, title: '空き家を外国人材の住まいに再生「外国人材シェアハウス」提供開始', summary: '空き家の利活用を起点に、企業向け外国人社宅サービスとして家具付き・敷金礼金ゼロの物件を提供。', region: 'japan', country: '日本', source: 'PR TIMES', date: formatDate(1), image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=500&fit=crop', url: 'https://prtimes.jp/main/html/rd/p/000000077.000120610.html' },
-    { id: 4, title: 'ネイバーズ羽田が2026年3月開業、新規入居者の募集開始', summary: '京急空港線「糀谷駅」徒歩13分、羽田空港まで最短10分の好立地にソーシャルアパートメントがオープン予定。', region: 'japan', country: '日本', source: 'SOCIAL APARTMENT', date: formatDate(1), image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=500&fit=crop', url: 'https://www.social-apartment.com/lifestyle/detail/20251219192601' },
-    { id: 5, title: '長崎に女性専用シェアハウス「長崎ライトハウス」誕生', summary: '斜面地の空き家をリノベーション。実家と1人暮らしの間の新しい選択肢として、女性の自立を支援。', region: 'japan', country: '日本', source: '長崎新聞', date: formatDate(2), image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=500&fit=crop', url: 'https://www.nagasaki-np.co.jp/kijis/?kijiid=341c58b5163a4d06a220c50c5f6436c5' },
-    { id: 6, title: '全国でも珍しいペット共生型シェアハウス「ペミリ住之江」', summary: 'ドッグトレーナーが管理人として常駐。ペットに関するお悩みを気軽に相談できる日本で数少ないペット共生型シェアハウス。', region: 'japan', country: '日本', source: '産経ニュース', date: formatDate(2), image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800&h=500&fit=crop', url: 'https://www.sankei.com/article/20231106-IQ2SI6RUHFMNJNSRUPWZBELAJU/' },
-    { id: 7, title: 'インバウンド需要の回復でシェアハウス市場が活況に', summary: '外国人入居者が7割に達する物件も。日本シェアハウス連盟によると物件数は前年比5.4%増と拡大傾向。', region: 'japan', country: '日本', source: 'WEB翻訳', date: formatDate(3), image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=500&fit=crop', url: 'https://web-honyaku.jp/2025/05/14/share-house/' },
-    { id: 8, title: '政府が「高齢者シェアハウス」整備へ、2028年度までに全国100カ所目標', summary: '急増する独居高齢者の孤独死防止や生活支援を目的に、低料金で入居可能な高齢者向けシェアハウスの整備を推進。', region: 'japan', country: '日本', source: 'SUUMO', date: formatDate(3), image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800&h=500&fit=crop', url: 'https://suumo.jp/journal/2025/11/18/212864/' },
+    { id: 1, title: 'シェアレジデンス「nears五反田」2026年5月入居開始', summary: 'ひとり暮らしとシェアハウスの間、ゆるくつながる心地よい暮らしを提案する新コンセプト物件が五反田にオープン予定。', region: 'japan', country: '日本', source: '大和ハウス工業', date: formatDate(0), category: 'new_open', url: 'https://www.daiwahouse.co.jp/about/release/group/20251211162546.html' },
+    { id: 2, title: '高齢者シェアハウスで新しい老後生活、自由と安心を両立', summary: '70代〜90代が共同生活するシェアハウスが人気に。孤独解消と自立を両立する新しい住まいの形として注目される。', region: 'japan', country: '日本', source: 'テレ朝NEWS', date: formatDate(0), category: 'senior', url: 'https://news.tv-asahi.co.jp/news_economy/articles/900180056.html' },
+    { id: 3, title: '空き家を外国人材の住まいに再生「外国人材シェアハウス」提供開始', summary: '空き家の利活用を起点に、企業向け外国人社宅サービスとして家具付き・敷金礼金ゼロの物件を提供。', region: 'japan', country: '日本', source: 'PR TIMES', date: formatDate(1), category: 'foreign', url: 'https://prtimes.jp/main/html/rd/p/000000077.000120610.html' },
+    { id: 4, title: 'ネイバーズ羽田が2026年3月開業、新規入居者の募集開始', summary: '京急空港線「糀谷駅」徒歩13分、羽田空港まで最短10分の好立地にソーシャルアパートメントがオープン予定。', region: 'japan', country: '日本', source: 'SOCIAL APARTMENT', date: formatDate(1), category: 'new_open', url: 'https://www.social-apartment.com/lifestyle/detail/20251219192601' },
+    { id: 5, title: '長崎に女性専用シェアハウス「長崎ライトハウス」誕生', summary: '斜面地の空き家をリノベーション。実家と1人暮らしの間の新しい選択肢として、女性の自立を支援。', region: 'japan', country: '日本', source: '長崎新聞', date: formatDate(2), category: 'women', url: 'https://www.nagasaki-np.co.jp/kijis/?kijiid=341c58b5163a4d06a220c50c5f6436c5' },
+    { id: 6, title: '全国でも珍しいペット共生型シェアハウス「ペミリ住之江」', summary: 'ドッグトレーナーが管理人として常駐。ペットに関するお悩みを気軽に相談できる日本で数少ないペット共生型シェアハウス。', region: 'japan', country: '日本', source: '産経ニュース', date: formatDate(2), category: 'pet', url: 'https://www.sankei.com/article/20231106-IQ2SI6RUHFMNJNSRUPWZBELAJU/' },
+    { id: 7, title: 'インバウンド需要の回復でシェアハウス市場が活況に', summary: '外国人入居者が7割に達する物件も。日本シェアハウス連盟によると物件数は前年比5.4%増と拡大傾向。', region: 'japan', country: '日本', source: 'WEB翻訳', date: formatDate(3), category: 'market', url: 'https://web-honyaku.jp/2025/05/14/share-house/' },
+    { id: 8, title: '政府が「高齢者シェアハウス」整備へ、2028年度までに全国100カ所目標', summary: '急増する独居高齢者の孤独死防止や生活支援を目的に、低料金で入居可能な高齢者向けシェアハウスの整備を推進。', region: 'japan', country: '日本', source: 'SUUMO', date: formatDate(3), category: 'policy', url: 'https://suumo.jp/journal/2025/11/18/212864/' },
     // 海外のニュース（実際の記事リンク）
-    { id: 101, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living apartments are evolving into a key strategy for affordable housing that doesn\'t skimp on the amenities.', region: 'world', country: 'アメリカ', source: 'Business Insider', date: formatDate(0), image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&h=500&fit=crop', url: 'https://www.businessinsider.com/co-living-apartments-cheap-rent-fix-housing-crisis-2025-8' },
-    { id: 102, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living starting rents range from £1,550 to £1,750 pcm. Average tenant age has remained above 30 for third consecutive year.', region: 'world', country: 'イギリス', source: 'Savills', date: formatDate(1), image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=500&fit=crop', url: 'https://www.savills.co.uk/research_articles/229130/372282-0' },
-    { id: 103, title: 'Singapore Co-living Player The Assembly Place Gears Up for Listing', summary: 'シンガポールのコリビング大手がCatalist上場に向けて目論見書を提出。市場拡大の勢いを反映。', region: 'world', country: 'シンガポール', source: 'EdgeProp', date: formatDate(1), image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&h=500&fit=crop', url: 'https://www.edgeprop.sg/property-news/co-living-player-assembly-place-lodges-prospectus-gears-catalist-listing' },
-    { id: 104, title: 'Coliving 2025: Key Investment, Design and Development Trends', summary: 'Explore 2025 coliving trends, from investment shifts to evolving design and tenant needs, with insights from industry experts.', region: 'world', country: 'グローバル', source: 'Coliving Insights', date: formatDate(2), image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=800&h=500&fit=crop', url: 'https://www.colivinginsights.com/articles/whats-next-for-coliving-key-investment-design-and-development-trends-shaping-2025-at-coliving-insights-talks' },
-    { id: 105, title: 'East London Coliving Scheme Gets the Green Light', summary: 'Blue Coast Capital has been granted planning consent for a 245-unit coliving scheme in Shoreditch, east London.', region: 'world', country: 'イギリス', source: 'Urban Living News', date: formatDate(2), image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=500&fit=crop', url: 'https://urbanliving.news/coliving/east-london-coliving-scheme-gets-the-green-light/' },
-    { id: 106, title: 'Korea\'s Co-Living Market Heats Up in 2025', summary: 'The average monthly rent for a sub-40sqm co-living unit in Seoul stands at 1.13 million won, about 1.5 times higher than the average officetel.', region: 'world', country: '韓国', source: 'World Property Journal', date: formatDate(3), image: 'https://images.unsplash.com/photo-1534274867514-d5b47ef89ed7?w=800&h=500&fit=crop', url: 'https://www.worldpropertyjournal.com/real-estate-news/south-korea/seoul-real-estate-news/korea-real-estate-news-jll-korea-coliving-property-report-for-2025-veronica-shim-korea-property-trends-in-2025-korea-housing-data-for-2025-igis-reside-14462.php' },
+    { id: 101, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living apartments are evolving into a key strategy for affordable housing that doesn\'t skimp on the amenities.', region: 'world', country: 'アメリカ', source: 'Business Insider', date: formatDate(0), category: 'us', url: 'https://www.businessinsider.com/co-living-apartments-cheap-rent-fix-housing-crisis-2025-8' },
+    { id: 102, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living starting rents range from £1,550 to £1,750 pcm. Average tenant age has remained above 30 for third consecutive year.', region: 'world', country: 'イギリス', source: 'Savills', date: formatDate(1), category: 'uk', url: 'https://www.savills.co.uk/research_articles/229130/372282-0' },
+    { id: 103, title: 'Singapore Co-living Player The Assembly Place Gears Up for Listing', summary: 'シンガポールのコリビング大手がCatalist上場に向けて目論見書を提出。市場拡大の勢いを反映。', region: 'world', country: 'シンガポール', source: 'EdgeProp', date: formatDate(1), category: 'asia', url: 'https://www.edgeprop.sg/property-news/co-living-player-assembly-place-lodges-prospectus-gears-catalist-listing' },
+    { id: 104, title: 'Coliving 2025: Key Investment, Design and Development Trends', summary: 'Explore 2025 coliving trends, from investment shifts to evolving design and tenant needs, with insights from industry experts.', region: 'world', country: 'グローバル', source: 'Coliving Insights', date: formatDate(2), category: 'investment', url: 'https://www.colivinginsights.com/articles/whats-next-for-coliving-key-investment-design-and-development-trends-shaping-2025-at-coliving-insights-talks' },
+    { id: 105, title: 'East London Coliving Scheme Gets the Green Light', summary: 'Blue Coast Capital has been granted planning consent for a 245-unit coliving scheme in Shoreditch, east London.', region: 'world', country: 'イギリス', source: 'Urban Living News', date: formatDate(2), category: 'uk', url: 'https://urbanliving.news/coliving/east-london-coliving-scheme-gets-the-green-light/' },
+    { id: 106, title: 'Korea\'s Co-Living Market Heats Up in 2025', summary: 'The average monthly rent for a sub-40sqm co-living unit in Seoul stands at 1.13 million won, about 1.5 times higher than the average officetel.', region: 'world', country: '韓国', source: 'World Property Journal', date: formatDate(3), category: 'asia', url: 'https://www.worldpropertyjournal.com/real-estate-news/south-korea/seoul-real-estate-news/korea-real-estate-news-jll-korea-coliving-property-report-for-2025-veronica-shim-korea-property-trends-in-2025-korea-housing-data-for-2025-igis-reside-14462.php' },
   ]
 }
