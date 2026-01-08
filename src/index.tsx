@@ -948,6 +948,60 @@ app.get('/', (c) => {
             \`;
         }
 
+        // 表示件数の設定
+        const DISPLAY_LIMITS = {
+            topics: 5,      // トピックス初期表示
+            japan: 5,       // 国内ニュース初期表示
+            world: 3,       // 海外ニュース初期表示
+            expanded: 20    // 展開時の最大表示
+        };
+        
+        // 展開状態の管理
+        let expandedSections = {
+            topics: false,
+            japan: false,
+            world: false
+        };
+
+        function createMoreButton(sectionId, totalCount, currentCount) {
+            if (totalCount <= currentCount) return '';
+            const remaining = totalCount - currentCount;
+            return \`
+                <button onclick="expandSection('\${sectionId}')" 
+                        class="w-full py-3 text-center text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors border-t border-gray-100 flex items-center justify-center gap-2"
+                        id="\${sectionId}MoreBtn">
+                    <i class="fas fa-chevron-down"></i>
+                    もっと見る（残り\${remaining}件）
+                </button>
+            \`;
+        }
+        
+        function createCollapseButton(sectionId) {
+            return \`
+                <button onclick="collapseSection('\${sectionId}')" 
+                        class="w-full py-3 text-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100 flex items-center justify-center gap-2"
+                        id="\${sectionId}CollapseBtn">
+                    <i class="fas fa-chevron-up"></i>
+                    閉じる
+                </button>
+            \`;
+        }
+        
+        function expandSection(sectionId) {
+            expandedSections[sectionId] = true;
+            displayNews(allNews);
+        }
+        
+        function collapseSection(sectionId) {
+            expandedSections[sectionId] = false;
+            displayNews(allNews);
+            // スクロール位置をセクション上部に戻す
+            const section = document.getElementById(sectionId + 'Section') || document.getElementById(sectionId + 'List')?.parentElement;
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
         function displayNews(news) {
             // フィルタリング
             let filteredNews = news;
@@ -973,32 +1027,59 @@ app.get('/', (c) => {
                 titleEl.classList.add('hidden');
             }
             
-            // トピックス（上位5件）
-            const topNews = filteredNews.slice(0, 5);
-            document.getElementById('topicsList').innerHTML = 
-                topNews.length > 0 ? topNews.map(n => createHeadlineItem(n)).join('') : '<p class="p-4 text-gray-500 text-sm">該当するニュースがありません</p>';
+            // トピックス（初期5件、展開時は最大20件）
+            const topicsLimit = expandedSections.topics ? DISPLAY_LIMITS.expanded : DISPLAY_LIMITS.topics;
+            const topNews = filteredNews.slice(0, topicsLimit);
+            const topicsContainer = document.getElementById('topicsList');
+            if (topNews.length > 0) {
+                let html = topNews.map(n => createHeadlineItem(n)).join('');
+                if (expandedSections.topics) {
+                    html += createCollapseButton('topics');
+                } else {
+                    html += createMoreButton('topics', filteredNews.length, DISPLAY_LIMITS.topics);
+                }
+                topicsContainer.innerHTML = html;
+            } else {
+                topicsContainer.innerHTML = '<p class="p-4 text-gray-500 text-sm">該当するニュースがありません</p>';
+            }
             
             // 更新時刻
             const now = new Date();
             document.getElementById('updateTime').textContent = 
                 now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) + ' 更新';
             
-            // 日本ニュース
+            // 日本ニュース（初期5件、展開時は最大20件）
             const japanSection = document.getElementById('japanSection');
             const japanContainer = document.getElementById('japanNewsList');
             if ((currentRegion === 'all' || currentRegion === 'japan') && currentCategory === 'all' && japanNews.length > 0) {
                 japanSection.classList.remove('hidden');
-                japanContainer.innerHTML = japanNews.map(n => createHeadlineItem(n)).join('');
+                const japanLimit = expandedSections.japan ? DISPLAY_LIMITS.expanded : DISPLAY_LIMITS.japan;
+                const displayJapan = japanNews.slice(0, japanLimit);
+                let html = displayJapan.map(n => createHeadlineItem(n)).join('');
+                if (expandedSections.japan) {
+                    html += createCollapseButton('japan');
+                } else {
+                    html += createMoreButton('japan', japanNews.length, DISPLAY_LIMITS.japan);
+                }
+                japanContainer.innerHTML = html;
             } else {
                 japanSection.classList.add('hidden');
             }
             
-            // 海外ニュース
+            // 海外ニュース（初期3件、展開時は最大20件）
             const worldSection = document.getElementById('worldSection');
             const worldContainer = document.getElementById('worldNewsList');
             if ((currentRegion === 'all' || currentRegion === 'world') && currentCategory === 'all' && worldNews.length > 0) {
                 worldSection.classList.remove('hidden');
-                worldContainer.innerHTML = worldNews.map(n => createHeadlineItem(n)).join('');
+                const worldLimit = expandedSections.world ? DISPLAY_LIMITS.expanded : DISPLAY_LIMITS.world;
+                const displayWorld = worldNews.slice(0, worldLimit);
+                let html = displayWorld.map(n => createHeadlineItem(n)).join('');
+                if (expandedSections.world) {
+                    html += createCollapseButton('world');
+                } else {
+                    html += createMoreButton('world', worldNews.length, DISPLAY_LIMITS.world);
+                }
+                worldContainer.innerHTML = html;
             } else {
                 worldSection.classList.add('hidden');
             }
