@@ -13,11 +13,11 @@ app.use('/api/*', cors())
 // クランテラスの画像URL（物件別）
 const CRANN_IMAGES = {
   // クランテラス久が原
-  kugahara: 'https://www.genspark.ai/api/files/s/V4bSF9bT',
+  kugahara: '/images/kugahara.jpg',
   // クランテラス溝の口
-  mizonokuchi: 'https://www.genspark.ai/api/files/s/aPyXMyFe',
+  mizonokuchi: '/images/mizonokuchi.jpg',
   // クランテラス品川
-  shinagawa: 'https://www.genspark.ai/api/files/s/uzX92PM2',
+  shinagawa: '/images/shinagawa.jpg',
 }
 
 // モダンスタイル（ミニマル・クリーン）
