@@ -10,6 +10,9 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
 
+// クランテラスの画像URL
+const CRANN_TERRACE_IMAGE = 'https://www.genspark.ai/api/files/s/V4bSF9bT'
+
 // 共通のスタイル
 const commonStyles = `
     <style>
@@ -40,36 +43,77 @@ const commonStyles = `
             to { opacity: 1; transform: translateY(0); }
         }
         .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        .crann-gradient {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 50%, #6b9b64 100%);
+        }
+        .crann-btn {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
+            transition: all 0.3s ease;
+        }
+        .crann-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 90, 39, 0.4);
+        }
+        .featured-card {
+            background: linear-gradient(135deg, rgba(45, 90, 39, 0.05) 0%, rgba(107, 155, 100, 0.1) 100%);
+            border: 2px solid #4a7c43;
+        }
+        .pulse-border {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 124, 67, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(74, 124, 67, 0); }
         }
     </style>
 `
 
-// 共通のヘッダー
+// 共通のヘッダー（クランテラスブランド）
 const header = `
     <header class="bg-white border-b sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <i class="fas fa-home text-2xl text-purple-600"></i>
+                    <i class="fas fa-leaf text-2xl text-green-700"></i>
                     <span class="text-xl font-bold gradient-text">シェアハウスニュース</span>
+                </a>
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
+                   class="crann-btn text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                    <i class="fas fa-home"></i>
+                    クランテラスを見る
                 </a>
             </div>
         </div>
     </header>
 `
 
-// 共通のフッター
+// 共通のフッター（クランテラス訴求）
 const footer = `
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex items-center justify-center gap-2 mb-4">
-                <i class="fas fa-home text-purple-400"></i>
-                <span class="font-bold">シェアハウスニュース</span>
+    <footer class="bg-gray-800 text-white py-12 mt-12">
+        <div class="container mx-auto px-4">
+            <!-- クランテラスCTA -->
+            <div class="bg-gradient-to-r from-green-800 to-green-600 rounded-2xl p-8 mb-8 text-center">
+                <h3 class="text-2xl font-bold mb-3">シェアハウスをお探しですか？</h3>
+                <p class="text-white/90 mb-6">クランテラスシリーズで、新しい暮らしを始めませんか</p>
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-2 bg-white text-green-700 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-arrow-right"></i>
+                    クランテラス公式サイトへ
+                </a>
             </div>
-            <p class="text-gray-400 text-sm">© 2026 シェアハウスニュース All Rights Reserved.</p>
+            
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <i class="fas fa-leaf text-green-400"></i>
+                    <span class="font-bold">シェアハウスニュース</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-2">Presented by <a href="https://crann-terrace.com/" class="text-green-400 hover:underline">クランテラス</a></p>
+                <p class="text-gray-500 text-xs">© 2026 シェアハウスニュース All Rights Reserved.</p>
+            </div>
         </div>
     </footer>
 `
@@ -82,7 +126,8 @@ app.get('/', (c) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>シェアハウスニュース | 日本・海外のシェアハウス最新情報</title>
+    <title>シェアハウスニュース | 日本・海外のシェアハウス最新情報 by クランテラス</title>
+    <meta name="description" content="日本と世界のシェアハウス最新ニュースをお届け。クランテラスが運営するシェアハウス情報サイト。">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     ${commonStyles}
@@ -90,15 +135,55 @@ app.get('/', (c) => {
 <body class="bg-gray-50">
     ${header}
 
+    <!-- クランテラス特集バナー（トップ） -->
+    <section class="crann-gradient text-white py-8">
+        <div class="container mx-auto px-4">
+            <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
+               class="block bg-white/10 backdrop-blur rounded-2xl overflow-hidden hover:bg-white/20 transition-all">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 p-6 md:p-8">
+                        <div class="inline-block bg-white/20 text-white text-xs px-3 py-1 rounded-full mb-4">
+                            <i class="fas fa-star mr-1"></i>PICK UP
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-3">クランテラスシリーズ</h2>
+                        <p class="text-white/90 mb-4 leading-relaxed">
+                            緑あふれる開放的な空間で、新しい出会いと暮らしを。<br>
+                            都心へのアクセス良好、充実した共用設備で快適なシェアライフを提供します。
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-white/20 text-sm px-3 py-1 rounded-full">
+                                <i class="fas fa-wifi mr-1"></i>高速Wi-Fi
+                            </span>
+                            <span class="bg-white/20 text-sm px-3 py-1 rounded-full">
+                                <i class="fas fa-couch mr-1"></i>充実の共用スペース
+                            </span>
+                            <span class="bg-white/20 text-sm px-3 py-1 rounded-full">
+                                <i class="fas fa-train mr-1"></i>駅近物件多数
+                            </span>
+                        </div>
+                        <span class="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-full font-bold hover:shadow-lg transition-all">
+                            詳しく見る
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </div>
+                    <div class="md:w-1/2">
+                        <img src="${CRANN_TERRACE_IMAGE}" alt="クランテラス - 開放的なラウンジ" 
+                             class="w-full h-64 md:h-80 object-cover">
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
     <!-- サイト説明 -->
-    <section class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-12">
+    <section class="bg-white py-8 border-b">
         <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                <i class="fas fa-globe-asia mr-2"></i>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-newspaper text-green-600 mr-2"></i>
                 シェアハウスニュース
             </h1>
-            <p class="text-xl text-white/90 mb-2">日本と世界のシェアハウス最新情報をお届け</p>
-            <p class="text-white/70">
+            <p class="text-gray-600">日本と世界のシェアハウス最新情報をお届け</p>
+            <p class="text-gray-400 text-sm mt-1">
                 <i class="fas fa-clock mr-1"></i>
                 毎朝10時に自動更新
             </p>
@@ -108,7 +193,7 @@ app.get('/', (c) => {
     <main class="container mx-auto px-4 py-8">
         <!-- 地域タブ -->
         <div class="flex justify-center gap-4 mb-8">
-            <button onclick="filterRegion('all')" class="region-btn px-6 py-3 rounded-full font-medium bg-purple-600 text-white transition-all shadow-md" data-region="all">
+            <button onclick="filterRegion('all')" class="region-btn px-6 py-3 rounded-full font-medium bg-green-700 text-white transition-all shadow-md" data-region="all">
                 <i class="fas fa-globe mr-2"></i>すべて
             </button>
             <button onclick="filterRegion('japan')" class="region-btn px-6 py-3 rounded-full font-medium bg-white text-gray-600 border-2 border-gray-200 hover:border-red-300 transition-all" data-region="japan">
@@ -128,6 +213,33 @@ app.get('/', (c) => {
             <div id="japanNewsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
+        <!-- クランテラス中間バナー -->
+        <section class="mb-12">
+            <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer"
+               class="block featured-card rounded-2xl p-6 hover:shadow-lg transition-all pulse-border">
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="md:w-1/3">
+                        <img src="${CRANN_TERRACE_IMAGE}" alt="クランテラス" 
+                             class="w-full h-48 object-cover rounded-xl">
+                    </div>
+                    <div class="md:w-2/3">
+                        <div class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full mb-3">
+                            <i class="fas fa-bullhorn mr-1"></i>おすすめシェアハウス
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">クランテラスで新生活を始めませんか？</h3>
+                        <p class="text-gray-600 mb-4">
+                            緑に囲まれた開放的なリビング、充実した設備、そして素敵な仲間との出会い。
+                            クランテラスシリーズがあなたの新生活をサポートします。
+                        </p>
+                        <span class="inline-flex items-center gap-2 text-green-700 font-bold hover:underline">
+                            公式サイトで物件を見る
+                            <i class="fas fa-external-link-alt"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </section>
+
         <!-- 海外のニュース -->
         <section id="worldSection">
             <div class="flex items-center gap-3 mb-6">
@@ -138,7 +250,7 @@ app.get('/', (c) => {
         </section>
 
         <div id="loading" class="hidden text-center py-12">
-            <i class="fas fa-spinner fa-spin text-4xl text-purple-500 mb-4"></i>
+            <i class="fas fa-spinner fa-spin text-4xl text-green-600 mb-4"></i>
             <p class="text-gray-500">記事を読み込み中...</p>
         </div>
     </main>
@@ -163,7 +275,7 @@ app.get('/', (c) => {
                             <div class="absolute top-3 left-3">\${regionBadge}</div>
                         </div>
                         <div class="p-5">
-                            <h3 class="font-bold text-gray-800 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">\${article.title}</h3>
+                            <h3 class="font-bold text-gray-800 mb-2 line-clamp-2 hover:text-green-700 transition-colors">\${article.title}</h3>
                             <p class="text-gray-500 text-sm mb-4 line-clamp-2">\${article.summary}</p>
                             <div class="flex items-center justify-between text-xs text-gray-400">
                                 <span><i class="fas fa-clock mr-1"></i>\${article.date}</span>
@@ -204,9 +316,9 @@ app.get('/', (c) => {
             document.querySelectorAll('.region-btn').forEach(btn => {
                 if (btn.dataset.region === region) {
                     btn.classList.remove('bg-white', 'text-gray-600', 'border-2', 'border-gray-200');
-                    btn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-green-700', 'text-white', 'shadow-md');
                 } else {
-                    btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
+                    btn.classList.remove('bg-green-700', 'text-white', 'shadow-md');
                     btn.classList.add('bg-white', 'text-gray-600', 'border-2', 'border-gray-200');
                 }
             });
@@ -291,5 +403,3 @@ function generateDefaultNews() {
     { id: 106, title: 'Korea\'s Co-Living Market Heats Up in 2025', summary: 'The average monthly rent for a sub-40sqm co-living unit in Seoul stands at 1.13 million won, about 1.5 times higher than the average officetel.', region: 'world', country: '韓国', source: 'World Property Journal', date: formatDate(3), image: 'https://images.unsplash.com/photo-1534274867514-d5b47ef89ed7?w=800&h=500&fit=crop', url: 'https://www.worldpropertyjournal.com/real-estate-news/south-korea/seoul-real-estate-news/korea-real-estate-news-jll-korea-coliving-property-report-for-2025-veronica-shim-korea-property-trends-in-2025-korea-housing-data-for-2025-igis-reside-14462.php' },
   ]
 }
-
-
