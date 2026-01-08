@@ -467,28 +467,86 @@ app.get('/', (c) => {
     <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     ${yahooStyles}
+    <style>
+        .logo-text { font-family: 'Poppins', sans-serif; }
+        .logo-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            animation: gradient-shift 3s ease infinite;
+            background-size: 200% 200%;
+        }
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .ai-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+        }
+        .header-cta {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .header-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+    </style>
 </head>
 <body>
     <!-- ヘッダー -->
     <header class="yahoo-header">
         <div class="max-w-6xl mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">ST</div>
+                <a href="/" class="flex items-center gap-3 group">
+                    <!-- ロゴアイコン -->
+                    <div class="logo-icon w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg relative">
+                        <i class="fas fa-house-chimney text-lg"></i>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-bolt text-[8px] text-yellow-900"></i>
+                        </div>
+                    </div>
+                    <!-- ロゴテキスト -->
                     <div>
-                        <span class="font-bold text-sm text-slate-800 hidden sm:block">シェアハウスタイムズ</span>
-                        <span class="font-bold text-xs text-slate-800 sm:hidden">シェアタイムズ</span>
-                        <span class="text-xs text-slate-500 hidden sm:block">AIがまとめる最新情報</span>
+                        <div class="flex items-center gap-2">
+                            <span class="logo-text font-extrabold text-lg text-slate-800 tracking-tight hidden sm:block group-hover:text-indigo-600 transition-colors">
+                                ShareTimes
+                            </span>
+                            <span class="logo-text font-extrabold text-base text-slate-800 tracking-tight sm:hidden">
+                                ShareTimes
+                            </span>
+                            <span class="ai-badge text-[10px] font-bold text-white px-2 py-0.5 rounded-full">
+                                AI
+                            </span>
+                        </div>
+                        <span class="text-[11px] text-slate-500 hidden sm:flex items-center gap-1">
+                            <i class="fas fa-sparkles text-amber-400"></i>
+                            シェアハウスの最新情報をAIがお届け
+                        </span>
                     </div>
                 </a>
                 <div class="flex items-center gap-3">
-                    <span class="update-time hidden sm:inline"><i class="far fa-clock mr-1"></i>毎日7時・18時更新</span>
+                    <!-- 更新時刻 -->
+                    <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                        <i class="fas fa-sync-alt text-indigo-500"></i>
+                        <span>毎日 <strong class="text-slate-700">7時・18時</strong> 更新</span>
+                    </div>
+                    <!-- クランテラスボタン -->
                     <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="text-white px-4 py-2 rounded-full text-xs font-bold hidden sm:flex items-center gap-2" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); box-shadow: 0 4px 14px rgba(5,150,105,0.3);">
-                        <i class="fas fa-home"></i>
-                        クランテラス
+                       class="header-cta text-white px-5 py-2.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-2 shadow-lg">
+                        <i class="fas fa-building"></i>
+                        <span>クランテラス</span>
+                        <i class="fas fa-arrow-right text-[10px] opacity-70"></i>
+                    </a>
+                    <!-- モバイル用アイコン -->
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
+                       class="header-cta w-10 h-10 rounded-full flex items-center justify-center text-white sm:hidden shadow-lg">
+                        <i class="fas fa-building"></i>
                     </a>
                 </div>
             </div>
