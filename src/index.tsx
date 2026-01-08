@@ -10,35 +10,6 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
 
-// 日本時間を取得するヘルパー関数
-function getJSTDate(): Date {
-  const now = new Date()
-  // UTC + 9時間 = JST
-  return new Date(now.getTime() + 9 * 60 * 60 * 1000)
-}
-
-function formatJSTDate(date: Date): string {
-  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-  return jst.toLocaleDateString('ja-JP', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
-    timeZone: 'Asia/Tokyo'
-  })
-}
-
-function formatJSTDateTime(date: Date): string {
-  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-  return jst.toLocaleString('ja-JP', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Tokyo'
-  })
-}
-
 // メインページ
 app.get('/', (c) => {
   return c.html(`
@@ -99,33 +70,13 @@ app.get('/', (c) => {
                     <i class="fas fa-home text-2xl text-purple-600"></i>
                     <span class="text-xl font-bold gradient-text">シェアハウスニュース</span>
                 </div>
-                <nav class="hidden md:flex items-center gap-6 text-sm">
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">ニュース</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">トレンド</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">生活ガイド</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">物件情報</a>
-                </nav>
                 <div class="text-sm text-gray-500">
-                    <i class="fas fa-clock mr-1"></i>
-                    <span id="currentTime"></span>
+                    <i class="fas fa-calendar mr-1"></i>
+                    <span id="currentDate"></span>
                 </div>
             </div>
         </div>
     </header>
-
-    <!-- 更新情報バー -->
-    <div class="bg-purple-50 border-b border-purple-100">
-        <div class="container mx-auto px-4 py-2 flex items-center justify-between text-sm">
-            <div class="flex items-center gap-2 text-purple-700">
-                <i class="fas fa-sync-alt"></i>
-                <span>最終更新: <span id="lastUpdated">読み込み中...</span></span>
-            </div>
-            <div class="text-purple-600">
-                <i class="fas fa-bell mr-1"></i>
-                毎朝10時に自動更新
-            </div>
-        </div>
-    </div>
 
     <main class="container mx-auto px-4 py-8">
         <!-- ヒーローセクション -->
@@ -171,69 +122,26 @@ app.get('/', (c) => {
         </div>
     </main>
 
-    <!-- 人気記事セクション -->
-    <section class="bg-white border-t py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">
-                <i class="fas fa-fire text-orange-500 mr-2"></i>人気の記事
-            </h2>
-            <div id="popularList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            </div>
-        </div>
-    </section>
-
     <!-- フッター -->
-    <footer class="bg-gray-800 text-white py-10">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fas fa-home text-purple-400"></i>
-                        <span class="font-bold">シェアハウスニュース</span>
-                    </div>
-                    <p class="text-gray-400 text-sm">全国のシェアハウスに関する最新ニュース、トレンド、生活情報を毎朝10時に自動更新でお届けします。</p>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">カテゴリ</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white">最新ニュース</a></li>
-                        <li><a href="#" class="hover:text-white">トレンド・市場動向</a></li>
-                        <li><a href="#" class="hover:text-white">生活ガイド</a></li>
-                        <li><a href="#" class="hover:text-white">インタビュー</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">関連サイト</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="https://www.hituji.jp/" target="_blank" class="hover:text-white">ひつじ不動産</a></li>
-                        <li><a href="https://www.oakhouse.jp/" target="_blank" class="hover:text-white">オークハウス</a></li>
-                        <li><a href="https://www.social-apartment.com/" target="_blank" class="hover:text-white">ソーシャルアパートメント</a></li>
-                    </ul>
-                </div>
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <i class="fas fa-home text-purple-400"></i>
+                <span class="font-bold">シェアハウスニュース</span>
             </div>
-            <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
-                <p>© 2026 シェアハウスニュース All Rights Reserved.</p>
-            </div>
+            <p class="text-gray-400 text-sm">© 2026 シェアハウスニュース All Rights Reserved.</p>
         </div>
     </footer>
 
     <script>
-        // 日本時間を表示
-        function updateJSTTime() {
-            const now = new Date();
-            const jstOptions = { 
-                timeZone: 'Asia/Tokyo', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                weekday: 'short',
-                hour: '2-digit', 
-                minute: '2-digit'
-            };
-            document.getElementById('currentTime').textContent = now.toLocaleString('ja-JP', jstOptions);
-        }
-        updateJSTTime();
-        setInterval(updateJSTTime, 60000); // 1分ごとに更新
+        // 日本時間で日付を表示
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ja-JP', {
+            timeZone: 'Asia/Tokyo',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'short'
+        });
 
         let allNews = [];
         let currentCategory = 'all';
@@ -299,20 +207,6 @@ app.get('/', (c) => {
             \`;
         }
 
-        // 人気記事カードを生成
-        function createPopularCard(article, index) {
-            return \`
-                <a href="\${article.url}" target="_blank" rel="noopener noreferrer" 
-                   class="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <span class="text-2xl font-bold text-purple-300">\${index + 1}</span>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-medium text-gray-800 text-sm line-clamp-2">\${article.title}</h4>
-                        <span class="text-xs text-gray-400">\${article.date}</span>
-                    </div>
-                </a>
-            \`;
-        }
-
         // 記事一覧を表示
         function displayNews(news) {
             const container = document.getElementById('newsList');
@@ -334,12 +228,6 @@ app.get('/', (c) => {
             // 残りをグリッドに
             const remaining = filtered.slice(1);
             container.innerHTML = remaining.map((n, i) => createNewsCard(n, i)).join('');
-        }
-
-        // 人気記事を表示
-        function displayPopular(news) {
-            const popular = news.filter(n => n.isPopular).slice(0, 4);
-            document.getElementById('popularList').innerHTML = popular.map((n, i) => createPopularCard(n, i)).join('');
         }
 
         // カテゴリフィルター
@@ -368,22 +256,7 @@ app.get('/', (c) => {
                 const response = await fetch('/api/news');
                 const data = await response.json();
                 allNews = data.news || [];
-                
-                // 最終更新時刻を表示
-                if (data.lastUpdated) {
-                    const updateTime = new Date(data.lastUpdated);
-                    document.getElementById('lastUpdated').textContent = updateTime.toLocaleString('ja-JP', {
-                        timeZone: 'Asia/Tokyo',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
-                
                 displayNews(allNews);
-                displayPopular(allNews);
             } catch (err) {
                 console.error('Error:', err);
                 document.getElementById('featuredNews').innerHTML = \`
@@ -409,13 +282,11 @@ app.get('/api/news', async (c) => {
   try {
     // KVからキャッシュされたニュースを取得
     let cachedNews = null
-    let lastUpdated = null
     
     if (c.env?.NEWS_KV) {
       const cached = await c.env.NEWS_KV.get('news_data', 'json')
       if (cached) {
         cachedNews = cached.news
-        lastUpdated = cached.lastUpdated
       }
     }
     
@@ -425,47 +296,15 @@ app.get('/api/news', async (c) => {
     return c.json({
       success: true,
       news: news,
-      total: news.length,
-      lastUpdated: lastUpdated || new Date().toISOString(),
-      source: cachedNews ? 'cache' : 'default'
+      total: news.length
     })
   } catch (error) {
     console.error('Error fetching news:', error)
     return c.json({
       success: false,
       news: generateDefaultNews(),
-      total: 0,
-      lastUpdated: new Date().toISOString(),
-      source: 'fallback'
+      total: 0
     })
-  }
-})
-
-// API: 手動でニュースを更新（テスト用）
-app.post('/api/news/refresh', async (c) => {
-  try {
-    const news = await fetchAndProcessNews()
-    
-    // KVに保存
-    if (c.env?.NEWS_KV) {
-      await c.env.NEWS_KV.put('news_data', JSON.stringify({
-        news: news,
-        lastUpdated: new Date().toISOString()
-      }))
-    }
-    
-    return c.json({
-      success: true,
-      message: 'ニュースを更新しました',
-      count: news.length,
-      lastUpdated: new Date().toISOString()
-    })
-  } catch (error) {
-    console.error('Error refreshing news:', error)
-    return c.json({
-      success: false,
-      error: 'ニュースの更新に失敗しました'
-    }, 500)
   }
 })
 
@@ -496,19 +335,8 @@ export default {
 
 // Web検索でシェアハウス情報を取得して処理
 async function fetchAndProcessNews(): Promise<NewsItem[]> {
-  const searchQueries = [
-    'シェアハウス 最新ニュース',
-    'シェアハウス トレンド 2026',
-    'シェアハウス 新規オープン',
-    'シェアハウス 生活 コツ',
-    'シェアハウス 市場動向'
-  ]
-  
   // 実際の本番環境では、ここでWeb検索APIを呼び出して
   // 最新のシェアハウス情報を取得します
-  // 例: Google Custom Search API, Bing Search API等
-  
-  // 現在はデモ用のデータを返す
   return generateDefaultNews()
 }
 
@@ -537,7 +365,6 @@ function generateDefaultNews(): NewsItem[] {
   }
   
   return [
-    // 最新ニュース
     {
       id: 1,
       title: '2026年シェアハウス市場、過去最高の成長率を記録　コロナ後の住まい方改革が加速',
@@ -571,8 +398,6 @@ function generateDefaultNews(): NewsItem[] {
       url: 'https://tokyosharehouse.com/',
       isPopular: false
     },
-    
-    // トレンド
     {
       id: 4,
       title: '【2026年トレンド】多世代交流型シェアハウスが台頭、孤独解消の場として注目',
@@ -606,8 +431,6 @@ function generateDefaultNews(): NewsItem[] {
       url: 'https://www.hituji.jp/comret/search/pet',
       isPopular: true
     },
-    
-    // 生活ガイド
     {
       id: 7,
       title: '【完全ガイド】シェアハウス入居前に確認すべき10のポイント',
@@ -641,8 +464,6 @@ function generateDefaultNews(): NewsItem[] {
       url: 'https://www.oakhouse.jp/',
       isPopular: false
     },
-    
-    // 物件ニュース
     {
       id: 10,
       title: '渋谷に過去最大級のシェアハウスオープン、全150室でコワーキング併設',
@@ -676,8 +497,6 @@ function generateDefaultNews(): NewsItem[] {
       url: 'https://address.love/',
       isPopular: true
     },
-    
-    // インタビュー
     {
       id: 13,
       title: '【インタビュー】シェアハウス歴5年、フリーランスデザイナーが語る「理想の住まい方」',
