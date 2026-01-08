@@ -48,7 +48,7 @@ const commonStyles = `
 `
 
 // 共通のヘッダー
-const getHeader = (currentPage: string) => `
+const header = `
     <header class="bg-white border-b sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
@@ -56,14 +56,6 @@ const getHeader = (currentPage: string) => `
                     <i class="fas fa-home text-2xl text-purple-600"></i>
                     <span class="text-xl font-bold gradient-text">シェアハウスニュース</span>
                 </a>
-                <nav class="flex items-center gap-1">
-                    <a href="/" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPage === 'news' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100'}">
-                        <i class="fas fa-newspaper mr-1"></i>ニュース
-                    </a>
-                    <a href="/properties" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPage === 'properties' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100'}">
-                        <i class="fas fa-building mr-1"></i>物件紹介
-                    </a>
-                </nav>
             </div>
         </div>
     </header>
@@ -96,7 +88,7 @@ app.get('/', (c) => {
     ${commonStyles}
 </head>
 <body class="bg-gray-50">
-    ${getHeader('news')}
+    ${header}
 
     <!-- サイト説明 -->
     <section class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-12">
@@ -242,156 +234,6 @@ app.get('/', (c) => {
   `)
 })
 
-// 物件紹介ページ
-app.get('/properties', (c) => {
-  return c.html(`
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本のシェアハウス紹介 | シェアハウスニュース</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    ${commonStyles}
-</head>
-<body class="bg-gray-50">
-    ${getHeader('properties')}
-
-    <!-- ヒーロー -->
-    <section class="bg-gradient-to-r from-red-500 to-pink-500 text-white py-12">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                <span class="mr-2">🇯🇵</span>
-                日本のシェアハウス紹介
-            </h1>
-            <p class="text-xl text-white/90">全国の人気シェアハウスをピックアップ</p>
-        </div>
-    </section>
-
-    <main class="container mx-auto px-4 py-8">
-        <!-- エリアフィルター -->
-        <div class="flex flex-wrap justify-center gap-2 mb-8">
-            <button onclick="filterArea('all')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-red-500 text-white transition-all" data-area="all">
-                すべて
-            </button>
-            <button onclick="filterArea('tokyo')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-red-300 transition-all" data-area="tokyo">
-                東京
-            </button>
-            <button onclick="filterArea('kanagawa')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-red-300 transition-all" data-area="kanagawa">
-                神奈川
-            </button>
-            <button onclick="filterArea('osaka')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-red-300 transition-all" data-area="osaka">
-                大阪
-            </button>
-            <button onclick="filterArea('fukuoka')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-red-300 transition-all" data-area="fukuoka">
-                福岡
-            </button>
-            <button onclick="filterArea('other')" class="area-btn px-5 py-2 rounded-full text-sm font-medium bg-white text-gray-600 border hover:border-red-300 transition-all" data-area="other">
-                その他
-            </button>
-        </div>
-
-        <!-- 物件一覧 -->
-        <div id="propertyList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-        <div id="loading" class="hidden text-center py-12">
-            <i class="fas fa-spinner fa-spin text-4xl text-red-500 mb-4"></i>
-            <p class="text-gray-500">物件を読み込み中...</p>
-        </div>
-    </main>
-
-    ${footer}
-
-    <script>
-        let allProperties = [];
-        let currentArea = 'all';
-
-        function createPropertyCard(property, index) {
-            const delay = index * 80;
-            const tags = property.tags || [];
-            
-            return \`
-                <article class="card-hover bg-white rounded-xl overflow-hidden shadow-sm fade-in" style="animation-delay: \${delay}ms">
-                    <a href="\${property.url}" target="_blank" rel="noopener noreferrer" class="block">
-                        <div class="relative h-52 overflow-hidden">
-                            <img src="\${property.image}" alt="\${property.name}" class="w-full h-full object-cover image-zoom">
-                            <div class="absolute top-3 left-3 flex gap-2">
-                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">\${property.area}</span>
-                                \${property.isNew ? '<span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>' : ''}
-                            </div>
-                            <div class="absolute bottom-3 right-3">
-                                <span class="bg-black/70 text-white text-sm px-3 py-1 rounded-full">
-                                    ¥\${property.rent.toLocaleString()}〜/月
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <h3 class="font-bold text-gray-800 text-lg mb-2">\${property.name}</h3>
-                            <p class="text-gray-500 text-sm mb-3">
-                                <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                                \${property.location}
-                            </p>
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">\${property.description}</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                \${tags.map(tag => \`<span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">\${tag}</span>\`).join('')}
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-gray-400 border-t pt-3">
-                                <span><i class="fas fa-door-open mr-1"></i>\${property.rooms}室</span>
-                                <span><i class="fas fa-train mr-1"></i>\${property.station}</span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-            \`;
-        }
-
-        function displayProperties(properties) {
-            const container = document.getElementById('propertyList');
-            const filtered = currentArea === 'all' 
-                ? properties 
-                : properties.filter(p => p.areaCode === currentArea);
-            
-            container.innerHTML = filtered.length > 0
-                ? filtered.map((p, i) => createPropertyCard(p, i)).join('')
-                : '<p class="col-span-full text-center text-gray-500 py-12">該当する物件がありません</p>';
-        }
-
-        function filterArea(area) {
-            currentArea = area;
-            document.querySelectorAll('.area-btn').forEach(btn => {
-                if (btn.dataset.area === area) {
-                    btn.classList.remove('bg-white', 'text-gray-600', 'border');
-                    btn.classList.add('bg-red-500', 'text-white');
-                } else {
-                    btn.classList.remove('bg-red-500', 'text-white');
-                    btn.classList.add('bg-white', 'text-gray-600', 'border');
-                }
-            });
-            displayProperties(allProperties);
-        }
-
-        async function fetchProperties() {
-            document.getElementById('loading').classList.remove('hidden');
-            try {
-                const response = await fetch('/api/properties');
-                const data = await response.json();
-                allProperties = data.properties || [];
-                displayProperties(allProperties);
-            } catch (err) {
-                console.error('Error:', err);
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchProperties);
-    </script>
-</body>
-</html>
-  `)
-})
-
 // API: ニュースデータを取得
 app.get('/api/news', async (c) => {
   try {
@@ -405,12 +247,6 @@ app.get('/api/news', async (c) => {
   } catch (error) {
     return c.json({ success: false, news: generateDefaultNews(), total: 0 })
   }
-})
-
-// API: 物件データを取得
-app.get('/api/properties', async (c) => {
-  const properties = generateProperties()
-  return c.json({ success: true, properties, total: properties.length })
 })
 
 // Cron Trigger
@@ -456,22 +292,4 @@ function generateDefaultNews() {
   ]
 }
 
-// 物件データ生成
-function generateProperties() {
-  return [
-    { id: 1, name: 'SOCIAL APARTMENT 渋谷', location: '東京都渋谷区神南1丁目', area: '東京', areaCode: 'tokyo', station: '渋谷駅 徒歩8分', rent: 65000, rooms: 80, description: 'コワーキングスペース、ジム、シアタールーム完備。クリエイターやIT系に人気。', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop', url: 'https://www.social-apartment.com/', tags: ['個室', 'ジム', 'コワーキング', 'Wi-Fi'], isNew: false },
-    { id: 2, name: 'オークハウス目黒', location: '東京都目黒区目黒2丁目', area: '東京', areaCode: 'tokyo', station: '目黒駅 徒歩5分', rent: 72000, rooms: 45, description: '閑静な住宅街に位置する落ち着いた雰囲気。広々としたキッチンとリビングが自慢。', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop', url: 'https://www.oakhouse.jp/', tags: ['個室', 'オートロック', '駅近', '家具付き'], isNew: true },
-    { id: 3, name: 'シェアプレイス田園調布', location: '東京都大田区田園調布3丁目', area: '東京', areaCode: 'tokyo', station: '田園調布駅 徒歩10分', rent: 85000, rooms: 30, description: '高級住宅街のハイグレード物件。広い個室とホテルライクな共用部が特徴。', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop', url: 'https://www.hituji.jp/', tags: ['高級', '広い個室', '防音', 'ラウンジ'], isNew: true },
-    { id: 4, name: 'グローバルシェアハウス池袋', location: '東京都豊島区池袋2丁目', area: '東京', areaCode: 'tokyo', station: '池袋駅 徒歩10分', rent: 52000, rooms: 70, description: '20カ国以上の入居者が暮らす国際色豊かな物件。毎週国際交流イベント開催。', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop', url: 'https://tokyosharehouse.com/', tags: ['国際交流', '語学', 'イベント', 'キッチン広い'], isNew: false },
-    { id: 5, name: 'レディースシェア新宿', location: '東京都新宿区西新宿5丁目', area: '東京', areaCode: 'tokyo', station: '西新宿駅 徒歩6分', rent: 58000, rooms: 35, description: '女性専用のセキュリティ重視物件。オートロック、防犯カメラ、管理人常駐。', image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&h=400&fit=crop', url: 'https://www.share-apartment.com/', tags: ['女性専用', 'オートロック', '管理人常駐', 'パウダールーム'], isNew: true },
-    { id: 6, name: 'ADDress 鎌倉邸', location: '神奈川県鎌倉市長谷2丁目', area: '神奈川', areaCode: 'kanagawa', station: '長谷駅 徒歩8分', rent: 55000, rooms: 15, description: '古都・鎌倉で暮らす贅沢。海も山も徒歩圏内。リモートワーカーに人気。', image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=600&h=400&fit=crop', url: 'https://address.love/', tags: ['多拠点', '海近', '古民家風', 'リモートワーク'], isNew: true },
-    { id: 7, name: 'シェアハウス横浜みなとみらい', location: '神奈川県横浜市西区みなとみらい', area: '神奈川', areaCode: 'kanagawa', station: 'みなとみらい駅 徒歩7分', rent: 62000, rooms: 40, description: '夜景が美しいベイエリアに位置。屋上テラスからの眺望が自慢。', image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&h=400&fit=crop', url: 'https://www.oakhouse.jp/', tags: ['夜景', '屋上テラス', 'オーシャンビュー', 'モダン'], isNew: false },
-    { id: 8, name: 'CROSS HOUSE 大阪梅田', location: '大阪府大阪市北区梅田1丁目', area: '大阪', areaCode: 'osaka', station: '梅田駅 徒歩5分', rent: 48000, rooms: 60, description: '大阪の中心・梅田駅徒歩5分。ビジネスパーソンに人気の好立地物件。', image: 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=600&h=400&fit=crop', url: 'https://www.hituji.jp/comret/info/osaka', tags: ['駅近', 'ビジネス向け', 'Wi-Fi高速', '会議室'], isNew: false },
-    { id: 9, name: 'シェアハウス難波', location: '大阪府大阪市中央区難波', area: '大阪', areaCode: 'osaka', station: '難波駅 徒歩3分', rent: 45000, rooms: 35, description: 'なんば駅徒歩3分の好アクセス。外国人入居者も多く国際的な雰囲気。', image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop', url: 'https://www.oakhouse.jp/', tags: ['駅近', '国際交流', '繁華街', '格安'], isNew: true },
-    { id: 10, name: 'SHARE HOUSE 福岡天神', location: '福岡県福岡市中央区天神2丁目', area: '福岡', areaCode: 'fukuoka', station: '天神駅 徒歩3分', rent: 42000, rooms: 50, description: '天神駅徒歩3分。屋上テラスから福岡の夜景が一望。国際色豊かな入居者。', image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=600&h=400&fit=crop', url: 'https://www.oakhouse.jp/', tags: ['駅近', '屋上テラス', '国際交流', '格安'], isNew: false },
-    { id: 11, name: 'ペットと暮らすシェアハウス中野', location: '東京都中野区中野3丁目', area: '東京', areaCode: 'tokyo', station: '中野駅 徒歩7分', rent: 68000, rooms: 25, description: '愛犬・愛猫と暮らせる貴重な物件。専用ドッグラン、猫部屋完備。', image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&h=400&fit=crop', url: 'https://www.hituji.jp/comret/search/pet', tags: ['ペット可', 'ドッグラン', '猫部屋', 'ペットシッター'], isNew: false },
-    { id: 12, name: 'エコシェアハウス世田谷', location: '東京都世田谷区三軒茶屋1丁目', area: '東京', areaCode: 'tokyo', station: '三軒茶屋駅 徒歩12分', rent: 60000, rooms: 20, description: '太陽光発電、雨水利用、コンポスト完備。サステナブルな暮らしを実践。', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop', url: 'https://www.social-apartment.com/', tags: ['エコ', '太陽光発電', '菜園', 'サステナブル'], isNew: true },
-    { id: 13, name: 'シェアハウス札幌', location: '北海道札幌市中央区大通', area: 'その他', areaCode: 'other', station: '大通駅 徒歩5分', rent: 38000, rooms: 30, description: '札幌中心部の好立地。冬も暖かい全館暖房完備。スキー・スノボ好きに人気。', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&h=400&fit=crop', url: 'https://www.oakhouse.jp/', tags: ['全館暖房', '駅近', 'スキー', '格安'], isNew: false },
-    { id: 14, name: 'シェアハウス名古屋栄', location: '愛知県名古屋市中区栄', area: 'その他', areaCode: 'other', station: '栄駅 徒歩6分', rent: 45000, rooms: 40, description: '名古屋の中心・栄エリア。おしゃれなカフェ風ラウンジが自慢の物件。', image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600&h=400&fit=crop', url: 'https://www.hituji.jp/', tags: ['カフェ風', '駅近', 'おしゃれ', 'ラウンジ'], isNew: true },
-  ]
-}
+
