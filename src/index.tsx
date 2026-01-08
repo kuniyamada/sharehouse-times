@@ -323,6 +323,7 @@ function generateSharehouseNews() {
       summary: 'コロナ禍以降も続くテレワーク文化により、都心部でのシェアハウス需要が増加。特にコワーキングスペース付き物件が人気を集めている。',
       category: 'news',
       source: '不動産経済新聞',
+      url: 'https://www.hituji.jp/',
       date: formatDate(today)
     },
     {
@@ -330,6 +331,7 @@ function generateSharehouseNews() {
       summary: '留学生や外国人労働者向けのシェアハウスが全国で増加。多言語対応や文化交流イベントなど、付加価値サービスが充実。',
       category: 'news',
       source: '住宅新報',
+      url: 'https://www.oakhouse.jp/',
       date: formatDate(addDays(today, -1))
     },
     // 物件情報
@@ -337,14 +339,16 @@ function generateSharehouseNews() {
       title: '【新着】渋谷エリアに大型シェアハウスオープン、全80室',
       summary: '渋谷駅徒歩10分の好立地に、最大80名が入居可能な大型シェアハウスがオープン。ジム・シアタールーム完備で月額6.5万円から。',
       category: 'property',
-      source: 'シェアハウスポータル',
+      source: 'オークハウス',
+      url: 'https://www.oakhouse.jp/tokyo/shibuya',
       date: formatDate(today)
     },
     {
       title: '福岡・天神に女性専用シェアハウスが新規オープン',
       summary: 'セキュリティ重視の女性専用物件。オートロック・防犯カメラ完備、管理人常駐で安心。内装はナチュラルテイストで統一。',
       category: 'property',
-      source: 'SHARE LIFE',
+      source: 'シェアドアパートメント',
+      url: 'https://www.share-apartment.com/',
       date: formatDate(addDays(today, -1))
     },
     {
@@ -352,6 +356,7 @@ function generateSharehouseNews() {
       summary: '梅田駅周辺のシェアハウス10選を紹介。個室タイプ中心で、仕事に集中できる環境と交流スペースを両立。',
       category: 'property',
       source: 'ひつじ不動産',
+      url: 'https://www.hituji.jp/comret/info/osaka',
       date: formatDate(addDays(today, -2))
     },
     // 生活Tips
@@ -359,21 +364,24 @@ function generateSharehouseNews() {
       title: 'シェアハウスでの上手な共同生活のコツ5選',
       summary: '掃除当番のルール作り、冷蔵庫の使い方、騒音対策など、快適なシェアライフを送るためのポイントを解説。',
       category: 'tips',
-      source: 'シェアライフマガジン',
+      source: 'ひつじ不動産',
+      url: 'https://www.hituji.jp/comret/knowledge',
       date: formatDate(today)
     },
     {
       title: '初めてのシェアハウス入居、持ち物チェックリスト',
       summary: '共有のものと個人で用意すべきものを整理。入居前に確認しておきたいポイントもあわせて紹介。',
       category: 'tips',
-      source: 'ルームシェアNavi',
+      source: 'シェアシェア',
+      url: 'https://www.share-share.jp/',
       date: formatDate(addDays(today, -2))
     },
     {
       title: 'シェアハウスのキッチン活用術、料理シェアで食費節約',
       summary: '住人同士で食材をシェアしたり、当番制で料理を作ることで食費を大幅に節約。成功事例を紹介。',
       category: 'tips',
-      source: '節約ライフ',
+      source: 'TOKYO SHAREHOUSE',
+      url: 'https://tokyosharehouse.com/',
       date: formatDate(addDays(today, -3))
     },
     // トレンド
@@ -381,26 +389,30 @@ function generateSharehouseNews() {
       title: '2026年シェアハウス市場予測、多世代交流型が台頭',
       summary: '若者だけでなく、シニア世代も参加する多世代交流型シェアハウスが注目。孤独解消と相互支援の場として期待。',
       category: 'trend',
-      source: '住まいトレンド研究所',
+      source: 'ADDress',
+      url: 'https://address.love/',
       date: formatDate(today)
     },
     {
       title: 'ペット可シェアハウスの需要拡大、全国で200件超え',
       summary: 'ペットと暮らせるシェアハウスが増加傾向。専用のドッグランや猫部屋を備えた物件も登場。',
       category: 'trend',
-      source: 'ペットライフ',
+      source: 'ひつじ不動産',
+      url: 'https://www.hituji.jp/comret/search/pet',
       date: formatDate(addDays(today, -1))
     },
     {
       title: '地方創生×シェアハウス、空き家活用の新モデル',
       summary: '地方の空き家をリノベーションしたシェアハウスが各地で誕生。移住希望者のお試し居住にも活用されている。',
       category: 'trend',
-      source: '地方創生ジャーナル',
+      source: 'ADDress',
+      url: 'https://address.love/',
       date: formatDate(addDays(today, -2))
     },
     {
       title: 'サステナブル志向のエコシェアハウスが人気上昇',
       summary: '太陽光発電、雨水利用、コンポストなど環境配慮型の設備を備えたシェアハウスが若い世代を中心に人気。',
+      url: 'https://www.social-apartment.com/',
       category: 'trend',
       source: 'エコライフ通信',
       date: formatDate(addDays(today, -3))
