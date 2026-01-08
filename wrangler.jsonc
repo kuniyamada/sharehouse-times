@@ -1,22 +1,22 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "sharehouse-news",
+  "name": "sharehouse-times",
   "compatibility_date": "2026-01-08",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   // KVストレージ（ニュースデータ保存用）
-  "kv_namespaces": [
-    {
-      "binding": "NEWS_KV",
-      "id": "sharehouse-news-kv"
-    }
-  ],
-  // 1日2回自動更新（日本時間）
-  // UTC 22:00 = JST 07:00（朝）
-  // UTC 09:00 = JST 18:00（夕方）
-  "triggers": {
-    "crons": ["0 22 * * *", "0 9 * * *"]
+  // KVストレージはCloudflareダッシュボードで設定後に有効化
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "NEWS_KV",
+  //     "id": "your-kv-id"
+  //   }
+  // ],
+  // Cron Triggersは Workers で設定（Pagesでは非対応）
+  // JST 07:00 (UTC 22:00) と JST 18:00 (UTC 09:00) の1日2回更新
+  "vars": {
+    "UPDATE_SCHEDULE": "07:00 JST, 18:00 JST"
   }
 }

@@ -459,11 +459,11 @@ app.get('/', (c) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
-    <title>シェアハウスニュース｜AIがまとめる最新シェアハウス情報</title>
+    <title>シェアハウスタイムズ｜AIがまとめる最新シェアハウス情報</title>
     <meta name="description" content="AIが国内外のシェアハウス・コリビング最新ニュースを毎日自動収集。女性専用、ペット可、高齢者向け、格安物件など幅広くカバー。東京・大阪・福岡のエリア情報も。">
     <meta name="keywords" content="シェアハウス,コリビング,女性専用,ペット可,高齢者,東京,一人暮らし,賃貸,ニュース">
-    <link rel="canonical" href="https://sharehouse-news.pages.dev/">
-    <meta property="og:title" content="シェアハウスニュース｜AIがまとめる最新情報">
+    <link rel="canonical" href="https://sharehouse-times.pages.dev/">
+    <meta property="og:title" content="シェアハウスタイムズ｜AIがまとめる最新情報">
     <meta property="og:description" content="AIが国内外のシェアハウス最新ニュースを毎日自動収集">
     <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -476,9 +476,9 @@ app.get('/', (c) => {
         <div class="max-w-6xl mx-auto px-3 py-2">
             <div class="flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2">
-                    <span class="text-white font-bold text-xl" style="text-shadow: 0 0 10px rgba(233,69,96,0.5);">S!</span>
-                    <span class="font-bold text-sm text-gray-200 hidden sm:inline">シェアハウスニュース</span>
-                    <span class="font-bold text-xs text-gray-200 sm:hidden">シェアハウスNews</span>
+                    <span class="text-white font-bold text-xl" style="text-shadow: 0 0 10px rgba(233,69,96,0.5);">ST</span>
+                    <span class="font-bold text-sm text-gray-200 hidden sm:inline">シェアハウスタイムズ</span>
+                    <span class="font-bold text-xs text-gray-200 sm:hidden">シェアタイムズ</span>
                     <span class="text-xs px-2 py-0.5 rounded font-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">AI</span>
                 </a>
                 <div class="flex items-center gap-3">
