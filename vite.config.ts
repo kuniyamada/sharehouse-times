@@ -19,7 +19,8 @@ export default defineConfig({
         '/*.jpg',
         '/*.json',
         '/*.xml',
-        '/*.txt'
+        '/*.txt',
+        '/*.html'
       ]
     }),
     devServer({

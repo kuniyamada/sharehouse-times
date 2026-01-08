@@ -10,6 +10,11 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
 
+// Google Search Console 確認用
+app.get('/googlec63dbc50a2bf04c5.html', (c) => {
+  return c.text('google-site-verification: googlec63dbc50a2bf04c5.html')
+})
+
 // クランテラスの画像URL（物件別）
 const CRANN_IMAGES = {
   // クランテラス久が原
@@ -472,6 +477,7 @@ app.get('/', (c) => {
     <meta name="author" content="SHARE HOUSE TIMES">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
+    <meta name="google-site-verification" content="bhdWzbIDYMG2GKfgXbEW-MEKU4f2zmw6TvusTNrRr0E" />
     <link rel="canonical" href="https://sharehouse-times.pages.dev/">
     
     <!-- 多言語対応 -->
