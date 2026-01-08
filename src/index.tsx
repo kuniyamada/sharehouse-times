@@ -482,7 +482,7 @@ app.get('/', (c) => {
                     <span class="text-xs px-2 py-0.5 rounded font-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">AI</span>
                 </a>
                 <div class="flex items-center gap-3">
-                    <span class="update-time hidden sm:inline text-gray-400"><i class="far fa-clock mr-1"></i>毎朝10時更新</span>
+                    <span class="update-time hidden sm:inline text-gray-400"><i class="far fa-clock mr-1"></i>毎日7時・18時更新</span>
                     <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
                        class="text-white px-4 py-1.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-1" style="background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%); box-shadow: 0 2px 8px rgba(45,90,39,0.3);">
                         <i class="fas fa-home"></i>
