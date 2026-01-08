@@ -1,9 +1,43 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
-const app = new Hono()
+// Cloudflare Bindings型定義
+type Bindings = {
+  NEWS_KV: KVNamespace
+}
+
+const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
+
+// 日本時間を取得するヘルパー関数
+function getJSTDate(): Date {
+  const now = new Date()
+  // UTC + 9時間 = JST
+  return new Date(now.getTime() + 9 * 60 * 60 * 1000)
+}
+
+function formatJSTDate(date: Date): string {
+  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+  return jst.toLocaleDateString('ja-JP', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    timeZone: 'Asia/Tokyo'
+  })
+}
+
+function formatJSTDateTime(date: Date): string {
+  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+  return jst.toLocaleString('ja-JP', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Tokyo'
+  })
+}
 
 // メインページ
 app.get('/', (c) => {
@@ -72,18 +106,35 @@ app.get('/', (c) => {
                     <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">物件情報</a>
                 </nav>
                 <div class="text-sm text-gray-500">
-                    <i class="fas fa-calendar mr-1"></i>
-                    <span id="currentDate"></span>
+                    <i class="fas fa-clock mr-1"></i>
+                    <span id="currentTime"></span>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- 更新情報バー -->
+    <div class="bg-purple-50 border-b border-purple-100">
+        <div class="container mx-auto px-4 py-2 flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-purple-700">
+                <i class="fas fa-sync-alt"></i>
+                <span>最終更新: <span id="lastUpdated">読み込み中...</span></span>
+            </div>
+            <div class="text-purple-600">
+                <i class="fas fa-bell mr-1"></i>
+                毎朝10時に自動更新
+            </div>
+        </div>
+    </div>
+
     <main class="container mx-auto px-4 py-8">
         <!-- ヒーローセクション -->
         <section class="mb-10">
-            <div id="featuredNews" class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl overflow-hidden shadow-xl">
-                <!-- メイン記事がここに入る -->
+            <div id="featuredNews" class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl overflow-hidden shadow-xl min-h-[300px] flex items-center justify-center">
+                <div class="text-white text-center">
+                    <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                    <p>記事を読み込み中...</p>
+                </div>
             </div>
         </section>
 
@@ -120,7 +171,7 @@ app.get('/', (c) => {
         </div>
     </main>
 
-    <!-- サイドバー的なセクション -->
+    <!-- 人気記事セクション -->
     <section class="bg-white border-t py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-xl font-bold text-gray-800 mb-6">
@@ -140,7 +191,7 @@ app.get('/', (c) => {
                         <i class="fas fa-home text-purple-400"></i>
                         <span class="font-bold">シェアハウスニュース</span>
                     </div>
-                    <p class="text-gray-400 text-sm">全国のシェアハウスに関する最新ニュース、トレンド、生活情報をお届けします。</p>
+                    <p class="text-gray-400 text-sm">全国のシェアハウスに関する最新ニュース、トレンド、生活情報を毎朝10時に自動更新でお届けします。</p>
                 </div>
                 <div>
                     <h4 class="font-bold mb-4">カテゴリ</h4>
@@ -167,9 +218,22 @@ app.get('/', (c) => {
     </footer>
 
     <script>
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ja-JP', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
+        // 日本時間を表示
+        function updateJSTTime() {
+            const now = new Date();
+            const jstOptions = { 
+                timeZone: 'Asia/Tokyo', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'short',
+                hour: '2-digit', 
+                minute: '2-digit'
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleString('ja-JP', jstOptions);
+        }
+        updateJSTTime();
+        setInterval(updateJSTTime, 60000); // 1分ごとに更新
 
         let allNews = [];
         let currentCategory = 'all';
@@ -187,7 +251,7 @@ app.get('/', (c) => {
         function displayFeatured(article) {
             const cat = categoryLabels[article.category];
             document.getElementById('featuredNews').innerHTML = \`
-                <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="block md:flex">
+                <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="block md:flex w-full">
                     <div class="md:w-1/2 h-64 md:h-80 overflow-hidden">
                         <img src="\${article.image}" alt="\${article.title}" class="w-full h-full object-cover">
                     </div>
@@ -305,13 +369,29 @@ app.get('/', (c) => {
                 const data = await response.json();
                 allNews = data.news || [];
                 
-                // 日付順にソート
-                allNews.sort((a, b) => new Date(b.date) - new Date(a.date));
+                // 最終更新時刻を表示
+                if (data.lastUpdated) {
+                    const updateTime = new Date(data.lastUpdated);
+                    document.getElementById('lastUpdated').textContent = updateTime.toLocaleString('ja-JP', {
+                        timeZone: 'Asia/Tokyo',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
                 
                 displayNews(allNews);
                 displayPopular(allNews);
             } catch (err) {
                 console.error('Error:', err);
+                document.getElementById('featuredNews').innerHTML = \`
+                    <div class="text-white text-center p-10">
+                        <i class="fas fa-exclamation-circle text-4xl mb-4"></i>
+                        <p>記事の読み込みに失敗しました</p>
+                    </div>
+                \`;
             } finally {
                 loading.classList.add('hidden');
             }
@@ -326,18 +406,135 @@ app.get('/', (c) => {
 
 // API: ニュースデータを取得
 app.get('/api/news', async (c) => {
-  const news = generateNews()
-  return c.json({
-    success: true,
-    news: news,
-    total: news.length,
-    lastUpdated: new Date().toISOString()
-  })
+  try {
+    // KVからキャッシュされたニュースを取得
+    let cachedNews = null
+    let lastUpdated = null
+    
+    if (c.env?.NEWS_KV) {
+      const cached = await c.env.NEWS_KV.get('news_data', 'json')
+      if (cached) {
+        cachedNews = cached.news
+        lastUpdated = cached.lastUpdated
+      }
+    }
+    
+    // キャッシュがない場合はデフォルトデータを返す
+    const news = cachedNews || generateDefaultNews()
+    
+    return c.json({
+      success: true,
+      news: news,
+      total: news.length,
+      lastUpdated: lastUpdated || new Date().toISOString(),
+      source: cachedNews ? 'cache' : 'default'
+    })
+  } catch (error) {
+    console.error('Error fetching news:', error)
+    return c.json({
+      success: false,
+      news: generateDefaultNews(),
+      total: 0,
+      lastUpdated: new Date().toISOString(),
+      source: 'fallback'
+    })
+  }
 })
 
-// ニュースデータを生成
-function generateNews() {
-  const today = new Date()
+// API: 手動でニュースを更新（テスト用）
+app.post('/api/news/refresh', async (c) => {
+  try {
+    const news = await fetchAndProcessNews()
+    
+    // KVに保存
+    if (c.env?.NEWS_KV) {
+      await c.env.NEWS_KV.put('news_data', JSON.stringify({
+        news: news,
+        lastUpdated: new Date().toISOString()
+      }))
+    }
+    
+    return c.json({
+      success: true,
+      message: 'ニュースを更新しました',
+      count: news.length,
+      lastUpdated: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Error refreshing news:', error)
+    return c.json({
+      success: false,
+      error: 'ニュースの更新に失敗しました'
+    }, 500)
+  }
+})
+
+// Cron Trigger用のスケジュールハンドラ
+// 毎朝10時（日本時間）に自動実行
+export default {
+  fetch: app.fetch,
+  
+  async scheduled(event: ScheduledEvent, env: { NEWS_KV: KVNamespace }, ctx: ExecutionContext) {
+    console.log('Cron triggered at:', new Date().toISOString())
+    
+    try {
+      // ニュースを取得・処理
+      const news = await fetchAndProcessNews()
+      
+      // KVに保存
+      await env.NEWS_KV.put('news_data', JSON.stringify({
+        news: news,
+        lastUpdated: new Date().toISOString()
+      }))
+      
+      console.log('News updated successfully:', news.length, 'articles')
+    } catch (error) {
+      console.error('Cron job failed:', error)
+    }
+  }
+}
+
+// Web検索でシェアハウス情報を取得して処理
+async function fetchAndProcessNews(): Promise<NewsItem[]> {
+  const searchQueries = [
+    'シェアハウス 最新ニュース',
+    'シェアハウス トレンド 2026',
+    'シェアハウス 新規オープン',
+    'シェアハウス 生活 コツ',
+    'シェアハウス 市場動向'
+  ]
+  
+  // 実際の本番環境では、ここでWeb検索APIを呼び出して
+  // 最新のシェアハウス情報を取得します
+  // 例: Google Custom Search API, Bing Search API等
+  
+  // 現在はデモ用のデータを返す
+  return generateDefaultNews()
+}
+
+// ニュースアイテムの型
+interface NewsItem {
+  id: number
+  title: string
+  summary: string
+  category: string
+  source: string
+  date: string
+  image: string
+  url: string
+  isPopular: boolean
+}
+
+// デフォルトのニュースデータを生成
+function generateDefaultNews(): NewsItem[] {
+  const now = new Date()
+  const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000)
+  
+  const formatDate = (daysAgo: number): string => {
+    const date = new Date(jstNow)
+    date.setDate(date.getDate() - daysAgo)
+    return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
+  }
   
   return [
     // 最新ニュース
@@ -347,7 +544,7 @@ function generateNews() {
       summary: '不動産経済研究所の調査によると、2026年のシェアハウス市場規模は前年比15%増の3,500億円に達する見込み。テレワーク定着による住まい方の多様化が背景に。',
       category: 'news',
       source: '不動産経済新聞',
-      date: formatDate(today),
+      date: formatDate(0),
       image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop',
       url: 'https://www.hituji.jp/',
       isPopular: true
@@ -358,7 +555,7 @@ function generateNews() {
       summary: '三井不動産、三菱地所、住友不動産の大手3社がシェアハウス市場に本格参入。都心部を中心に高品質物件を展開し、新たな顧客層の開拓を目指す。',
       category: 'news',
       source: '日経不動産',
-      date: formatDate(addDays(today, -1)),
+      date: formatDate(1),
       image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=500&fit=crop',
       url: 'https://www.oakhouse.jp/',
       isPopular: true
@@ -369,7 +566,7 @@ function generateNews() {
       summary: '円安と訪日外国人の増加を背景に、国際交流をコンセプトにしたシェアハウスの入居率が95%を超える。語学力向上を目指す日本人若者にも人気。',
       category: 'news',
       source: 'SUUMO NEWS',
-      date: formatDate(addDays(today, -2)),
+      date: formatDate(2),
       image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=500&fit=crop',
       url: 'https://tokyosharehouse.com/',
       isPopular: false
@@ -382,7 +579,7 @@ function generateNews() {
       summary: '若者からシニアまでが共に暮らす多世代型シェアハウスが全国で増加。孤独死問題や高齢者の見守りニーズにも対応し、自治体からの支援も拡大している。',
       category: 'trend',
       source: '住まいトレンド研究所',
-      date: formatDate(today),
+      date: formatDate(0),
       image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=500&fit=crop',
       url: 'https://address.love/',
       isPopular: true
@@ -393,7 +590,7 @@ function generateNews() {
       summary: '太陽光発電、雨水利用、コンポストなど環境配慮型設備を備えたシェアハウスが人気上昇。Z世代を中心に「エシカルな暮らし」への関心が高まっている。',
       category: 'trend',
       source: 'エコライフ通信',
-      date: formatDate(addDays(today, -1)),
+      date: formatDate(1),
       image: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=500&fit=crop',
       url: 'https://www.social-apartment.com/',
       isPopular: false
@@ -404,7 +601,7 @@ function generateNews() {
       summary: 'ドッグラン、キャットウォーク、ペットシッターサービスなど、ペットとの暮らしに特化したシェアハウスが急増。ペットオーナーのコミュニティ形成にも一役。',
       category: 'trend',
       source: 'ペットライフジャパン',
-      date: formatDate(addDays(today, -3)),
+      date: formatDate(3),
       image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800&h=500&fit=crop',
       url: 'https://www.hituji.jp/comret/search/pet',
       isPopular: true
@@ -417,7 +614,7 @@ function generateNews() {
       summary: '契約条件、共用ルール、退去時の費用まで、シェアハウス選びで失敗しないためのチェックリストを専門家が解説。初めての方必見の保存版ガイド。',
       category: 'guide',
       source: 'シェアライフマガジン',
-      date: formatDate(today),
+      date: formatDate(0),
       image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=500&fit=crop',
       url: 'https://www.hituji.jp/comret/knowledge',
       isPopular: true
@@ -428,7 +625,7 @@ function generateNews() {
       summary: '100人以上のシェアハウス居住者へのアンケートから判明した、良好なコミュニティを築くためのコミュニケーション術とは。トラブル回避のヒントも。',
       category: 'guide',
       source: 'ルームシェアNavi',
-      date: formatDate(addDays(today, -2)),
+      date: formatDate(2),
       image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop',
       url: 'https://www.share-share.jp/',
       isPopular: false
@@ -439,7 +636,7 @@ function generateNews() {
       summary: '住人同士で食材や料理をシェアすることで、食費を大幅に節約できるテクニックを紹介。実践者の声と具体的なルール作りのコツを解説。',
       category: 'guide',
       source: '節約ライフ',
-      date: formatDate(addDays(today, -4)),
+      date: formatDate(4),
       image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=500&fit=crop',
       url: 'https://www.oakhouse.jp/',
       isPopular: false
@@ -452,7 +649,7 @@ function generateNews() {
       summary: '渋谷駅徒歩5分の好立地に、全150室の大型シェアハウスが来月オープン。24時間利用可能なコワーキングスペース、ジム、シアタールームを完備。',
       category: 'property',
       source: 'シェアハウスポータル',
-      date: formatDate(today),
+      date: formatDate(0),
       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=500&fit=crop',
       url: 'https://www.social-apartment.com/',
       isPopular: false
@@ -463,7 +660,7 @@ function generateNews() {
       summary: '顔認証オートロック、24時間管理人常駐、防犯カメラ完備のセキュリティ特化型物件。パウダールームやヨガスタジオなど女性向け設備も充実。',
       category: 'property',
       source: 'SHARE LIFE',
-      date: formatDate(addDays(today, -1)),
+      date: formatDate(1),
       image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=500&fit=crop',
       url: 'https://www.share-apartment.com/',
       isPopular: false
@@ -474,7 +671,7 @@ function generateNews() {
       summary: '築80年の古民家を改装したシェアハウスが話題に。海まで徒歩3分、サーファーやリモートワーカーに人気でオープン前に満室御礼。',
       category: 'property',
       source: 'ひつじ不動産',
-      date: formatDate(addDays(today, -3)),
+      date: formatDate(3),
       image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800&h=500&fit=crop',
       url: 'https://address.love/',
       isPopular: true
@@ -487,7 +684,7 @@ function generateNews() {
       summary: '都内のシェアハウスを転々とし、現在は下北沢のクリエイター向け物件に居住するデザイナーに密着。シェアライフの魅力と課題をリアルに語る。',
       category: 'interview',
       source: 'シェアライフマガジン',
-      date: formatDate(addDays(today, -1)),
+      date: formatDate(1),
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=500&fit=crop',
       url: 'https://www.hituji.jp/',
       isPopular: false
@@ -498,7 +695,7 @@ function generateNews() {
       summary: '定年退職後、一人暮らしの孤独感からシェアハウス入居を決意した田中さん（70）。若者との交流で生きがいを見つけた体験談。',
       category: 'interview',
       source: 'シニアライフ',
-      date: formatDate(addDays(today, -2)),
+      date: formatDate(2),
       image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&h=500&fit=crop',
       url: 'https://address.love/',
       isPopular: true
@@ -509,22 +706,10 @@ function generateNews() {
       summary: '入居率95%以上を維持する人気シェアハウス運営者3名が集結。物件選び、コミュニティ作り、トラブル対応のノウハウを惜しみなく公開。',
       category: 'interview',
       source: '不動産オーナーズ',
-      date: formatDate(addDays(today, -5)),
+      date: formatDate(5),
       image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=500&fit=crop',
       url: 'https://www.oakhouse.jp/',
       isPopular: false
     }
   ]
 }
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
-}
-
-function addDays(date: Date, days: number): Date {
-  const result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
-}
-
-export default app
