@@ -12,9 +12,9 @@ app.use('/api/*', cors())
 
 // クランテラスの画像URL
 const CRANN_IMAGES = {
-  lounge1: 'https://www.genspark.ai/api/files/s/V4bSF9bT',  // 緑のラウンジ
-  lounge2: 'https://www.genspark.ai/api/files/s/aPyXMyFe',  // インダストリアル風
-  lounge3: 'https://www.genspark.ai/api/files/s/uzX92PM2',  // 明るいリビング
+  lounge1: '/images/crann1.jpg',  // 緑のラウンジ（グリーンウォール）
+  lounge2: '/images/crann2.jpg',  // 明るいリビング（天窓）
+  lounge3: '/images/crann3.jpg',  // インダストリアル風キッチン
 }
 
 // 共通のスタイル
