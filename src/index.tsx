@@ -11,7 +11,11 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use('/api/*', cors())
 
 // クランテラスの画像URL
-const CRANN_TERRACE_IMAGE = 'https://www.genspark.ai/api/files/s/V4bSF9bT'
+const CRANN_IMAGES = {
+  lounge1: 'https://www.genspark.ai/api/files/s/V4bSF9bT',  // 緑のラウンジ
+  lounge2: 'https://www.genspark.ai/api/files/s/aPyXMyFe',  // インダストリアル風
+  lounge3: 'https://www.genspark.ai/api/files/s/uzX92PM2',  // 明るいリビング
+}
 
 // 共通のスタイル
 const commonStyles = `
@@ -167,8 +171,14 @@ app.get('/', (c) => {
                         </span>
                     </div>
                     <div class="md:w-1/2">
-                        <img src="${CRANN_TERRACE_IMAGE}" alt="クランテラス - 開放的なラウンジ" 
-                             class="w-full h-64 md:h-80 object-cover">
+                        <div class="grid grid-cols-2 gap-2 p-2">
+                            <img src="${CRANN_IMAGES.lounge1}" alt="クランテラス - 緑あふれるラウンジ" 
+                                 class="w-full h-36 md:h-40 object-cover rounded-lg col-span-2">
+                            <img src="${CRANN_IMAGES.lounge2}" alt="クランテラス - モダンな共用スペース" 
+                                 class="w-full h-28 md:h-32 object-cover rounded-lg">
+                            <img src="${CRANN_IMAGES.lounge3}" alt="クランテラス - 明るいリビング" 
+                                 class="w-full h-28 md:h-32 object-cover rounded-lg">
+                        </div>
                     </div>
                 </div>
             </a>
@@ -219,8 +229,16 @@ app.get('/', (c) => {
                class="block featured-card rounded-2xl p-6 hover:shadow-lg transition-all pulse-border">
                 <div class="flex flex-col md:flex-row items-center gap-6">
                     <div class="md:w-1/3">
-                        <img src="${CRANN_TERRACE_IMAGE}" alt="クランテラス" 
-                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="grid grid-cols-1 gap-2">
+                            <img src="${CRANN_IMAGES.lounge2}" alt="クランテラス" 
+                                 class="w-full h-32 object-cover rounded-xl">
+                            <div class="grid grid-cols-2 gap-2">
+                                <img src="${CRANN_IMAGES.lounge1}" alt="クランテラス" 
+                                     class="w-full h-20 object-cover rounded-lg">
+                                <img src="${CRANN_IMAGES.lounge3}" alt="クランテラス" 
+                                     class="w-full h-20 object-cover rounded-lg">
+                            </div>
+                        </div>
                     </div>
                     <div class="md:w-2/3">
                         <div class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full mb-3">
