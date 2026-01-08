@@ -89,6 +89,13 @@
     <priority>0.8</priority>
   </url>
   
+  <url>
+    <loc>https://sharehouse-times.pages.dev/#company_housing</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
   <!-- 管理者ページ（noindex） -->
   <!-- /admin は robots.txt で除外推奨 -->
   

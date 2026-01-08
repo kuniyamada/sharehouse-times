@@ -442,6 +442,7 @@ const yahooStyles = `
         .cat-highlight-trend { border-left: 3px solid #2563eb; background: linear-gradient(90deg, rgba(37,99,235,0.05) 0%, transparent 100%); }
         .cat-highlight-coliving { border-left: 3px solid #14b8a6; background: linear-gradient(90deg, rgba(20,184,166,0.05) 0%, transparent 100%); }
         .cat-highlight-desk_tour { border-left: 3px solid #8b5cf6; background: linear-gradient(90deg, rgba(139,92,246,0.05) 0%, transparent 100%); }
+        .cat-highlight-company_housing { border-left: 3px solid #475569; background: linear-gradient(90deg, rgba(71,85,105,0.05) 0%, transparent 100%); }
         
         /* スマホ用の余白調整 */
         @media (max-width: 767px) {
@@ -466,8 +467,8 @@ app.get('/', (c) => {
     
     <!-- 基本SEOメタタグ -->
     <title>シェアハウス探し・東京一人暮らし情報｜SHARE HOUSE TIMES</title>
-    <meta name="description" content="【2026年最新】シェアハウス・コリビングの最新ニュースをAIが毎日更新。東京で一人暮らしを始める方、女性専用・ペット可・格安物件を探している方必見。家賃相場、初期費用、エリア別おすすめ情報を網羅。">
-    <meta name="keywords" content="シェアハウス,東京 一人暮らし,コリビング,女性専用シェアハウス,ペット可シェアハウス,格安シェアハウス,東京 シェアハウス,一人暮らし 費用,家賃相場,初期費用,賃貸">
+    <meta name="description" content="【2026年最新】シェアハウス・コリビングの最新ニュースをAIが毎日更新。東京で一人暮らしを始める方、女性専用・ペット可・格安物件を探している方必見。社宅・借り上げ社宅・法人契約情報も充実。家賃相場、初期費用、エリア別おすすめ情報を網羅。">
+    <meta name="keywords" content="シェアハウス,東京 一人暮らし,コリビング,女性専用シェアハウス,ペット可シェアハウス,格安シェアハウス,東京 シェアハウス,社宅,借り上げ社宅,法人契約,一人暮らし 費用,家賃相場,初期費用,賃貸">
     <meta name="author" content="SHARE HOUSE TIMES">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
@@ -569,7 +570,8 @@ app.get('/', (c) => {
         {"@type": "ListItem", "position": 3, "name": "格安シェアハウス", "url": "https://sharehouse-times.pages.dev/#budget"},
         {"@type": "ListItem", "position": 4, "name": "東京のシェアハウス", "url": "https://sharehouse-times.pages.dev/#tokyo"},
         {"@type": "ListItem", "position": 5, "name": "コリビング", "url": "https://sharehouse-times.pages.dev/#coliving"},
-        {"@type": "ListItem", "position": 6, "name": "東京一人暮らし情報", "url": "https://sharehouse-times.pages.dev/#tokyo_life"}
+        {"@type": "ListItem", "position": 6, "name": "東京一人暮らし情報", "url": "https://sharehouse-times.pages.dev/#tokyo_life"},
+        {"@type": "ListItem", "position": 7, "name": "社宅・法人契約", "url": "https://sharehouse-times.pages.dev/#company_housing"}
       ]
     }
     </script>
@@ -624,6 +626,14 @@ app.get('/', (c) => {
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "女性専用シェアハウスは、セキュリティ面での安心感、清潔な共用スペース、女性同士の気軽なコミュニケーションなどのメリットがあります。オートロックや防犯カメラ完備の物件も多いです。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "社宅・借り上げ社宅とシェアハウスの違いは？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "社宅・借り上げ社宅は企業が従業員のために用意する住居で、家賃補助や福利厚生の一環として提供されます。最近では法人契約可能なシェアハウスも増えており、企業の社宅として活用するケースが増加しています。転勤者や新入社員の住居としてコミュニティ形成にも役立ちます。"
           }
         }
       ]
@@ -779,6 +789,7 @@ app.get('/', (c) => {
             <a href="#senior" class="mobile-cat-item" onclick="filterCategory('senior'); return false;" data-cat="senior">高齢者</a>
             <a href="#trend" class="mobile-cat-item" onclick="filterCategory('trend'); return false;" data-cat="trend">トレンド</a>
             <a href="#desk_tour" class="mobile-cat-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">デスクツアー</a>
+            <a href="#company_housing" class="mobile-cat-item" onclick="filterCategory('company_housing'); return false;" data-cat="company_housing">社宅</a>
         </div>
     </nav>
 
@@ -816,6 +827,9 @@ app.get('/', (c) => {
                 </a>
                 <a href="#" class="side-menu-item" onclick="filterCategory('remote'); return false;" data-cat="remote">
                     <i class="fas fa-laptop-house mr-2 text-cyan-400"></i>リモートワーク
+                </a>
+                <a href="#" class="side-menu-item" onclick="filterCategory('company_housing'); return false;" data-cat="company_housing">
+                    <i class="fas fa-briefcase mr-2 text-slate-500"></i>社宅
                 </a>
             </div>
             
@@ -1036,6 +1050,7 @@ app.get('/', (c) => {
                     <button onclick="filterCategory('remote')" class="keyword-tag" role="listitem">リモートワーク向け</button>
                     <button onclick="filterCategory('tokyo_life')" class="keyword-tag" role="listitem">東京一人暮らし</button>
                     <button onclick="filterCategory('student')" class="keyword-tag" role="listitem">学生向け</button>
+                    <button onclick="filterCategory('company_housing')" class="keyword-tag" role="listitem">社宅・法人契約</button>
                 </div>
             </div>
 
@@ -1084,7 +1099,7 @@ app.get('/', (c) => {
                         <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-3">
                             <i class="fas fa-tags text-white"></i>
                         </div>
-                        <h3 class="font-bold text-gray-800 text-sm mb-2">18カテゴリー</h3>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">19カテゴリー</h3>
                         <p class="text-xs text-gray-500 leading-relaxed">女性専用・ペット可・格安など、あなたのニーズに合った情報が見つかります。</p>
                     </div>
                 </div>
@@ -1121,7 +1136,8 @@ app.get('/', (c) => {
                         <span class="px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">東京</span>
                         <span class="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">大阪</span>
                         <span class="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">コリビング</span>
-                        <span class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">+10カテゴリー</span>
+                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">社宅</span>
+                        <span class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">+9カテゴリー</span>
                     </div>
                 </div>
             </div>
@@ -1208,6 +1224,24 @@ app.get('/', (c) => {
                         </div>
                     </div>
                 </details>
+                
+                <!-- FAQ 5: 社宅 -->
+                <details class="group bg-gray-50 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0">Q</span>
+                            <span class="font-medium text-gray-800 text-sm" itemprop="name">社宅・借り上げ社宅とシェアハウスの違いは？</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="ml-11 p-4 bg-white rounded-xl border-l-4 border-slate-500">
+                            <p class="text-sm text-gray-600 leading-relaxed" itemprop="text">
+                                <strong class="text-gray-800">社宅・借り上げ社宅</strong>は企業が従業員のために用意する住居で、家賃補助や福利厚生の一環として提供されます。最近では<strong class="text-gray-800">法人契約可能なシェアハウス</strong>も増えており、企業の社宅として活用するケースが増加しています。転勤者や新入社員の住居としてコミュニティ形成にも役立ちます。
+                            </p>
+                        </div>
+                    </div>
+                </details>
             </div>
         </div>
         
@@ -1228,6 +1262,7 @@ app.get('/', (c) => {
                     <a href="#coliving" onclick="filterCategory('coliving'); return false;" class="footer-link hover:text-indigo-600">コリビング</a>
                     <a href="#tokyo_life" onclick="filterCategory('tokyo_life'); return false;" class="footer-link hover:text-indigo-600">東京一人暮らし</a>
                     <a href="#student" onclick="filterCategory('student'); return false;" class="footer-link hover:text-indigo-600">学生向けシェアハウス</a>
+                    <a href="#company_housing" onclick="filterCategory('company_housing'); return false;" class="footer-link hover:text-indigo-600">社宅・法人契約</a>
                 </div>
             </nav>
             
@@ -1263,7 +1298,7 @@ app.get('/', (c) => {
         let currentRegion = 'all';
         let currentCategory = 'all';
 
-        // カテゴリー設定（18カテゴリー）
+        // カテゴリー設定（19カテゴリー）
         const categoryConfig = {
             // 物件タイプ
             'new_open': { icon: 'fa-door-open', color: 'bg-blue-500', label: '新規オープン', desc: '新しくオープンするシェアハウス情報' },
@@ -1274,6 +1309,7 @@ app.get('/', (c) => {
             'student': { icon: 'fa-graduation-cap', color: 'bg-indigo-500', label: '学生向け', desc: '学生向けシェアハウス情報' },
             'budget': { icon: 'fa-yen-sign', color: 'bg-yellow-500', label: '格安', desc: '3万円以下の格安シェアハウス情報' },
             'remote': { icon: 'fa-laptop-house', color: 'bg-cyan-500', label: 'リモートワーク', desc: 'テレワーク対応シェアハウス情報' },
+            'company_housing': { icon: 'fa-briefcase', color: 'bg-slate-600', label: '社宅', desc: '社宅・借り上げ社宅・法人向け物件情報' },
             // エリア
             'tokyo': { icon: 'fa-building', color: 'bg-red-500', label: '東京', desc: '東京都内のシェアハウス最新情報' },
             'osaka': { icon: 'fa-torii-gate', color: 'bg-purple-500', label: '大阪', desc: '大阪府内のシェアハウス最新情報' },
