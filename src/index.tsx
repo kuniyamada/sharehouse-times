@@ -692,7 +692,7 @@ app.get('/', (c) => {
                         <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 w-40">
                             <img src="${CRANN_IMAGES.shinagawa}" alt="品川" class="w-full h-20 object-cover rounded-lg mb-1">
                             <p class="text-xs font-bold text-gray-800 truncate">クランテラス品川</p>
-                            <p class="text-[10px] text-gray-500">北品川駅</p>
+                            <p class="text-[10px] text-gray-500">大井町駅</p>
                         </a>
                     </div>
                 </div>
@@ -801,7 +801,7 @@ app.get('/', (c) => {
                         <div>
                             <p class="font-bold text-gray-800 text-sm">クランテラス品川</p>
                             <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                <i class="fas fa-map-marker-alt text-red-400"></i>京急本線 北品川駅
+                                <i class="fas fa-map-marker-alt text-red-400"></i>JR 大井町駅
                             </p>
                         </div>
                         <i class="fas fa-chevron-right text-gray-300 group-hover:text-emerald-500 transition-colors"></i>
