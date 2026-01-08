@@ -102,9 +102,22 @@ async function handleScheduled(env: Env): Promise<void> {
   }
 }
 
+// CORSヘッダー
+const corsHeaders = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 // HTTP リクエスト処理（手動実行・デバッグ用）
 async function handleFetch(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
+  
+  // OPTIONSリクエスト（CORS preflight）
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
   
   // 手動更新エンドポイント
   if (url.pathname === '/update') {
@@ -114,7 +127,7 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
       message: 'News updated successfully',
       timestamp: new Date().toISOString()
     }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: corsHeaders
     });
   }
   
@@ -130,11 +143,11 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
         evening: '18:00 JST'
       }
     }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: corsHeaders
     });
   }
   
-  // ニュース取得エンドポイント（CORS対応）
+  // ニュース取得エンドポイント
   if (url.pathname === '/api/news') {
     const cached = await env.NEWS_KV.get('news_data', 'json') as { news: NewsItem[] } | null;
     const news = cached?.news || generateDefaultNews();
@@ -144,11 +157,7 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
       news,
       total: news.length
     }), {
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      }
+      headers: corsHeaders
     });
   }
   
@@ -162,7 +171,7 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
     },
     schedule: '07:00 JST & 18:00 JST daily'
   }), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: corsHeaders
   });
 }
 
