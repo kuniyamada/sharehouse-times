@@ -17,7 +17,7 @@ const CRANN_IMAGES = {
   lounge3: '/images/crann3.jpg',
 }
 
-// Yahoo! JAPAN風スタイル（スマホ対応）
+// Yahoo! JAPAN風スタイル（スマホ対応・カテゴリー色付き）
 const yahooStyles = `
     <style>
         * { 
@@ -26,14 +26,14 @@ const yahooStyles = `
         }
         
         body {
-            background-color: #f5f5f5;
+            background-color: #f0f2f5;
             font-size: 14px;
         }
         
         /* ヘッダー */
         .yahoo-header {
-            background: linear-gradient(180deg, #f0f0f0 0%, #e8e8e8 100%);
-            border-bottom: 1px solid #ddd;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #e94560;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -41,14 +41,15 @@ const yahooStyles = `
         
         /* タブナビゲーション - スマホ対応 */
         .tab-nav {
-            background: #fff;
-            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%);
+            border-bottom: 2px solid #e0e0e0;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
             position: sticky;
             top: 44px;
             z-index: 99;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .tab-nav::-webkit-scrollbar {
             display: none;
@@ -56,30 +57,32 @@ const yahooStyles = `
         .tab-item {
             display: inline-block;
             padding: 12px 16px;
-            color: #333;
+            color: #444;
             text-decoration: none;
             font-size: 13px;
+            font-weight: 500;
             border-bottom: 3px solid transparent;
             transition: all 0.2s;
         }
         .tab-item:hover {
-            background: #f5f5f5;
-            color: #ff0033;
+            background: #f0f4ff;
+            color: #e94560;
         }
         .tab-item.active {
-            color: #ff0033;
-            border-bottom-color: #ff0033;
+            color: #e94560;
+            border-bottom-color: #e94560;
             font-weight: bold;
+            background: #fff0f3;
         }
         
         /* モバイルカテゴリーメニュー */
         .mobile-cat-menu {
-            background: #fff;
+            background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
             border-bottom: 1px solid #e0e0e0;
-            padding: 8px 0;
+            padding: 10px 0;
         }
         .mobile-cat-menu::-webkit-scrollbar {
             display: none;
@@ -88,32 +91,44 @@ const yahooStyles = `
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 6px 12px;
+            padding: 8px 14px;
             margin: 0 4px;
-            background: #f5f5f5;
+            background: #fff;
+            border: 1px solid #e0e0e0;
             border-radius: 20px;
             font-size: 11px;
-            color: #333;
+            font-weight: 500;
+            color: #555;
             text-decoration: none;
             white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .mobile-cat-item:hover {
+            border-color: #e94560;
+            color: #e94560;
         }
         .mobile-cat-item.active {
-            background: #ff0033;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            border-color: #e94560;
             color: white;
+            box-shadow: 0 2px 8px rgba(233,69,96,0.3);
         }
         
         /* カテゴリーセクション */
         .cat-section-title {
             font-size: 10px;
-            color: #999;
-            padding: 8px 12px 4px;
-            background: #f9f9f9;
-            border-bottom: 1px solid #eee;
+            color: #888;
+            padding: 10px 12px 6px;
+            background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 100%);
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         
         /* 左サイドのカテゴリメニュー（PC用） */
         .side-menu {
-            background: #f8f8f8;
+            background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%);
             border-right: 1px solid #e0e0e0;
             max-height: calc(100vh - 90px);
             overflow-y: auto;
@@ -124,84 +139,118 @@ const yahooStyles = `
             width: 4px;
         }
         .side-menu::-webkit-scrollbar-thumb {
-            background: #ddd;
+            background: #ccc;
             border-radius: 2px;
         }
         .side-menu-section {
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e8e8e8;
         }
         .side-menu-section-title {
             font-size: 10px;
-            color: #999;
-            padding: 10px 12px 5px;
-            background: #f0f0f0;
+            color: #fff;
+            padding: 8px 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .side-menu-section:nth-child(1) .side-menu-section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .side-menu-section:nth-child(2) .side-menu-section-title {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .side-menu-section:nth-child(3) .side-menu-section-title {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
         .side-menu-item {
-            display: block;
-            padding: 8px 12px;
-            color: #333;
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: #444;
             text-decoration: none;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f0f0f0;
             font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         .side-menu-item:hover {
-            background: #fff;
-            color: #ff0033;
+            background: #f0f4ff;
+            color: #e94560;
+            padding-left: 15px;
         }
         .side-menu-item.active {
-            background: #fff;
-            color: #ff0033;
+            background: linear-gradient(90deg, #fff0f3 0%, #fff 100%);
+            color: #e94560;
             font-weight: bold;
-            border-left: 3px solid #ff0033;
+            border-left: 4px solid #e94560;
+            padding-left: 8px;
         }
         
         /* トピックス（メイン） */
         .topics-box {
             background: #fff;
-            border: 1px solid #ddd;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
         @media (max-width: 767px) {
             .topics-box {
-                border-left: none;
-                border-right: none;
+                border-radius: 0;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             }
         }
         .topics-header {
-            background: linear-gradient(180deg, #f8f8f8 0%, #f0f0f0 100%);
-            border-bottom: 1px solid #ddd;
-            padding: 10px 12px;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            border-bottom: none;
+            padding: 12px 16px;
             font-weight: bold;
-            font-size: 13px;
-            color: #333;
+            font-size: 14px;
+            color: #fff;
         }
         .topics-header-icon {
-            color: #ff0033;
-            margin-right: 5px;
+            color: #fff;
+            margin-right: 6px;
+        }
+        
+        /* セクション別ヘッダー色 */
+        .section-japan .topics-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .section-world .topics-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .section-ranking .topics-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
         
         /* 見出しリスト */
         .headline-item {
-            padding: 12px;
+            padding: 14px 16px;
             border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+        .headline-item:hover {
+            background: #f8f9ff;
         }
         .headline-item:active {
-            background: #f5f5f5;
+            background: #f0f2f5;
         }
         .headline-link {
-            color: #1a0dab;
+            color: #2c3e50;
             text-decoration: none;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
             flex: 1;
             display: block;
+            font-weight: 500;
         }
         .headline-link:hover {
-            color: #ff0033;
+            color: #e94560;
         }
         @media (max-width: 767px) {
             .headline-link {
@@ -211,55 +260,72 @@ const yahooStyles = `
         
         /* NEWバッジ */
         .badge-new {
-            background: #ff0033;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
             color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 2px;
-            margin-left: 5px;
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
             vertical-align: middle;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
         
         /* カテゴリアイコン */
         .cat-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            font-size: 11px;
+            font-size: 13px;
             color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
         
         /* 情報元 */
         .source-info {
             font-size: 11px;
-            color: #999;
-            margin-top: 4px;
+            color: #888;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         
         /* カテゴリータグ */
         .cat-tag {
             display: inline-block;
             font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-right: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
         
         /* PR広告枠 */
         .pr-box {
-            border: 1px solid #ddd;
+            border: none;
             background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
         .pr-header {
-            background: #f5f5f5;
-            padding: 8px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 14px;
             font-size: 12px;
-            color: #666;
-            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            color: #fff;
+            border-bottom: none;
         }
         
         /* クランテラス広告 */
@@ -278,26 +344,27 @@ const yahooStyles = `
             background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
             color: white;
             margin: 12px;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(45,90,39,0.3);
         }
         
         /* ランキング */
         .ranking-num {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 6px;
             flex-shrink: 0;
         }
-        .rank-1 { background: #ffd700; color: #333; }
-        .rank-2 { background: #c0c0c0; color: #333; }
-        .rank-3 { background: #cd7f32; color: #fff; }
-        .rank-other { background: #e8e8e8; color: #666; }
+        .rank-1 { background: linear-gradient(135deg, #f5af19 0%, #f12711 100%); color: #fff; box-shadow: 0 2px 6px rgba(245,175,25,0.4); }
+        .rank-2 { background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%); color: #fff; box-shadow: 0 2px 6px rgba(189,195,199,0.4); }
+        .rank-3 { background: linear-gradient(135deg, #c9920e 0%, #8b5a00 100%); color: #fff; box-shadow: 0 2px 6px rgba(201,146,14,0.4); }
+        .rank-other { background: #f0f2f5; color: #666; }
         
         /* 更新時刻 */
         .update-time {
@@ -307,16 +374,18 @@ const yahooStyles = `
 
         /* フッター */
         .yahoo-footer {
-            background: #f5f5f5;
-            border-top: 1px solid #ddd;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-top: none;
         }
         .footer-link {
-            color: #666;
+            color: #a0aec0;
             text-decoration: none;
             font-size: 12px;
+            transition: color 0.2s;
         }
         .footer-link:hover {
-            text-decoration: underline;
+            color: #e94560;
+            text-decoration: none;
         }
         
         /* モバイルフッター固定バナー */
@@ -327,13 +396,50 @@ const yahooStyles = `
             right: 0;
             background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
             color: white;
-            padding: 10px 15px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
         }
+        
+        /* 注目キーワード */
+        .keyword-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+            border-radius: 20px;
+            font-size: 11px;
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+        .keyword-tag:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+        }
+        
+        /* カテゴリー別ハイライト色 */
+        .cat-highlight-new_open { border-left: 4px solid #3b82f6; }
+        .cat-highlight-women { border-left: 4px solid #ec4899; }
+        .cat-highlight-senior { border-left: 4px solid #f97316; }
+        .cat-highlight-pet { border-left: 4px solid #f59e0b; }
+        .cat-highlight-foreign { border-left: 4px solid #22c55e; }
+        .cat-highlight-student { border-left: 4px solid #6366f1; }
+        .cat-highlight-budget { border-left: 4px solid #eab308; }
+        .cat-highlight-remote { border-left: 4px solid #06b6d4; }
+        .cat-highlight-tokyo { border-left: 4px solid #ef4444; }
+        .cat-highlight-osaka { border-left: 4px solid #a855f7; }
+        .cat-highlight-trend { border-left: 4px solid #2563eb; }
+        .cat-highlight-coliving { border-left: 4px solid #14b8a6; }
+        .cat-highlight-desk_tour { border-left: 4px solid #8b5cf6; }
         
         /* スマホ用の余白調整 */
         @media (max-width: 767px) {
@@ -370,15 +476,15 @@ app.get('/', (c) => {
         <div class="max-w-6xl mx-auto px-3 py-2">
             <div class="flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2">
-                    <span class="text-red-600 font-bold text-lg">S!</span>
-                    <span class="font-bold text-sm text-gray-700 hidden sm:inline">シェアハウスニュース</span>
-                    <span class="font-bold text-xs text-gray-700 sm:hidden">シェアハウスNews</span>
-                    <span class="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">AI</span>
+                    <span class="text-white font-bold text-xl" style="text-shadow: 0 0 10px rgba(233,69,96,0.5);">S!</span>
+                    <span class="font-bold text-sm text-gray-200 hidden sm:inline">シェアハウスニュース</span>
+                    <span class="font-bold text-xs text-gray-200 sm:hidden">シェアハウスNews</span>
+                    <span class="text-xs px-2 py-0.5 rounded font-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">AI</span>
                 </a>
-                <div class="flex items-center gap-2">
-                    <span class="update-time hidden sm:inline"><i class="far fa-clock mr-1"></i>毎朝10時更新</span>
+                <div class="flex items-center gap-3">
+                    <span class="update-time hidden sm:inline text-gray-400"><i class="far fa-clock mr-1"></i>毎朝10時更新</span>
                     <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="bg-green-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-green-700 hidden sm:flex items-center gap-1">
+                       class="text-white px-4 py-1.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-1" style="background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%); box-shadow: 0 2px 8px rgba(45,90,39,0.3);">
                         <i class="fas fa-home"></i>
                         クランテラス
                     </a>
@@ -531,25 +637,25 @@ app.get('/', (c) => {
             </section>
 
             <!-- 国内ニュース -->
-            <section id="japanSection" class="topics-box m-3 md:m-3">
+            <section id="japanSection" class="topics-box section-japan m-3 md:m-3">
                 <div class="topics-header">
-                    <span>🇯🇵 国内</span>
+                    <span>🇯🇵 国内ニュース</span>
                 </div>
                 <div id="japanNewsList" class="divide-y divide-gray-100"></div>
             </section>
 
             <!-- 海外ニュース -->
-            <section id="worldSection" class="topics-box m-3 md:m-3">
+            <section id="worldSection" class="topics-box section-world m-3 md:m-3">
                 <div class="topics-header">
-                    <span>🌍 海外</span>
+                    <span>🌍 海外ニュース</span>
                 </div>
                 <div id="worldNewsList" class="divide-y divide-gray-100"></div>
             </section>
 
             <!-- モバイル用ランキング -->
-            <section class="topics-box m-3 md:hidden">
+            <section class="topics-box section-ranking m-3 md:hidden">
                 <div class="topics-header">
-                    <i class="fas fa-ranking-star text-yellow-500 mr-2"></i>アクセスランキング
+                    <i class="fas fa-ranking-star mr-2"></i>アクセスランキング
                 </div>
                 <div class="p-3" id="mobileRankingList"></div>
             </section>
@@ -601,16 +707,16 @@ app.get('/', (c) => {
             <!-- 注目キーワード -->
             <div class="pr-box">
                 <div class="pr-header">
-                    <i class="fas fa-tag text-blue-500 mr-2"></i>
+                    <i class="fas fa-tag mr-2"></i>
                     注目キーワード
                 </div>
-                <div class="p-2 flex flex-wrap gap-1">
-                    <span onclick="filterCategory('women')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">女性専用</span>
-                    <span onclick="filterCategory('pet')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">ペット可</span>
-                    <span onclick="filterCategory('budget')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">格安</span>
-                    <span onclick="filterCategory('tokyo')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">東京</span>
-                    <span onclick="filterCategory('coliving')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">コリビング</span>
-                    <span onclick="filterCategory('remote')" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer">リモートワーク</span>
+                <div class="p-3 flex flex-wrap">
+                    <span onclick="filterCategory('women')" class="keyword-tag">♀️ 女性専用</span>
+                    <span onclick="filterCategory('pet')" class="keyword-tag">🐾 ペット可</span>
+                    <span onclick="filterCategory('budget')" class="keyword-tag">💴 格安</span>
+                    <span onclick="filterCategory('tokyo')" class="keyword-tag">🗼 東京</span>
+                    <span onclick="filterCategory('coliving')" class="keyword-tag">🏢 コリビング</span>
+                    <span onclick="filterCategory('remote')" class="keyword-tag">💻 リモート</span>
                 </div>
             </div>
 
@@ -629,8 +735,8 @@ app.get('/', (c) => {
                 <span class="text-gray-300">|</span>
                 <a href="#" onclick="filterCategory('coliving'); return false;" class="footer-link">コリビング</a>
             </div>
-            <p class="text-xs text-gray-400">
-                Presented by <a href="https://crann-terrace.com/" class="text-green-600 hover:underline">クランテラス</a>
+            <p class="text-xs text-gray-500">
+                Presented by <a href="https://crann-terrace.com/" class="text-green-400 hover:text-green-300">クランテラス</a>
                 &copy; 2026
             </p>
         </div>
@@ -690,9 +796,10 @@ app.get('/', (c) => {
             const isNew = article.date.includes(today.getDate() + '(') || article.date.includes((today.getDate()-1) + '(');
             const newBadge = isNew ? '<span class="badge-new">NEW</span>' : '';
             const cat = categoryConfig[article.category] || { icon: 'fa-newspaper', color: 'bg-gray-400', label: 'ニュース' };
+            const highlightClass = 'cat-highlight-' + article.category;
             
             return \`
-                <div class="headline-item">
+                <div class="headline-item \${highlightClass}">
                     <div class="cat-icon \${cat.color}">
                         <i class="fas \${cat.icon}"></i>
                     </div>
@@ -702,7 +809,10 @@ app.get('/', (c) => {
                         </a>
                         <div class="source-info">
                             <span class="cat-tag \${cat.color} text-white">\${cat.label}</span>
-                            \${article.source} \${article.date}
+                            <span class="text-gray-400">|</span>
+                            <span>\${article.source}</span>
+                            <span class="text-gray-400">|</span>
+                            <span>\${article.date}</span>
                         </div>
                     </div>
                 </div>
@@ -712,10 +822,10 @@ app.get('/', (c) => {
         function createRankingItem(article, rank) {
             const rankClass = rank <= 3 ? \`rank-\${rank}\` : 'rank-other';
             return \`
-                <div class="flex gap-2 py-2 border-b border-gray-100 last:border-b-0">
+                <div class="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 items-start">
                     <span class="ranking-num \${rankClass}">\${rank}</span>
                     <a href="\${article.url}" target="_blank" rel="noopener noreferrer" 
-                       class="flex-1 text-sm text-gray-700 hover:text-red-600 leading-snug">
+                       class="flex-1 text-sm text-gray-700 hover:text-[#e94560] leading-snug font-medium">
                         \${article.title}
                     </a>
                 </div>
