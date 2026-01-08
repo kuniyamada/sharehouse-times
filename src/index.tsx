@@ -10,11 +10,14 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
 
-// クランテラスの画像URL
+// クランテラスの画像URL（物件別）
 const CRANN_IMAGES = {
-  lounge1: '/images/crann1.jpg',
-  lounge2: '/images/crann2.jpg',
-  lounge3: '/images/crann3.jpg',
+  // クランテラス久が原
+  kugahara: 'https://www.genspark.ai/api/files/s/V4bSF9bT',
+  // クランテラス溝の口
+  mizonokuchi: 'https://www.genspark.ai/api/files/s/aPyXMyFe',
+  // クランテラス品川
+  shinagawa: 'https://www.genspark.ai/api/files/s/uzX92PM2',
 }
 
 // モダンスタイル（ミニマル・クリーン）
@@ -669,17 +672,31 @@ app.get('/', (c) => {
         <div class="flex-1 min-w-0">
             
             <!-- モバイル用クランテラスバナー -->
-            <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="mobile-crann-banner block md:hidden">
-                <div class="p-3 flex items-center gap-3">
-                    <img src="${CRANN_IMAGES.lounge1}" alt="クランテラス" class="w-16 h-16 object-cover rounded">
-                    <div class="flex-1">
-                        <div class="text-xs opacity-70">PR</div>
-                        <div class="font-bold text-sm">クランテラスシリーズ</div>
-                        <div class="text-xs opacity-90">緑あふれる開放的な空間で新生活を</div>
+            <div class="block md:hidden m-3">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-2 flex items-center justify-between">
+                        <span class="text-white font-bold text-xs"><i class="fas fa-building mr-1"></i>クランテラス物件</span>
+                        <span class="text-white/80 text-[10px]">PR</span>
                     </div>
-                    <i class="fas fa-chevron-right opacity-70"></i>
+                    <div class="flex overflow-x-auto gap-2 p-2 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+                        <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 w-40">
+                            <img src="${CRANN_IMAGES.kugahara}" alt="久が原" class="w-full h-20 object-cover rounded-lg mb-1">
+                            <p class="text-xs font-bold text-gray-800 truncate">クランテラス久が原</p>
+                            <p class="text-[10px] text-gray-500">久が原駅</p>
+                        </a>
+                        <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 w-40">
+                            <img src="${CRANN_IMAGES.mizonokuchi}" alt="溝の口" class="w-full h-20 object-cover rounded-lg mb-1">
+                            <p class="text-xs font-bold text-gray-800 truncate">クランテラス溝の口</p>
+                            <p class="text-[10px] text-gray-500">溝の口駅</p>
+                        </a>
+                        <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 w-40">
+                            <img src="${CRANN_IMAGES.shinagawa}" alt="品川" class="w-full h-20 object-cover rounded-lg mb-1">
+                            <p class="text-xs font-bold text-gray-800 truncate">クランテラス品川</p>
+                            <p class="text-[10px] text-gray-500">北品川駅</p>
+                        </a>
+                    </div>
                 </div>
-            </a>
+            </div>
             
             <!-- カテゴリータイトル -->
             <div id="categoryTitle" class="hidden bg-white border-b px-4 py-3 m-3 md:m-3 rounded-t">
@@ -725,22 +742,80 @@ app.get('/', (c) => {
         <!-- 右サイドバー（PC用） -->
         <aside class="w-64 flex-shrink-0 hidden lg:block p-3 space-y-3">
             
-            <!-- クランテラス広告 -->
-            <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block crann-ad">
-                <div class="p-3">
-                    <div class="text-xs opacity-70 mb-1">PR</div>
-                    <div class="font-bold mb-2">クランテラスシリーズ</div>
-                    <div class="grid grid-cols-3 gap-1 mb-2">
-                        <img src="${CRANN_IMAGES.lounge1}" alt="" class="w-full h-12 object-cover rounded">
-                        <img src="${CRANN_IMAGES.lounge2}" alt="" class="w-full h-12 object-cover rounded">
-                        <img src="${CRANN_IMAGES.lounge3}" alt="" class="w-full h-12 object-cover rounded">
-                    </div>
-                    <p class="text-xs opacity-90 mb-2">緑あふれる開放的な空間でシェアライフを</p>
-                    <div class="bg-white text-green-700 text-center py-1.5 rounded text-xs font-bold">
-                        物件を見る →
+            <!-- クランテラス物件バナー広告 -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-building text-white"></i>
+                        <span class="text-white font-bold text-sm">クランテラス物件情報</span>
                     </div>
                 </div>
-            </a>
+                
+                <!-- クランテラス久が原 -->
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 border-b hover:bg-gray-50 transition-colors group">
+                    <div class="relative overflow-hidden rounded-xl mb-2">
+                        <img src="${CRANN_IMAGES.kugahara}" alt="クランテラス久が原" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                            <i class="fas fa-star mr-1"></i>人気No.1
+                        </div>
+                    </div>
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">クランテラス久が原</p>
+                            <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-map-marker-alt text-red-400"></i>東急池上線 久が原駅
+                            </p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-emerald-500 transition-colors"></i>
+                    </div>
+                </a>
+                
+                <!-- クランテラス溝の口 -->
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 border-b hover:bg-gray-50 transition-colors group">
+                    <div class="relative overflow-hidden rounded-xl mb-2">
+                        <img src="${CRANN_IMAGES.mizonokuchi}" alt="クランテラス溝の口" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                            <i class="fas fa-bolt mr-1"></i>NEW OPEN
+                        </div>
+                    </div>
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">クランテラス溝の口</p>
+                            <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-map-marker-alt text-red-400"></i>東急田園都市線 溝の口駅
+                            </p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-emerald-500 transition-colors"></i>
+                    </div>
+                </a>
+                
+                <!-- クランテラス品川 -->
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 hover:bg-gray-50 transition-colors group">
+                    <div class="relative overflow-hidden rounded-xl mb-2">
+                        <img src="${CRANN_IMAGES.shinagawa}" alt="クランテラス品川" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                            <i class="fas fa-crown mr-1"></i>Premium
+                        </div>
+                    </div>
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">クランテラス品川</p>
+                            <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-map-marker-alt text-red-400"></i>京急本線 北品川駅
+                            </p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-emerald-500 transition-colors"></i>
+                    </div>
+                </a>
+                
+                <!-- CTAボタン -->
+                <div class="p-3 bg-gradient-to-r from-gray-50 to-gray-100">
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
+                       class="block bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-center py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-teal-600 transition-all">
+                        <i class="fas fa-search mr-2"></i>全物件を見る
+                    </a>
+                </div>
+            </div>
 
             <!-- アクセスランキング -->
             <div class="pr-box">
@@ -749,19 +824,6 @@ app.get('/', (c) => {
                     アクセスランキング
                 </div>
                 <div class="p-2" id="rankingList"></div>
-            </div>
-
-            <!-- おすすめシェアハウス -->
-            <div class="pr-box">
-                <div class="pr-header">
-                    <i class="fas fa-leaf text-green-500 mr-2"></i>
-                    おすすめ
-                </div>
-                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-2 hover:bg-gray-50">
-                    <img src="${CRANN_IMAGES.lounge2}" alt="クランテラス" class="w-full h-24 object-cover rounded mb-2">
-                    <p class="text-xs font-bold text-gray-800">クランテラス</p>
-                    <p class="text-xs text-gray-500">駅近・Wi-Fi完備・共用ラウンジ</p>
-                </a>
             </div>
 
             <!-- 注目キーワード -->
