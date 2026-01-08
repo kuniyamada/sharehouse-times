@@ -1,4 +1,6 @@
 # SHARE HOUSE TIMES - LLM向け情報
+# URL: https://sharehouse-times.pages.dev/.well-known/llms.txt
+# 更新日: 2026-01-08
 
 ## サイト概要
 SHARE HOUSE TIMESは、シェアハウス・コリビングの最新ニュースをAIが毎日更新する情報サイトです。
@@ -83,3 +85,8 @@ SHARE HOUSE TIMESは、シェアハウス・コリビングの最新ニュース
 
 ## お問い合わせ
 クランテラスへのお問い合わせは公式サイトまたはLINEでご連絡ください。
+
+## 関連リソース
+- 詳細版: https://sharehouse-times.pages.dev/llms-full.txt
+- API: https://sharehouse-times.pages.dev/api/llms
+- サイトマップ: https://sharehouse-times.pages.dev/sitemap.xml
