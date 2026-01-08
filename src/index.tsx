@@ -17,72 +17,72 @@ const CRANN_IMAGES = {
   lounge3: '/images/crann3.jpg',
 }
 
-// Yahoo! JAPAN風スタイル（スマホ対応・カテゴリー色付き）
+// モダンスタイル（ミニマル・クリーン）
 const yahooStyles = `
     <style>
         * { 
-            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+            font-family: "Inter", "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background-color: #f0f2f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
             font-size: 14px;
+            min-height: 100vh;
         }
         
-        /* ヘッダー */
+        /* ヘッダー - グラスモーフィズム */
         .yahoo-header {
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            border-bottom: 2px solid #e94560;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 100;
         }
         
-        /* タブナビゲーション - スマホ対応 */
+        /* タブナビゲーション */
         .tab-nav {
-            background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%);
-            border-bottom: 2px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
             position: sticky;
             top: 44px;
             z-index: 99;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .tab-nav::-webkit-scrollbar {
             display: none;
         }
         .tab-item {
             display: inline-block;
-            padding: 12px 16px;
-            color: #444;
+            padding: 14px 20px;
+            color: #64748b;
             text-decoration: none;
             font-size: 13px;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tab-item:hover {
-            background: #f0f4ff;
-            color: #e94560;
+            color: #6366f1;
         }
         .tab-item.active {
-            color: #e94560;
-            border-bottom-color: #e94560;
-            font-weight: bold;
-            background: #fff0f3;
+            color: #6366f1;
+            border-bottom-color: #6366f1;
         }
         
         /* モバイルカテゴリーメニュー */
         .mobile-cat-menu {
-            background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
+            background: rgba(255, 255, 255, 0.95);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 12px 0;
         }
         .mobile-cat-menu::-webkit-scrollbar {
             display: none;
@@ -90,46 +90,45 @@ const yahooStyles = `
         .mobile-cat-item {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 8px 14px;
+            gap: 6px;
+            padding: 8px 16px;
             margin: 0 4px;
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 500;
-            color: #555;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
             text-decoration: none;
             white-space: nowrap;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .mobile-cat-item:hover {
-            border-color: #e94560;
-            color: #e94560;
+            background: #e2e8f0;
+            color: #6366f1;
         }
         .mobile-cat-item.active {
-            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
-            border-color: #e94560;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
-            box-shadow: 0 2px 8px rgba(233,69,96,0.3);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
         }
         
         /* カテゴリーセクション */
         .cat-section-title {
-            font-size: 10px;
-            color: #888;
-            padding: 10px 12px 6px;
-            background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 100%);
-            border-bottom: 1px solid #ddd;
-            font-weight: 600;
+            font-size: 11px;
+            color: #94a3b8;
+            padding: 12px 16px 8px;
+            background: transparent;
+            font-weight: 700;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         /* 左サイドのカテゴリメニュー（PC用） */
         .side-menu {
-            background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%);
-            border-right: 1px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0,0,0,0.06);
             max-height: calc(100vh - 90px);
             overflow-y: auto;
             position: sticky;
@@ -139,58 +138,54 @@ const yahooStyles = `
             width: 4px;
         }
         .side-menu::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 2px;
+            background: #cbd5e1;
+            border-radius: 4px;
         }
         .side-menu-section {
-            border-bottom: 1px solid #e8e8e8;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            padding: 8px 0;
         }
         .side-menu-section-title {
             font-size: 10px;
-            color: #fff;
-            padding: 8px 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            color: #94a3b8;
+            padding: 8px 16px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: transparent;
         }
-        .side-menu-section:nth-child(1) .side-menu-section-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .side-menu-section:nth-child(2) .side-menu-section-title {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-        .side-menu-section:nth-child(3) .side-menu-section-title {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
+        .side-menu-section:nth-child(1) .side-menu-section-title { color: #6366f1; }
+        .side-menu-section:nth-child(2) .side-menu-section-title { color: #ec4899; }
+        .side-menu-section:nth-child(3) .side-menu-section-title { color: #06b6d4; }
         .side-menu-item {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            color: #444;
+            padding: 10px 16px;
+            margin: 2px 8px;
+            color: #64748b;
             text-decoration: none;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 11px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .side-menu-item:hover {
-            background: #f0f4ff;
-            color: #e94560;
-            padding-left: 15px;
+            background: #f1f5f9;
+            color: #6366f1;
         }
         .side-menu-item.active {
-            background: linear-gradient(90deg, #fff0f3 0%, #fff 100%);
-            color: #e94560;
-            font-weight: bold;
-            border-left: 4px solid #e94560;
-            padding-left: 8px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            font-weight: 600;
         }
         
-        /* トピックス（メイン） */
+        /* トピックス（メイン）- グラスモーフィズム */
         .topics-box {
-            background: #fff;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
             overflow: hidden;
         }
         @media (max-width: 767px) {
@@ -198,59 +193,61 @@ const yahooStyles = `
                 border-radius: 0;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                border-left: none;
+                border-right: none;
             }
         }
         .topics-header {
-            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             border-bottom: none;
-            padding: 12px 16px;
-            font-weight: bold;
+            padding: 14px 20px;
+            font-weight: 700;
             font-size: 14px;
             color: #fff;
+            letter-spacing: 0.3px;
         }
         .topics-header-icon {
             color: #fff;
-            margin-right: 6px;
+            margin-right: 8px;
         }
         
         /* セクション別ヘッダー色 */
         .section-japan .topics-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         }
         .section-world .topics-header {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
         .section-ranking .topics-header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
         
         /* 見出しリスト */
         .headline-item {
-            padding: 14px 16px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            transition: all 0.2s;
+            gap: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .headline-item:hover {
-            background: #f8f9ff;
+            background: rgba(99, 102, 241, 0.04);
         }
         .headline-item:active {
-            background: #f0f2f5;
+            background: rgba(99, 102, 241, 0.08);
         }
         .headline-link {
-            color: #2c3e50;
+            color: #1e293b;
             text-decoration: none;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.7;
             flex: 1;
             display: block;
             font-weight: 500;
         }
         .headline-link:hover {
-            color: #e94560;
+            color: #6366f1;
         }
         @media (max-width: 767px) {
             .headline-link {
@@ -260,10 +257,10 @@ const yahooStyles = `
         
         /* NEWバッジ */
         .badge-new {
-            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             color: white;
             font-size: 9px;
-            padding: 3px 6px;
+            padding: 3px 8px;
             border-radius: 4px;
             margin-left: 6px;
             vertical-align: middle;
@@ -278,26 +275,26 @@ const yahooStyles = `
         
         /* カテゴリアイコン */
         .cat-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            font-size: 13px;
+            font-size: 14px;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         }
         
         /* 情報元 */
         .source-info {
-            font-size: 11px;
-            color: #888;
-            margin-top: 6px;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         
@@ -305,86 +302,89 @@ const yahooStyles = `
         .cat-tag {
             display: inline-block;
             font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
             font-weight: 600;
             letter-spacing: 0.3px;
         }
         
-        /* PR広告枠 */
+        /* PR広告枠 - グラスモーフィズム */
         .pr-box {
-            border: none;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
             overflow: hidden;
         }
         .pr-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 10px 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 12px 16px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             color: #fff;
             border-bottom: none;
         }
         
         /* クランテラス広告 */
         .crann-ad {
-            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
-            border-radius: 8px;
+            border-radius: 16px;
             overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         .crann-ad:hover {
-            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
         }
         
         /* モバイル用クランテラスバナー */
         .mobile-crann-banner {
-            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
-            margin: 12px;
-            border-radius: 12px;
+            margin: 16px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(45,90,39,0.3);
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.25);
         }
         
         /* ランキング */
         .ranking-num {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            font-weight: bold;
-            border-radius: 6px;
+            font-weight: 700;
+            border-radius: 8px;
             flex-shrink: 0;
         }
-        .rank-1 { background: linear-gradient(135deg, #f5af19 0%, #f12711 100%); color: #fff; box-shadow: 0 2px 6px rgba(245,175,25,0.4); }
-        .rank-2 { background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%); color: #fff; box-shadow: 0 2px 6px rgba(189,195,199,0.4); }
-        .rank-3 { background: linear-gradient(135deg, #c9920e 0%, #8b5a00 100%); color: #fff; box-shadow: 0 2px 6px rgba(201,146,14,0.4); }
-        .rank-other { background: #f0f2f5; color: #666; }
+        .rank-1 { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #fff; }
+        .rank-2 { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); color: #fff; }
+        .rank-3 { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: #fff; }
+        .rank-other { background: #f1f5f9; color: #64748b; }
         
         /* 更新時刻 */
         .update-time {
-            font-size: 10px;
-            color: #999;
+            font-size: 11px;
+            color: #94a3b8;
         }
 
         /* フッター */
         .yahoo-footer {
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            background: #1e293b;
             border-top: none;
         }
         .footer-link {
-            color: #a0aec0;
+            color: #94a3b8;
             text-decoration: none;
             font-size: 12px;
             transition: color 0.2s;
         }
         .footer-link:hover {
-            color: #e94560;
+            color: #6366f1;
             text-decoration: none;
         }
         
@@ -394,57 +394,56 @@ const yahooStyles = `
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
-            padding: 12px 18px;
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
         }
         
         /* 注目キーワード */
         .keyword-tag {
             display: inline-block;
-            padding: 6px 12px;
-            margin: 3px;
-            background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
-            border-radius: 20px;
-            font-size: 11px;
-            color: #555;
-            font-weight: 500;
+            padding: 8px 14px;
+            margin: 4px;
+            background: #f1f5f9;
+            border-radius: 100px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid #e0e0e0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
         }
         .keyword-tag:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: #fff;
-            border-color: #667eea;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
         
-        /* カテゴリー別ハイライト色 */
-        .cat-highlight-new_open { border-left: 4px solid #3b82f6; }
-        .cat-highlight-women { border-left: 4px solid #ec4899; }
-        .cat-highlight-senior { border-left: 4px solid #f97316; }
-        .cat-highlight-pet { border-left: 4px solid #f59e0b; }
-        .cat-highlight-foreign { border-left: 4px solid #22c55e; }
-        .cat-highlight-student { border-left: 4px solid #6366f1; }
-        .cat-highlight-budget { border-left: 4px solid #eab308; }
-        .cat-highlight-remote { border-left: 4px solid #06b6d4; }
-        .cat-highlight-tokyo { border-left: 4px solid #ef4444; }
-        .cat-highlight-osaka { border-left: 4px solid #a855f7; }
-        .cat-highlight-trend { border-left: 4px solid #2563eb; }
-        .cat-highlight-coliving { border-left: 4px solid #14b8a6; }
-        .cat-highlight-desk_tour { border-left: 4px solid #8b5cf6; }
+        /* カテゴリー別ハイライト色 - よりソフトに */
+        .cat-highlight-new_open { border-left: 3px solid #3b82f6; background: linear-gradient(90deg, rgba(59,130,246,0.05) 0%, transparent 100%); }
+        .cat-highlight-women { border-left: 3px solid #ec4899; background: linear-gradient(90deg, rgba(236,72,153,0.05) 0%, transparent 100%); }
+        .cat-highlight-senior { border-left: 3px solid #f97316; background: linear-gradient(90deg, rgba(249,115,22,0.05) 0%, transparent 100%); }
+        .cat-highlight-pet { border-left: 3px solid #f59e0b; background: linear-gradient(90deg, rgba(245,158,11,0.05) 0%, transparent 100%); }
+        .cat-highlight-foreign { border-left: 3px solid #22c55e; background: linear-gradient(90deg, rgba(34,197,94,0.05) 0%, transparent 100%); }
+        .cat-highlight-student { border-left: 3px solid #6366f1; background: linear-gradient(90deg, rgba(99,102,241,0.05) 0%, transparent 100%); }
+        .cat-highlight-budget { border-left: 3px solid #eab308; background: linear-gradient(90deg, rgba(234,179,8,0.05) 0%, transparent 100%); }
+        .cat-highlight-remote { border-left: 3px solid #06b6d4; background: linear-gradient(90deg, rgba(6,182,212,0.05) 0%, transparent 100%); }
+        .cat-highlight-tokyo { border-left: 3px solid #ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%); }
+        .cat-highlight-osaka { border-left: 3px solid #a855f7; background: linear-gradient(90deg, rgba(168,85,247,0.05) 0%, transparent 100%); }
+        .cat-highlight-trend { border-left: 3px solid #2563eb; background: linear-gradient(90deg, rgba(37,99,235,0.05) 0%, transparent 100%); }
+        .cat-highlight-coliving { border-left: 3px solid #14b8a6; background: linear-gradient(90deg, rgba(20,184,166,0.05) 0%, transparent 100%); }
+        .cat-highlight-desk_tour { border-left: 3px solid #8b5cf6; background: linear-gradient(90deg, rgba(139,92,246,0.05) 0%, transparent 100%); }
         
         /* スマホ用の余白調整 */
         @media (max-width: 767px) {
             body {
-                padding-bottom: 60px;
+                padding-bottom: 70px;
             }
         }
     </style>
@@ -468,23 +467,26 @@ app.get('/', (c) => {
     <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     ${yahooStyles}
 </head>
 <body>
     <!-- ヘッダー -->
     <header class="yahoo-header">
-        <div class="max-w-6xl mx-auto px-3 py-2">
+        <div class="max-w-6xl mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center gap-2">
-                    <span class="text-white font-bold text-xl" style="text-shadow: 0 0 10px rgba(233,69,96,0.5);">ST</span>
-                    <span class="font-bold text-sm text-gray-200 hidden sm:inline">シェアハウスタイムズ</span>
-                    <span class="font-bold text-xs text-gray-200 sm:hidden">シェアタイムズ</span>
-                    <span class="text-xs px-2 py-0.5 rounded font-bold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">AI</span>
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">ST</div>
+                    <div>
+                        <span class="font-bold text-sm text-slate-800 hidden sm:block">シェアハウスタイムズ</span>
+                        <span class="font-bold text-xs text-slate-800 sm:hidden">シェアタイムズ</span>
+                        <span class="text-xs text-slate-500 hidden sm:block">AIがまとめる最新情報</span>
+                    </div>
                 </a>
                 <div class="flex items-center gap-3">
-                    <span class="update-time hidden sm:inline text-gray-400"><i class="far fa-clock mr-1"></i>毎日7時・18時更新</span>
+                    <span class="update-time hidden sm:inline"><i class="far fa-clock mr-1"></i>毎日7時・18時更新</span>
                     <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="text-white px-4 py-1.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-1" style="background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 100%); box-shadow: 0 2px 8px rgba(45,90,39,0.3);">
+                       class="text-white px-4 py-2 rounded-full text-xs font-bold hidden sm:flex items-center gap-2" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); box-shadow: 0 4px 14px rgba(5,150,105,0.3);">
                         <i class="fas fa-home"></i>
                         クランテラス
                     </a>
@@ -495,32 +497,32 @@ app.get('/', (c) => {
 
     <!-- タブナビゲーション -->
     <nav class="tab-nav">
-        <div class="max-w-6xl mx-auto px-2">
+        <div class="max-w-6xl mx-auto px-4">
             <a href="#" class="tab-item active" onclick="filterRegion('all'); return false;" data-region="all">トップ</a>
-            <a href="#" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">🇯🇵 国内</a>
-            <a href="#" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">🌍 海外</a>
-            <a href="#" class="tab-item" onclick="filterCategory('tokyo_life'); return false;" data-region="tokyo">🗼 東京</a>
-            <a href="#" class="tab-item" onclick="filterCategory('trend'); return false;" data-region="trend">📊 トレンド</a>
+            <a href="#" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">国内</a>
+            <a href="#" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">海外</a>
+            <a href="#" class="tab-item" onclick="filterCategory('tokyo_life'); return false;" data-region="tokyo">東京</a>
+            <a href="#" class="tab-item" onclick="filterCategory('trend'); return false;" data-region="trend">トレンド</a>
         </div>
     </nav>
 
     <!-- モバイル用カテゴリーメニュー -->
     <div class="mobile-cat-menu md:hidden">
-        <div class="px-2">
+        <div class="px-3">
             <a href="#" class="mobile-cat-item active" onclick="filterCategory('all'); return false;" data-cat="all">主要</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('new_open'); return false;" data-cat="new_open">🚪新規</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('women'); return false;" data-cat="women">♀️女性</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('senior'); return false;" data-cat="senior">👴高齢者</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('pet'); return false;" data-cat="pet">🐾ペット</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('budget'); return false;" data-cat="budget">💴格安</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('student'); return false;" data-cat="student">🎓学生</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('remote'); return false;" data-cat="remote">💻リモート</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo'); return false;" data-cat="tokyo">🗼東京</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('osaka'); return false;" data-cat="osaka">🏯大阪</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('coliving'); return false;" data-cat="coliving">🏢コリビング</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo_life'); return false;" data-cat="tokyo_life">🏠一人暮らし</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('trend'); return false;" data-cat="trend">📊賃貸トレンド</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">🖥️デスクツアー</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('new_open'); return false;" data-cat="new_open">新規</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('women'); return false;" data-cat="women">女性専用</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('senior'); return false;" data-cat="senior">高齢者</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('pet'); return false;" data-cat="pet">ペット可</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('budget'); return false;" data-cat="budget">格安</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('student'); return false;" data-cat="student">学生</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('remote'); return false;" data-cat="remote">リモート</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo'); return false;" data-cat="tokyo">東京</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('osaka'); return false;" data-cat="osaka">大阪</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('coliving'); return false;" data-cat="coliving">コリビング</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo_life'); return false;" data-cat="tokyo_life">一人暮らし</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('trend'); return false;" data-cat="trend">トレンド</a>
+            <a href="#" class="mobile-cat-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">デスクツアー</a>
         </div>
     </div>
 
