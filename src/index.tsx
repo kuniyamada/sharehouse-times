@@ -753,11 +753,8 @@ app.get('/', (c) => {
                 
                 <!-- クランテラス久が原 -->
                 <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 border-b hover:bg-gray-50 transition-colors group">
-                    <div class="relative overflow-hidden rounded-xl mb-2">
+                    <div class="overflow-hidden rounded-xl mb-2">
                         <img src="${CRANN_IMAGES.kugahara}" alt="クランテラス久が原" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                            <i class="fas fa-star mr-1"></i>人気No.1
-                        </div>
                     </div>
                     <div class="flex items-start justify-between">
                         <div>
@@ -772,11 +769,8 @@ app.get('/', (c) => {
                 
                 <!-- クランテラス溝の口 -->
                 <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 border-b hover:bg-gray-50 transition-colors group">
-                    <div class="relative overflow-hidden rounded-xl mb-2">
+                    <div class="overflow-hidden rounded-xl mb-2">
                         <img src="${CRANN_IMAGES.mizonokuchi}" alt="クランテラス溝の口" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-2 left-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                            <i class="fas fa-bolt mr-1"></i>NEW OPEN
-                        </div>
                     </div>
                     <div class="flex items-start justify-between">
                         <div>
@@ -791,11 +785,8 @@ app.get('/', (c) => {
                 
                 <!-- クランテラス品川 -->
                 <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" class="block p-3 hover:bg-gray-50 transition-colors group">
-                    <div class="relative overflow-hidden rounded-xl mb-2">
+                    <div class="overflow-hidden rounded-xl mb-2">
                         <img src="${CRANN_IMAGES.shinagawa}" alt="クランテラス品川" class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                            <i class="fas fa-crown mr-1"></i>Premium
-                        </div>
                     </div>
                     <div class="flex items-start justify-between">
                         <div>
