@@ -1,0 +1,26 @@
+# SHARE HOUSE TIMES - robots.txt
+# シェアハウス・東京一人暮らし情報サイト
+
+User-agent: *
+Allow: /
+
+# サイトマップ
+Sitemap: https://sharehouse-times.pages.dev/sitemap.xml
+
+# クロール頻度の推奨（コメント）
+# このサイトは毎日7時と18時に更新されます
+
+# 検索エンジンへのヒント
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /

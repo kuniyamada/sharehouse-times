@@ -454,20 +454,179 @@ const yahooStyles = `
 
 // ニュースページ（Yahoo! JAPAN風トップ - スマホ対応）
 app.get('/', (c) => {
+  const currentDate = new Date().toISOString();
+  
   return c.html(`
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
-    <title>シェアハウスタイムズ｜AIがまとめる最新シェアハウス情報</title>
-    <meta name="description" content="AIが国内外のシェアハウス・コリビング最新ニュースを毎日自動収集。女性専用、ペット可、高齢者向け、格安物件など幅広くカバー。東京・大阪・福岡のエリア情報も。">
-    <meta name="keywords" content="シェアハウス,コリビング,女性専用,ペット可,高齢者,東京,一人暮らし,賃貸,ニュース">
+    
+    <!-- 基本SEOメタタグ -->
+    <title>シェアハウス探し・東京一人暮らし情報｜SHARE HOUSE TIMES</title>
+    <meta name="description" content="【2026年最新】シェアハウス・コリビングの最新ニュースをAIが毎日更新。東京で一人暮らしを始める方、女性専用・ペット可・格安物件を探している方必見。家賃相場、初期費用、エリア別おすすめ情報を網羅。">
+    <meta name="keywords" content="シェアハウス,東京 一人暮らし,コリビング,女性専用シェアハウス,ペット可シェアハウス,格安シェアハウス,東京 シェアハウス,一人暮らし 費用,家賃相場,初期費用,賃貸">
+    <meta name="author" content="SHARE HOUSE TIMES">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
     <link rel="canonical" href="https://sharehouse-times.pages.dev/">
-    <meta property="og:title" content="シェアハウスタイムズ｜AIがまとめる最新情報">
-    <meta property="og:description" content="AIが国内外のシェアハウス最新ニュースを毎日自動収集">
+    
+    <!-- 多言語対応 -->
+    <link rel="alternate" hreflang="ja" href="https://sharehouse-times.pages.dev/">
+    <link rel="alternate" hreflang="x-default" href="https://sharehouse-times.pages.dev/">
+    
+    <!-- OGP（Open Graph Protocol） -->
+    <meta property="og:site_name" content="SHARE HOUSE TIMES">
+    <meta property="og:title" content="シェアハウス探し・東京一人暮らし情報｜SHARE HOUSE TIMES">
+    <meta property="og:description" content="シェアハウス・コリビングの最新ニュースをAIが毎日更新。東京で一人暮らしを始める方必見の情報サイト。">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sharehouse-times.pages.dev/">
+    <meta property="og:image" content="https://sharehouse-times.pages.dev/images/kugahara.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="シェアハウス探し・東京一人暮らし情報｜SHARE HOUSE TIMES">
+    <meta name="twitter:description" content="シェアハウス・コリビングの最新ニュースをAIが毎日更新。">
+    <meta name="twitter:image" content="https://sharehouse-times.pages.dev/images/kugahara.jpg">
+    
+    <!-- ファビコン -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    
+    <!-- 構造化データ（JSON-LD） -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SHARE HOUSE TIMES",
+      "alternateName": "シェアハウスタイムズ",
+      "url": "https://sharehouse-times.pages.dev/",
+      "description": "シェアハウス・コリビングの最新ニュースをAIが毎日更新",
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://sharehouse-times.pages.dev/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SHARE HOUSE TIMES",
+      "url": "https://sharehouse-times.pages.dev/",
+      "logo": "https://sharehouse-times.pages.dev/images/kugahara.jpg",
+      "description": "AIがシェアハウス・コリビングの最新情報を毎日お届け",
+      "foundingDate": "2026",
+      "sameAs": []
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsMediaOrganization",
+      "name": "SHARE HOUSE TIMES",
+      "url": "https://sharehouse-times.pages.dev/",
+      "description": "シェアハウス・東京一人暮らしに特化したニュースメディア",
+      "actionableFeedbackPolicy": "https://sharehouse-times.pages.dev/",
+      "diversityPolicy": "https://sharehouse-times.pages.dev/",
+      "ethicsPolicy": "https://sharehouse-times.pages.dev/"
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "シェアハウスカテゴリー一覧",
+      "description": "シェアハウスの種類・エリア別カテゴリー",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "女性専用シェアハウス", "url": "https://sharehouse-times.pages.dev/#women"},
+        {"@type": "ListItem", "position": 2, "name": "ペット可シェアハウス", "url": "https://sharehouse-times.pages.dev/#pet"},
+        {"@type": "ListItem", "position": 3, "name": "格安シェアハウス", "url": "https://sharehouse-times.pages.dev/#budget"},
+        {"@type": "ListItem", "position": 4, "name": "東京のシェアハウス", "url": "https://sharehouse-times.pages.dev/#tokyo"},
+        {"@type": "ListItem", "position": 5, "name": "コリビング", "url": "https://sharehouse-times.pages.dev/#coliving"},
+        {"@type": "ListItem", "position": 6, "name": "東京一人暮らし情報", "url": "https://sharehouse-times.pages.dev/#tokyo_life"}
+      ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "ホーム",
+          "item": "https://sharehouse-times.pages.dev/"
+        }
+      ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "シェアハウスとは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "シェアハウスとは、複数の入居者がキッチンやリビングなどの共用スペースを共有しながら、個室で生活する賃貸住宅の形態です。一人暮らしより家賃を抑えられ、入居者同士の交流も楽しめます。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "東京でシェアハウスの家賃相場はいくらですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "東京のシェアハウスの家賃相場は、エリアや設備により異なりますが、一般的に月額4万円〜8万円程度です。山手線沿線など人気エリアは6万円〜10万円程度になることもあります。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "シェアハウスの初期費用はいくらですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "シェアハウスの初期費用は一般的な賃貸より低く、デポジット（保証金）1ヶ月分＋初月家賃程度で入居できることが多いです。敷金・礼金・仲介手数料が不要な物件も多くあります。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "女性専用シェアハウスのメリットは？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "女性専用シェアハウスは、セキュリティ面での安心感、清潔な共用スペース、女性同士の気軽なコミュニケーションなどのメリットがあります。オートロックや防犯カメラ完備の物件も多いです。"
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <!-- パフォーマンス最適化 -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -501,14 +660,19 @@ app.get('/', (c) => {
         }
     </style>
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/WebPage">
+    <!-- スキップリンク（アクセシビリティ） -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-indigo-600 focus:text-white focus:p-4">
+        メインコンテンツへスキップ
+    </a>
+
     <!-- ヘッダー -->
-    <header class="yahoo-header">
+    <header class="yahoo-header" role="banner">
         <div class="max-w-6xl mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center gap-3 group">
+                <a href="/" class="flex items-center gap-3 group" aria-label="SHARE HOUSE TIMES ホーム">
                     <!-- ロゴアイコン -->
-                    <div class="logo-icon w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg relative">
+                    <div class="logo-icon w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg relative" aria-hidden="true">
                         <i class="fas fa-house-chimney text-lg"></i>
                         <div class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
                             <i class="fas fa-bolt text-[8px] text-yellow-900"></i>
@@ -517,84 +681,103 @@ app.get('/', (c) => {
                     <!-- ロゴテキスト -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="logo-text font-extrabold text-lg text-slate-800 tracking-wide hidden sm:block group-hover:text-indigo-600 transition-colors">
+                            <h1 class="logo-text font-extrabold text-lg text-slate-800 tracking-wide hidden sm:block group-hover:text-indigo-600 transition-colors m-0">
                                 SHARE HOUSE TIMES
-                            </span>
+                            </h1>
                             <span class="logo-text font-extrabold text-sm text-slate-800 tracking-wide sm:hidden">
                                 SHARE HOUSE TIMES
                             </span>
-                            <span class="ai-badge text-[10px] font-bold text-white px-2 py-0.5 rounded-full">
+                            <span class="ai-badge text-[10px] font-bold text-white px-2 py-0.5 rounded-full" aria-label="AI powered">
                                 AI
                             </span>
                         </div>
                         <span class="text-[10px] text-slate-500 hidden sm:flex items-center gap-1">
-                            <i class="fas fa-sparkles text-amber-400"></i>
-                            シェアハウスの最新情報をAIがお届け
+                            <i class="fas fa-sparkles text-amber-400" aria-hidden="true"></i>
+                            シェアハウス・東京一人暮らしの最新情報をAIがお届け
                         </span>
                     </div>
                 </a>
                 <div class="flex items-center gap-3">
                     <!-- 更新時刻 -->
                     <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                        <i class="fas fa-sync-alt text-indigo-500"></i>
-                        <span>毎日 <strong class="text-slate-700">7時・18時</strong> 更新</span>
+                        <i class="fas fa-sync-alt text-indigo-500" aria-hidden="true"></i>
+                        <time datetime="07:00">毎日 <strong class="text-slate-700">7時・18時</strong> 更新</time>
                     </div>
                     <!-- クランテラスボタン -->
-                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="header-cta text-white px-5 py-2.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-2 shadow-lg">
-                        <i class="fas fa-building"></i>
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer sponsored" 
+                       class="header-cta text-white px-5 py-2.5 rounded-full text-xs font-bold hidden sm:flex items-center gap-2 shadow-lg"
+                       aria-label="クランテラス シェアハウス物件を見る（外部サイト）">
+                        <i class="fas fa-building" aria-hidden="true"></i>
                         <span>クランテラス</span>
-                        <i class="fas fa-arrow-right text-[10px] opacity-70"></i>
+                        <i class="fas fa-arrow-right text-[10px] opacity-70" aria-hidden="true"></i>
                     </a>
                     <!-- モバイル用アイコン -->
-                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer" 
-                       class="header-cta w-10 h-10 rounded-full flex items-center justify-center text-white sm:hidden shadow-lg">
-                        <i class="fas fa-building"></i>
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer sponsored" 
+                       class="header-cta w-10 h-10 rounded-full flex items-center justify-center text-white sm:hidden shadow-lg"
+                       aria-label="クランテラス（外部サイト）">
+                        <i class="fas fa-building" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- タブナビゲーション -->
-    <nav class="tab-nav">
+    <!-- パンくずリスト -->
+    <nav class="max-w-6xl mx-auto px-4 py-2 text-xs text-gray-500" aria-label="パンくずリスト">
+        <ol class="flex items-center gap-2" itemscope itemtype="https://schema.org/BreadcrumbList">
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="/" itemprop="item" class="hover:text-indigo-600">
+                    <span itemprop="name">ホーム</span>
+                </a>
+                <meta itemprop="position" content="1">
+            </li>
+            <li class="text-gray-300" aria-hidden="true">></li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" id="breadcrumb-current">
+                <span itemprop="name">シェアハウスニュース</span>
+                <meta itemprop="position" content="2">
+            </li>
+        </ol>
+    </nav>
+
+    <!-- メインナビゲーション -->
+    <nav class="tab-nav" role="navigation" aria-label="メインナビゲーション">
         <div class="max-w-6xl mx-auto px-4">
-            <a href="#" class="tab-item active" onclick="filterRegion('all'); return false;" data-region="all">トップ</a>
-            <a href="#" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">国内</a>
-            <a href="#" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">海外</a>
-            <a href="#" class="tab-item" onclick="filterCategory('tokyo_life'); return false;" data-region="tokyo">東京</a>
-            <a href="#" class="tab-item" onclick="filterCategory('trend'); return false;" data-region="trend">トレンド</a>
+            <a href="#" class="tab-item active" onclick="filterRegion('all'); return false;" data-region="all" aria-current="page">トップ</a>
+            <a href="#japan" class="tab-item" onclick="filterRegion('japan'); return false;" data-region="japan">国内ニュース</a>
+            <a href="#world" class="tab-item" onclick="filterRegion('world'); return false;" data-region="world">海外ニュース</a>
+            <a href="#tokyo" class="tab-item" onclick="filterCategory('tokyo_life'); return false;" data-region="tokyo">東京一人暮らし</a>
+            <a href="#trend" class="tab-item" onclick="filterCategory('trend'); return false;" data-region="trend">トレンド</a>
         </div>
     </nav>
 
-    <!-- モバイル用カテゴリーメニュー -->
-    <div class="mobile-cat-menu md:hidden">
+    <!-- モバイル用カテゴリーナビゲーション -->
+    <nav class="mobile-cat-menu md:hidden" role="navigation" aria-label="カテゴリーメニュー">
         <div class="px-3">
             <a href="#" class="mobile-cat-item active" onclick="filterCategory('all'); return false;" data-cat="all">主要</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('new_open'); return false;" data-cat="new_open">新規</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('women'); return false;" data-cat="women">女性専用</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('senior'); return false;" data-cat="senior">高齢者</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('pet'); return false;" data-cat="pet">ペット可</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('budget'); return false;" data-cat="budget">格安</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('student'); return false;" data-cat="student">学生</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('remote'); return false;" data-cat="remote">リモート</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo'); return false;" data-cat="tokyo">東京</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('osaka'); return false;" data-cat="osaka">大阪</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('coliving'); return false;" data-cat="coliving">コリビング</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('tokyo_life'); return false;" data-cat="tokyo_life">一人暮らし</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('trend'); return false;" data-cat="trend">トレンド</a>
-            <a href="#" class="mobile-cat-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">デスクツアー</a>
+            <a href="#women" class="mobile-cat-item" onclick="filterCategory('women'); return false;" data-cat="women">女性専用</a>
+            <a href="#pet" class="mobile-cat-item" onclick="filterCategory('pet'); return false;" data-cat="pet">ペット可</a>
+            <a href="#budget" class="mobile-cat-item" onclick="filterCategory('budget'); return false;" data-cat="budget">格安</a>
+            <a href="#student" class="mobile-cat-item" onclick="filterCategory('student'); return false;" data-cat="student">学生</a>
+            <a href="#remote" class="mobile-cat-item" onclick="filterCategory('remote'); return false;" data-cat="remote">リモート</a>
+            <a href="#tokyo" class="mobile-cat-item" onclick="filterCategory('tokyo'); return false;" data-cat="tokyo">東京</a>
+            <a href="#osaka" class="mobile-cat-item" onclick="filterCategory('osaka'); return false;" data-cat="osaka">大阪</a>
+            <a href="#coliving" class="mobile-cat-item" onclick="filterCategory('coliving'); return false;" data-cat="coliving">コリビング</a>
+            <a href="#tokyo_life" class="mobile-cat-item" onclick="filterCategory('tokyo_life'); return false;" data-cat="tokyo_life">一人暮らし</a>
+            <a href="#new_open" class="mobile-cat-item" onclick="filterCategory('new_open'); return false;" data-cat="new_open">新規</a>
+            <a href="#senior" class="mobile-cat-item" onclick="filterCategory('senior'); return false;" data-cat="senior">高齢者</a>
+            <a href="#trend" class="mobile-cat-item" onclick="filterCategory('trend'); return false;" data-cat="trend">トレンド</a>
+            <a href="#desk_tour" class="mobile-cat-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">デスクツアー</a>
         </div>
-    </div>
+    </nav>
 
     <!-- メインコンテンツ -->
-    <main class="max-w-6xl mx-auto md:flex">
+    <main id="main-content" class="max-w-6xl mx-auto md:flex" role="main" itemprop="mainContentOfPage">
         
         <!-- 左サイドメニュー（PC用） -->
-        <aside class="side-menu w-40 flex-shrink-0 hidden md:block">
+        <aside class="side-menu w-40 flex-shrink-0 hidden md:block" role="complementary" aria-label="カテゴリーメニュー">
             <!-- 物件タイプ -->
             <div class="side-menu-section">
-                <div class="side-menu-section-title">物件タイプ</div>
+                <h2 class="side-menu-section-title">物件タイプ</h2>
                 <a href="#" class="side-menu-item active" onclick="filterCategory('all'); return false;" data-cat="all">
                     <i class="fas fa-home mr-2 text-gray-400"></i>主要ニュース
                 </a>
@@ -626,7 +809,7 @@ app.get('/', (c) => {
             
             <!-- エリア -->
             <div class="side-menu-section">
-                <div class="side-menu-section-title">エリア</div>
+                <h2 class="side-menu-section-title">エリア</h2>
                 <a href="#" class="side-menu-item" onclick="filterCategory('tokyo'); return false;" data-cat="tokyo">
                     <i class="fas fa-building mr-2 text-red-400"></i>東京
                 </a>
@@ -646,7 +829,7 @@ app.get('/', (c) => {
             
             <!-- ライフスタイル・トレンド -->
             <div class="side-menu-section">
-                <div class="side-menu-section-title">トレンド</div>
+                <h2 class="side-menu-section-title">トレンド</h2>
                 <a href="#" class="side-menu-item" onclick="filterCategory('trend'); return false;" data-cat="trend">
                     <i class="fas fa-chart-line mr-2 text-blue-400"></i>賃貸トレンド
                 </a>
@@ -700,55 +883,64 @@ app.get('/', (c) => {
             
             <!-- カテゴリータイトル -->
             <div id="categoryTitle" class="hidden bg-white border-b px-4 py-3 m-3 md:m-3 rounded-t">
-                <h1 class="text-lg font-bold text-gray-800" id="categoryTitleText">主要ニュース</h1>
+                <h2 class="text-lg font-bold text-gray-800" id="categoryTitleText">主要ニュース</h2>
                 <p class="text-xs text-gray-500" id="categoryDescription">シェアハウス・コリビングの最新ニュース</p>
             </div>
             
             <!-- トピックス -->
-            <section class="topics-box m-3 md:m-3">
-                <div class="topics-header flex items-center justify-between">
-                    <span><i class="fas fa-fire topics-header-icon"></i>トピックス</span>
-                    <span class="update-time" id="updateTime"></span>
-                </div>
-                <div id="topicsList" class="divide-y divide-gray-100"></div>
+            <section class="topics-box m-3 md:m-3" aria-labelledby="topics-heading" itemscope itemtype="https://schema.org/ItemList">
+                <header class="topics-header flex items-center justify-between">
+                    <h2 id="topics-heading" class="flex items-center m-0 text-base font-bold">
+                        <i class="fas fa-fire topics-header-icon mr-2" aria-hidden="true"></i>
+                        <span itemprop="name">シェアハウス・東京一人暮らし トピックス</span>
+                    </h2>
+                    <time class="update-time" id="updateTime" datetime=""></time>
+                </header>
+                <div id="topicsList" class="divide-y divide-gray-100" role="feed" aria-label="最新ニュース一覧"></div>
             </section>
 
             <!-- 国内ニュース -->
-            <section id="japanSection" class="topics-box section-japan m-3 md:m-3">
-                <div class="topics-header">
-                    <span>🇯🇵 国内ニュース</span>
-                </div>
-                <div id="japanNewsList" class="divide-y divide-gray-100"></div>
+            <section id="japanSection" class="topics-box section-japan m-3 md:m-3" aria-labelledby="japan-heading">
+                <header class="topics-header">
+                    <h2 id="japan-heading" class="m-0 text-base font-bold">
+                        <span aria-hidden="true">🇯🇵</span> 国内シェアハウスニュース
+                    </h2>
+                </header>
+                <div id="japanNewsList" class="divide-y divide-gray-100" role="feed" aria-label="国内ニュース一覧"></div>
             </section>
 
             <!-- 海外ニュース -->
-            <section id="worldSection" class="topics-box section-world m-3 md:m-3">
-                <div class="topics-header">
-                    <span>🌍 海外ニュース</span>
-                </div>
-                <div id="worldNewsList" class="divide-y divide-gray-100"></div>
+            <section id="worldSection" class="topics-box section-world m-3 md:m-3" aria-labelledby="world-heading">
+                <header class="topics-header">
+                    <h2 id="world-heading" class="m-0 text-base font-bold">
+                        <span aria-hidden="true">🌍</span> 海外コリビングニュース
+                    </h2>
+                </header>
+                <div id="worldNewsList" class="divide-y divide-gray-100" role="feed" aria-label="海外ニュース一覧"></div>
             </section>
 
             <!-- モバイル用ランキング -->
-            <section class="topics-box section-ranking m-3 md:hidden">
-                <div class="topics-header">
-                    <i class="fas fa-ranking-star mr-2"></i>アクセスランキング
-                </div>
-                <div class="p-3" id="mobileRankingList"></div>
+            <section class="topics-box section-ranking m-3 md:hidden" aria-labelledby="mobile-ranking-heading">
+                <header class="topics-header">
+                    <h2 id="mobile-ranking-heading" class="m-0 text-base font-bold flex items-center">
+                        <i class="fas fa-ranking-star mr-2" aria-hidden="true"></i>アクセスランキング
+                    </h2>
+                </header>
+                <div class="p-3" id="mobileRankingList" role="list" aria-label="人気記事ランキング"></div>
             </section>
 
         </div>
 
         <!-- 右サイドバー（PC用） -->
-        <aside class="w-64 flex-shrink-0 hidden lg:block p-3 space-y-3">
+        <aside class="w-64 flex-shrink-0 hidden lg:block p-3 space-y-3" role="complementary" aria-label="おすすめ物件・ランキング">
             
             <!-- クランテラス物件バナー広告 -->
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden" itemscope itemtype="https://schema.org/ItemList">
                 <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-building text-white"></i>
-                        <span class="text-white font-bold text-sm">クランテラス物件情報</span>
-                    </div>
+                    <h2 class="flex items-center gap-2 m-0 text-sm font-bold text-white">
+                        <i class="fas fa-building" aria-hidden="true"></i>
+                        <span itemprop="name">おすすめシェアハウス物件</span>
+                    </h2>
                 </div>
                 
                 <!-- クランテラス久が原 -->
@@ -809,51 +1001,108 @@ app.get('/', (c) => {
             </div>
 
             <!-- アクセスランキング -->
-            <div class="pr-box">
-                <div class="pr-header flex items-center">
-                    <i class="fas fa-ranking-star text-yellow-500 mr-2"></i>
+            <div class="pr-box" aria-labelledby="ranking-heading">
+                <h2 id="ranking-heading" class="pr-header flex items-center m-0 text-sm font-bold">
+                    <i class="fas fa-ranking-star text-yellow-500 mr-2" aria-hidden="true"></i>
                     アクセスランキング
-                </div>
-                <div class="p-2" id="rankingList"></div>
+                </h2>
+                <div class="p-2" id="rankingList" role="list" aria-label="人気記事ランキング"></div>
             </div>
 
             <!-- 注目キーワード -->
-            <div class="pr-box">
-                <div class="pr-header">
-                    <i class="fas fa-tag mr-2"></i>
-                    注目キーワード
-                </div>
-                <div class="p-3 flex flex-wrap">
-                    <span onclick="filterCategory('women')" class="keyword-tag">♀️ 女性専用</span>
-                    <span onclick="filterCategory('pet')" class="keyword-tag">🐾 ペット可</span>
-                    <span onclick="filterCategory('budget')" class="keyword-tag">💴 格安</span>
-                    <span onclick="filterCategory('tokyo')" class="keyword-tag">🗼 東京</span>
-                    <span onclick="filterCategory('coliving')" class="keyword-tag">🏢 コリビング</span>
-                    <span onclick="filterCategory('remote')" class="keyword-tag">💻 リモート</span>
+            <div class="pr-box" aria-labelledby="keywords-heading">
+                <h2 id="keywords-heading" class="pr-header m-0 text-sm font-bold">
+                    <i class="fas fa-tag mr-2" aria-hidden="true"></i>
+                    シェアハウス検索キーワード
+                </h2>
+                <div class="p-3 flex flex-wrap" role="list" aria-label="人気の検索キーワード">
+                    <button onclick="filterCategory('women')" class="keyword-tag" role="listitem">女性専用シェアハウス</button>
+                    <button onclick="filterCategory('pet')" class="keyword-tag" role="listitem">ペット可シェアハウス</button>
+                    <button onclick="filterCategory('budget')" class="keyword-tag" role="listitem">格安シェアハウス</button>
+                    <button onclick="filterCategory('tokyo')" class="keyword-tag" role="listitem">東京シェアハウス</button>
+                    <button onclick="filterCategory('coliving')" class="keyword-tag" role="listitem">コリビング</button>
+                    <button onclick="filterCategory('remote')" class="keyword-tag" role="listitem">リモートワーク向け</button>
+                    <button onclick="filterCategory('tokyo_life')" class="keyword-tag" role="listitem">東京一人暮らし</button>
+                    <button onclick="filterCategory('student')" class="keyword-tag" role="listitem">学生向け</button>
                 </div>
             </div>
 
         </aside>
     </main>
+    
+    <!-- SEO用コンテンツ（検索エンジン向け説明文） -->
+    <section class="max-w-6xl mx-auto px-4 py-6 bg-white mt-4 rounded-lg shadow-sm" aria-labelledby="about-heading">
+        <h2 id="about-heading" class="text-lg font-bold text-gray-800 mb-4">SHARE HOUSE TIMESについて</h2>
+        <div class="text-sm text-gray-600 space-y-3 leading-relaxed">
+            <p>
+                <strong>SHARE HOUSE TIMES（シェアハウスタイムズ）</strong>は、シェアハウス・コリビングの最新ニュースをAIが自動収集してお届けする情報サイトです。
+                東京で一人暮らしを始める方、シェアハウスを探している方に向けて、毎日朝7時と夕方18時に最新情報を更新しています。
+            </p>
+            <p>
+                <strong>女性専用シェアハウス</strong>、<strong>ペット可物件</strong>、<strong>格安シェアハウス</strong>、<strong>学生向け物件</strong>など、
+                様々なニーズに合わせたカテゴリー別のニュースをご覧いただけます。東京・大阪・福岡などエリア別の情報も充実。
+            </p>
+            <p>
+                シェアハウスの家賃相場、初期費用、メリット・デメリット、入居時の注意点など、
+                <strong>東京での一人暮らし</strong>や<strong>シェアハウス選び</strong>に役立つ情報を幅広くカバーしています。
+            </p>
+        </div>
+        
+        <!-- よくある質問（FAQセクション） -->
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <h3 class="text-base font-bold text-gray-800 mb-3">よくある質問</h3>
+            <dl class="space-y-4 text-sm">
+                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <dt class="font-medium text-gray-800" itemprop="name">Q. シェアハウスとは何ですか？</dt>
+                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <span itemprop="text">シェアハウスは、複数の入居者がキッチンやリビングなどの共用スペースを共有しながら、個室で生活する賃貸住宅です。一人暮らしより家賃を抑えられ、入居者同士の交流も楽しめます。</span>
+                    </dd>
+                </div>
+                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <dt class="font-medium text-gray-800" itemprop="name">Q. 東京のシェアハウスの家賃相場は？</dt>
+                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <span itemprop="text">東京のシェアハウスの家賃相場は月額4万円〜8万円程度です。山手線沿線など人気エリアは6万円〜10万円程度になることもあります。</span>
+                    </dd>
+                </div>
+                <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                    <dt class="font-medium text-gray-800" itemprop="name">Q. シェアハウスの初期費用はいくら？</dt>
+                    <dd class="mt-1 text-gray-600 pl-4" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <span itemprop="text">シェアハウスの初期費用は一般的な賃貸より低く、デポジット（保証金）1ヶ月分＋初月家賃程度で入居できることが多いです。敷金・礼金・仲介手数料が不要な物件も多くあります。</span>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </section>
 
     <!-- フッター -->
-    <footer class="yahoo-footer py-8 mt-4">
+    <footer class="yahoo-footer py-8 mt-4" role="contentinfo" itemscope itemtype="https://schema.org/WPFooter">
         <div class="max-w-6xl mx-auto px-4 text-center">
+            <!-- 内部リンク（SEO強化） -->
+            <nav class="mb-6" aria-label="カテゴリーリンク">
+                <h3 class="text-xs text-slate-400 mb-3">シェアハウスカテゴリー</h3>
+                <div class="flex flex-wrap justify-center gap-3 text-xs">
+                    <a href="#women" onclick="filterCategory('women'); return false;" class="footer-link hover:text-indigo-600">女性専用シェアハウス</a>
+                    <a href="#pet" onclick="filterCategory('pet'); return false;" class="footer-link hover:text-indigo-600">ペット可シェアハウス</a>
+                    <a href="#budget" onclick="filterCategory('budget'); return false;" class="footer-link hover:text-indigo-600">格安シェアハウス</a>
+                    <a href="#tokyo" onclick="filterCategory('tokyo'); return false;" class="footer-link hover:text-indigo-600">東京のシェアハウス</a>
+                    <a href="#osaka" onclick="filterCategory('osaka'); return false;" class="footer-link hover:text-indigo-600">大阪のシェアハウス</a>
+                    <a href="#coliving" onclick="filterCategory('coliving'); return false;" class="footer-link hover:text-indigo-600">コリビング</a>
+                    <a href="#tokyo_life" onclick="filterCategory('tokyo_life'); return false;" class="footer-link hover:text-indigo-600">東京一人暮らし</a>
+                    <a href="#student" onclick="filterCategory('student'); return false;" class="footer-link hover:text-indigo-600">学生向けシェアハウス</a>
+                </div>
+            </nav>
+            
+            <!-- 外部リンク -->
             <div class="flex flex-wrap justify-center gap-4 mb-4 text-xs">
-                <a href="https://crann-terrace.com/" class="footer-link">クランテラス公式</a>
-                <span class="text-slate-600">|</span>
-                <a href="#" onclick="filterCategory('women'); return false;" class="footer-link">女性専用</a>
-                <span class="text-slate-600">|</span>
-                <a href="#" onclick="filterCategory('tokyo'); return false;" class="footer-link">東京</a>
-                <span class="text-slate-600">|</span>
-                <a href="#" onclick="filterCategory('coliving'); return false;" class="footer-link">コリビング</a>
+                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer sponsored" class="footer-link">クランテラス公式サイト</a>
             </div>
+            
             <div class="flex items-center justify-center gap-2 mb-3">
-                <i class="fas fa-shield-halved text-indigo-400"></i>
+                <i class="fas fa-shield-halved text-indigo-400" aria-hidden="true"></i>
                 <span class="text-xs text-slate-400">東京ディフェンス株式会社 提供</span>
             </div>
             <p class="text-xs text-slate-500">
-                &copy; 2026 SHARE HOUSE TIMES
+                <small>&copy; 2026 SHARE HOUSE TIMES - シェアハウス・東京一人暮らし情報サイト</small>
             </p>
         </div>
     </footer>
