@@ -514,19 +514,19 @@ app.get('/', (c) => {
                     <!-- ロゴテキスト -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="logo-text font-extrabold text-lg text-slate-800 tracking-tight hidden sm:block group-hover:text-indigo-600 transition-colors">
-                                ShareTimes
+                            <span class="logo-text font-extrabold text-lg text-slate-800 tracking-wide hidden sm:block group-hover:text-indigo-600 transition-colors">
+                                SHARE HOUSE TIMES
                             </span>
-                            <span class="logo-text font-extrabold text-base text-slate-800 tracking-tight sm:hidden">
-                                ShareTimes
+                            <span class="logo-text font-extrabold text-sm text-slate-800 tracking-wide sm:hidden">
+                                SHARE HOUSE TIMES
                             </span>
                             <span class="ai-badge text-[10px] font-bold text-white px-2 py-0.5 rounded-full">
                                 AI
                             </span>
                         </div>
-                        <span class="text-[10px] text-slate-400 hidden sm:flex items-center gap-1">
-                            <i class="fas fa-shield-halved text-indigo-400"></i>
-                            東京ディフェンス株式会社 提供
+                        <span class="text-[10px] text-slate-500 hidden sm:flex items-center gap-1">
+                            <i class="fas fa-sparkles text-amber-400"></i>
+                            シェアハウスの最新情報をAIがお届け
                         </span>
                     </div>
                 </a>
@@ -800,7 +800,7 @@ app.get('/', (c) => {
                 <span class="text-xs text-slate-400">東京ディフェンス株式会社 提供</span>
             </div>
             <p class="text-xs text-slate-500">
-                &copy; 2026 ShareTimes - シェアハウスタイムズ
+                &copy; 2026 SHARE HOUSE TIMES
             </p>
         </div>
     </footer>
