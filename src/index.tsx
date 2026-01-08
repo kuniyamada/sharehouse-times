@@ -964,6 +964,484 @@ app.get('/', (c) => {
   `)
 })
 
+// 管理者パスワード（本番環境では環境変数から取得）
+const ADMIN_PASSWORD = 'sharehouse2026'
+
+// 管理者ページ
+app.get('/admin', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード | シェアハウスタイムズ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: "Hiragino Kaku Gothic ProN", sans-serif; background: #1a1a2e; color: #fff; }
+        .card { background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%); border: 1px solid #2d3748; border-radius: 12px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-primary { background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .table-row:hover { background: rgba(102, 126, 234, 0.1); }
+        .status-online { color: #38ef7d; }
+        .status-offline { color: #f5576c; }
+        .login-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- ログイン画面 -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="login-card card p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <span class="text-3xl font-bold text-white">ST</span>
+                <h1 class="text-xl font-bold mt-2">管理者ダッシュボード</h1>
+                <p class="text-gray-400 text-sm mt-1">シェアハウスタイムズ</p>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">パスワード</label>
+                    <input type="password" id="password" 
+                           class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-purple-500 focus:outline-none"
+                           placeholder="パスワードを入力">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-bold text-white">
+                    <i class="fas fa-sign-in-alt mr-2"></i>ログイン
+                </button>
+                <p id="loginError" class="text-red-400 text-sm text-center hidden">パスワードが正しくありません</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ダッシュボード -->
+    <div id="dashboard" class="hidden">
+        <!-- ヘッダー -->
+        <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl font-bold text-white">ST</span>
+                    <span class="text-gray-400">|</span>
+                    <span class="font-bold">管理者ダッシュボード</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="/" class="text-gray-400 hover:text-white text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>サイトを表示
+                    </a>
+                    <button onclick="logout()" class="text-gray-400 hover:text-red-400 text-sm">
+                        <i class="fas fa-sign-out-alt mr-1"></i>ログアウト
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 space-y-6">
+            <!-- 統計カード -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="stat-card p-4 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-80">総ニュース数</p>
+                            <p class="text-3xl font-bold" id="totalNews">-</p>
+                        </div>
+                        <i class="fas fa-newspaper text-3xl opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card p-4 rounded-xl" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-80">国内ニュース</p>
+                            <p class="text-3xl font-bold" id="japanNews">-</p>
+                        </div>
+                        <span class="text-3xl">🇯🇵</span>
+                    </div>
+                </div>
+                <div class="card p-4 rounded-xl" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-80">海外ニュース</p>
+                            <p class="text-3xl font-bold" id="worldNews">-</p>
+                        </div>
+                        <span class="text-3xl">🌍</span>
+                    </div>
+                </div>
+                <div class="card p-4 rounded-xl" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-80">カテゴリー数</p>
+                            <p class="text-3xl font-bold" id="categoryCount">18</p>
+                        </div>
+                        <i class="fas fa-tags text-3xl opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- システム状態 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-server text-purple-400"></i>
+                        システム状態
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">Cron Worker</span>
+                            <span id="cronStatus" class="status-online"><i class="fas fa-circle text-xs mr-1"></i>稼働中</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">最終更新</span>
+                            <span id="lastUpdate" class="text-white">-</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">次回更新（朝）</span>
+                            <span class="text-white">07:00 JST</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-400">次回更新（夕）</span>
+                            <span class="text-white">18:00 JST</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-tools text-yellow-400"></i>
+                        クイックアクション
+                    </h2>
+                    <div class="space-y-3">
+                        <button onclick="manualUpdate()" id="updateBtn" class="btn-success w-full py-3 rounded-lg font-bold text-white flex items-center justify-center gap-2">
+                            <i class="fas fa-sync-alt"></i>
+                            今すぐニュースを更新
+                        </button>
+                        <button onclick="checkStatus()" class="btn-primary w-full py-3 rounded-lg font-bold text-white flex items-center justify-center gap-2">
+                            <i class="fas fa-heartbeat"></i>
+                            ステータスを確認
+                        </button>
+                        <a href="https://sharehouse-times-cron.kunihiro72.workers.dev/" target="_blank"
+                           class="btn-warning w-full py-3 rounded-lg font-bold text-white flex items-center justify-center gap-2 block text-center">
+                            <i class="fas fa-external-link-alt"></i>
+                            Cron Worker を開く
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- カテゴリー別統計 -->
+            <div class="card p-6">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-blue-400"></i>
+                    カテゴリー別ニュース数
+                </h2>
+                <div id="categoryStats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <!-- カテゴリー統計が動的に挿入される -->
+                </div>
+            </div>
+
+            <!-- ニュース一覧 -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fas fa-list text-green-400"></i>
+                        ニュース一覧
+                    </h2>
+                    <div class="flex gap-2">
+                        <select id="filterRegion" onchange="filterNews()" class="bg-gray-800 border border-gray-700 rounded px-3 py-1 text-sm">
+                            <option value="all">すべて</option>
+                            <option value="japan">国内</option>
+                            <option value="world">海外</option>
+                        </select>
+                        <select id="filterCategory" onchange="filterNews()" class="bg-gray-800 border border-gray-700 rounded px-3 py-1 text-sm">
+                            <option value="all">全カテゴリー</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="text-left text-gray-400 border-b border-gray-700">
+                            <tr>
+                                <th class="py-3 px-2">ID</th>
+                                <th class="py-3 px-2">タイトル</th>
+                                <th class="py-3 px-2">カテゴリー</th>
+                                <th class="py-3 px-2">地域</th>
+                                <th class="py-3 px-2">ソース</th>
+                                <th class="py-3 px-2">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newsTable" class="divide-y divide-gray-800">
+                            <!-- ニュースが動的に挿入される -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 外部リンク -->
+            <div class="card p-6">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-link text-cyan-400"></i>
+                    関連リンク
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="https://sharehouse-times.pages.dev/" target="_blank" 
+                       class="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition flex items-center gap-3">
+                        <i class="fas fa-globe text-2xl text-blue-400"></i>
+                        <div>
+                            <p class="font-bold">本番サイト</p>
+                            <p class="text-xs text-gray-400">sharehouse-times.pages.dev</p>
+                        </div>
+                    </a>
+                    <a href="https://dash.cloudflare.com/" target="_blank"
+                       class="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition flex items-center gap-3">
+                        <i class="fas fa-cloud text-2xl text-orange-400"></i>
+                        <div>
+                            <p class="font-bold">Cloudflare Dashboard</p>
+                            <p class="text-xs text-gray-400">Workers & Pages 管理</p>
+                        </div>
+                    </a>
+                    <a href="https://crann-terrace.com/" target="_blank"
+                       class="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition flex items-center gap-3">
+                        <i class="fas fa-home text-2xl text-green-400"></i>
+                        <div>
+                            <p class="font-bold">クランテラス</p>
+                            <p class="text-xs text-gray-400">PR先サイト</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- フッター -->
+        <footer class="border-t border-gray-800 mt-8 py-4 text-center text-gray-500 text-sm">
+            <p>シェアハウスタイムズ 管理者ダッシュボード &copy; 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        const CRON_WORKER_URL = 'https://sharehouse-times-cron.kunihiro72.workers.dev';
+        let allNews = [];
+        let categoryConfig = {
+            'new_open': { label: '新規オープン', color: 'bg-blue-500' },
+            'women': { label: '女性専用', color: 'bg-pink-500' },
+            'senior': { label: '高齢者向け', color: 'bg-orange-500' },
+            'pet': { label: 'ペット可', color: 'bg-amber-500' },
+            'foreign': { label: '外国人向け', color: 'bg-green-500' },
+            'student': { label: '学生向け', color: 'bg-indigo-500' },
+            'budget': { label: '格安', color: 'bg-yellow-500' },
+            'remote': { label: 'リモート', color: 'bg-cyan-500' },
+            'tokyo': { label: '東京', color: 'bg-red-500' },
+            'osaka': { label: '大阪', color: 'bg-purple-500' },
+            'fukuoka': { label: '福岡', color: 'bg-pink-500' },
+            'nagoya': { label: '名古屋', color: 'bg-amber-600' },
+            'kyoto': { label: '京都', color: 'bg-red-600' },
+            'trend': { label: '賃貸トレンド', color: 'bg-blue-600' },
+            'tokyo_life': { label: '東京一人暮らし', color: 'bg-gray-500' },
+            'coliving': { label: 'コリビング', color: 'bg-teal-500' },
+            'rural': { label: '地方移住', color: 'bg-green-600' },
+            'investment': { label: '投資', color: 'bg-yellow-600' },
+            'desk_tour': { label: 'デスクツアー', color: 'bg-purple-500' },
+            'market': { label: '市場動向', color: 'bg-purple-500' },
+            'policy': { label: '政策', color: 'bg-red-500' },
+        };
+
+        // ログイン処理
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    sessionStorage.setItem('adminAuth', 'true');
+                    showDashboard();
+                } else {
+                    document.getElementById('loginError').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem('adminAuth');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('password').value = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadDashboard();
+        }
+
+        async function loadDashboard() {
+            await fetchNews();
+            await checkStatus();
+            populateCategoryFilter();
+        }
+
+        async function fetchNews() {
+            try {
+                const res = await fetch('/api/news');
+                const data = await res.json();
+                allNews = data.news || [];
+                updateStats();
+                renderNewsTable(allNews);
+                renderCategoryStats();
+            } catch (err) {
+                console.error('Error fetching news:', err);
+            }
+        }
+
+        function updateStats() {
+            const japanCount = allNews.filter(n => n.region === 'japan').length;
+            const worldCount = allNews.filter(n => n.region === 'world').length;
+            document.getElementById('totalNews').textContent = allNews.length;
+            document.getElementById('japanNews').textContent = japanCount;
+            document.getElementById('worldNews').textContent = worldCount;
+        }
+
+        function renderCategoryStats() {
+            const stats = {};
+            allNews.forEach(n => {
+                if (n.categories) {
+                    n.categories.forEach(cat => {
+                        stats[cat] = (stats[cat] || 0) + 1;
+                    });
+                }
+            });
+
+            const container = document.getElementById('categoryStats');
+            container.innerHTML = Object.entries(categoryConfig).map(([key, config]) => {
+                const count = stats[key] || 0;
+                return \`
+                    <div class="bg-gray-800 rounded-lg p-3 text-center">
+                        <p class="text-2xl font-bold">\${count}</p>
+                        <p class="text-xs text-gray-400">\${config.label}</p>
+                    </div>
+                \`;
+            }).join('');
+        }
+
+        function renderNewsTable(news) {
+            const tbody = document.getElementById('newsTable');
+            tbody.innerHTML = news.map(n => {
+                const cat = categoryConfig[n.category] || { label: n.category, color: 'bg-gray-500' };
+                const regionEmoji = n.region === 'japan' ? '🇯🇵' : '🌍';
+                return \`
+                    <tr class="table-row">
+                        <td class="py-3 px-2 text-gray-400">\${n.id}</td>
+                        <td class="py-3 px-2">
+                            <a href="\${n.url}" target="_blank" class="hover:text-purple-400">\${n.title}</a>
+                        </td>
+                        <td class="py-3 px-2">
+                            <span class="\${cat.color} text-white text-xs px-2 py-1 rounded">\${cat.label}</span>
+                        </td>
+                        <td class="py-3 px-2">\${regionEmoji}</td>
+                        <td class="py-3 px-2 text-gray-400">\${n.source}</td>
+                        <td class="py-3 px-2 text-gray-400">\${n.date}</td>
+                    </tr>
+                \`;
+            }).join('');
+        }
+
+        function populateCategoryFilter() {
+            const select = document.getElementById('filterCategory');
+            select.innerHTML = '<option value="all">全カテゴリー</option>' +
+                Object.entries(categoryConfig).map(([key, config]) => 
+                    \`<option value="\${key}">\${config.label}</option>\`
+                ).join('');
+        }
+
+        function filterNews() {
+            const region = document.getElementById('filterRegion').value;
+            const category = document.getElementById('filterCategory').value;
+            
+            let filtered = allNews;
+            if (region !== 'all') {
+                filtered = filtered.filter(n => n.region === region);
+            }
+            if (category !== 'all') {
+                filtered = filtered.filter(n => n.category === category || (n.categories && n.categories.includes(category)));
+            }
+            renderNewsTable(filtered);
+        }
+
+        async function checkStatus() {
+            try {
+                const res = await fetch(CRON_WORKER_URL + '/status');
+                const data = await res.json();
+                
+                document.getElementById('cronStatus').innerHTML = '<i class="fas fa-circle text-xs mr-1"></i>稼働中';
+                document.getElementById('cronStatus').className = 'status-online';
+                
+                if (data.lastUpdated && data.lastUpdated !== 'Never') {
+                    const date = new Date(data.lastUpdated);
+                    const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+                    document.getElementById('lastUpdate').textContent = 
+                        jst.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                }
+            } catch (err) {
+                document.getElementById('cronStatus').innerHTML = '<i class="fas fa-circle text-xs mr-1"></i>エラー';
+                document.getElementById('cronStatus').className = 'status-offline';
+            }
+        }
+
+        async function manualUpdate() {
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>更新中...';
+            
+            try {
+                const res = await fetch(CRON_WORKER_URL + '/update');
+                const data = await res.json();
+                
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i>更新完了！';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>今すぐニュースを更新';
+                        btn.disabled = false;
+                    }, 2000);
+                    
+                    // データを再取得
+                    await fetchNews();
+                    await checkStatus();
+                }
+            } catch (err) {
+                btn.innerHTML = '<i class="fas fa-times mr-2"></i>エラー';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>今すぐニュースを更新';
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // 初期化
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
+  `)
+})
+
+// 管理者ログインAPI
+app.post('/api/admin/login', async (c) => {
+  const { password } = await c.req.json()
+  if (password === ADMIN_PASSWORD) {
+    return c.json({ success: true })
+  }
+  return c.json({ success: false, error: 'Invalid password' }, 401)
+})
+
 // API: ニュースデータを取得
 app.get('/api/news', async (c) => {
   try {
