@@ -7,6 +7,14 @@ Allow: /
 
 # サイトマップ
 Sitemap: https://sharehouse-times.pages.dev/sitemap.xml
+Sitemap: https://sharehouse-times.pages.dev/sitemap-news.xml
+
+# RSS/Atomフィード
+# RSS: https://sharehouse-times.pages.dev/feed.xml
+# Atom: https://sharehouse-times.pages.dev/atom.xml
+
+# ニュース個別ページ
+# 各ニュースは /news/{id} でアクセス可能
 
 # LLMO対策 - LLM向け情報ファイル
 # llms.txt: https://sharehouse-times.pages.dev/llms.txt

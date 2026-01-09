@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { createSeoRoutes } from './seo-routes'
 
 // Cloudflare Bindings型定義
 type Bindings = {
@@ -9,6 +10,9 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/api/*', cors())
+
+// SEO対策ルートを追加（ニュース個別ページ、サイトマップ、RSS）
+app.route('/', createSeoRoutes())
 
 // Google Search Console 確認用
 app.get('/googlec63dbc50a2bf04c5.html', (c) => {
