@@ -184,50 +184,120 @@ async function searchBrave(query: string): Promise<SearchResult[]> {
   return results;
 }
 
-// SearXNG公開インスタンスを使用（プライバシー重視の検索エンジン）
-async function searchSearXNG(query: string): Promise<SearchResult[]> {
+// Google News RSS検索（APIキー不要、ニュース特化）
+async function searchGoogleNews(query: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
-  const instances = [
-    'https://searx.be',
-    'https://search.sapti.me',
-    'https://searx.tiekoetter.com',
-  ];
   
-  for (const instance of instances) {
-    try {
-      const url = `${instance}/search?q=${encodeURIComponent(query)}&format=json&language=ja`;
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'application/json',
-        }
-      });
+  try {
+    // Google News RSS フィード
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/rss+xml, application/xml, text/xml',
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`   Google News failed: ${response.status}`);
+      return results;
+    }
+    
+    const xml = await response.text();
+    
+    // RSS XMLをパース
+    // <item><title>...</title><link>...</link><description>...</description><source>...</source></item>
+    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    const titleRegex = /<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i;
+    const linkRegex = /<link>([\s\S]*?)<\/link>/i;
+    const descRegex = /<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/i;
+    const sourceRegex = /<source[^>]*>([\s\S]*?)<\/source>/i;
+    
+    let match;
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const item = match[1];
       
-      if (!response.ok) continue;
+      const titleMatch = titleRegex.exec(item);
+      const linkMatch = linkRegex.exec(item);
+      const descMatch = descRegex.exec(item);
+      const sourceMatch = sourceRegex.exec(item);
       
-      const data = await response.json();
-      
-      if (data.results && Array.isArray(data.results)) {
-        for (const item of data.results.slice(0, 10)) {
-          if (item.url && item.title) {
-            results.push({
-              title: cleanText(item.title),
-              link: item.url,
-              snippet: cleanText(item.content || item.title),
-              source: extractSource(item.url)
-            });
-          }
-        }
+      if (titleMatch && linkMatch) {
+        const title = cleanText(titleMatch[1]);
+        let link = linkMatch[1].trim();
+        const snippet = descMatch ? cleanText(descMatch[1]) : title;
+        const sourceName = sourceMatch ? cleanText(sourceMatch[1]) : extractSource(link);
         
-        if (results.length > 0) {
-          console.log(`   SearXNG (${instance}): ${results.length} results`);
-          break;
+        // Google News のリダイレクトURLから実際のURLを取得する場合
+        // （リダイレクト先を取得するのは負荷が高いのでそのまま使用）
+        
+        if (title && link && !title.includes('Google ニュース')) {
+          results.push({
+            title: title.substring(0, 100),
+            link: link,
+            snippet: snippet.substring(0, 200),
+            source: sourceName
+          });
         }
       }
-    } catch (error) {
-      // このインスタンスが失敗したら次を試す
-      continue;
     }
+    
+    if (results.length > 0) {
+      console.log(`   Google News: ${results.length} results`);
+    } else {
+      console.log(`   Google News: No results for "${query}"`);
+    }
+  } catch (error) {
+    console.log('   Google News error:', error);
+  }
+  
+  return results;
+}
+
+// DuckDuckGo Instant Answer API（補助的に使用）
+async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+  
+  try {
+    const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'ShareHouseTimesBot/1.0 (News Aggregator)',
+        'Accept': 'application/json',
+      }
+    });
+    
+    if (!response.ok) return results;
+    
+    const data = await response.json();
+    
+    if (data.AbstractURL && data.AbstractText) {
+      results.push({
+        title: data.Heading || query,
+        link: data.AbstractURL,
+        snippet: data.AbstractText.substring(0, 200),
+        source: extractSource(data.AbstractURL)
+      });
+    }
+    
+    if (data.RelatedTopics && Array.isArray(data.RelatedTopics)) {
+      for (const topic of data.RelatedTopics.slice(0, 5)) {
+        if (topic.FirstURL && topic.Text) {
+          results.push({
+            title: topic.Text.split(' - ')[0] || topic.Text.substring(0, 80),
+            link: topic.FirstURL,
+            snippet: topic.Text.substring(0, 200),
+            source: extractSource(topic.FirstURL)
+          });
+        }
+      }
+    }
+    
+    if (results.length > 0) {
+      console.log(`   DuckDuckGo: ${results.length} results`);
+    }
+  } catch (error) {
+    // エラーは無視
   }
   
   return results;
@@ -235,13 +305,27 @@ async function searchSearXNG(query: string): Promise<SearchResult[]> {
 
 // 複数の検索クエリで検索
 async function searchNews(): Promise<NewsItem[]> {
-  const queries = [
-    'シェアハウス 新規オープン 2026',
-    'シェアハウス ニュース',
-    'コリビング 東京',
-    'シェアハウス 女性専用 オープン',
+  // 日本語クエリ
+  const japanQueries = [
+    'シェアハウス',
+    'シェアハウス 東京',
+    'シェアハウス オープン',
+    'シェアハウス 女性専用',
+    'シェアハウス ペット可',
+    'コリビング',
+    'ソーシャルアパートメント',
     'シェアハウス 高齢者',
+    'シェアハウス 格安',
   ];
+  
+  // 英語クエリ（海外ニュース用）
+  const worldQueries = [
+    'coliving real estate',
+    'co-living investment',
+    'shared housing trend',
+  ];
+  
+  const queries = [...japanQueries, ...worldQueries];
   
   const allResults: SearchResult[] = [];
   const seenUrls = new Set<string>();
@@ -249,10 +333,18 @@ async function searchNews(): Promise<NewsItem[]> {
   for (const query of queries) {
     console.log(`🔍 Searching: ${query}`);
     
-    // SearXNGで検索
-    const results = await searchSearXNG(query);
+    // Google Newsで検索（メイン）
+    const googleResults = await searchGoogleNews(query);
+    for (const result of googleResults) {
+      if (!seenUrls.has(result.link)) {
+        seenUrls.add(result.link);
+        allResults.push(result);
+      }
+    }
     
-    for (const result of results) {
+    // DuckDuckGoで補助検索
+    const ddgResults = await searchDuckDuckGo(query);
+    for (const result of ddgResults) {
       if (!seenUrls.has(result.link)) {
         seenUrls.add(result.link);
         allResults.push(result);
@@ -260,7 +352,7 @@ async function searchNews(): Promise<NewsItem[]> {
     }
     
     // レート制限を避けるため待機
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
   }
   
   console.log(`📰 Total unique results: ${allResults.length}`);
@@ -283,11 +375,20 @@ async function searchNews(): Promise<NewsItem[]> {
       const cleanTitle = result.title.substring(0, 100);
       const cleanSummary = result.snippet.substring(0, 200);
       
+      // 地域判定
+      // - 日本語が含まれていれば日本
+      // - .jpドメインなら日本
+      // - 英語のみかつ海外ドメインなら海外
+      const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(cleanTitle);
+      const hostname = new URL(result.link).hostname;
+      const isJapanDomain = hostname.includes('.jp') || hostname.includes('japan') || hostname.includes('yahoo.co');
+      const region: 'japan' | 'world' = (hasJapanese || isJapanDomain) ? 'japan' : 'world';
+      
       newsItems.push({
         id: id++,
         title: cleanTitle,
         summary: cleanSummary || cleanTitle,
-        region: 'japan',
+        region,
         source: result.source || extractSource(result.link),
         date: formatDate(0),
         category,
@@ -350,30 +451,47 @@ async function main() {
   // デフォルトニュースを取得
   const defaultNews = getDefaultNews();
   
-  // 統合（検索結果を優先、重複排除）
+  // 統合（地域バランスを考慮）
   const seenTitles = new Set<string>();
-  const allNews: NewsItem[] = [];
+  const japanNews: NewsItem[] = [];
+  const worldNews: NewsItem[] = [];
   
+  // 検索結果を地域別に分類
   for (const news of searchedNews) {
     const titleKey = news.title.substring(0, 15);
     if (!seenTitles.has(titleKey)) {
       seenTitles.add(titleKey);
-      allNews.push(news);
+      if (news.region === 'world') {
+        worldNews.push(news);
+      } else {
+        japanNews.push(news);
+      }
     }
   }
   
+  // デフォルトニュースを追加（重複排除）
   for (const news of defaultNews) {
     const titleKey = news.title.substring(0, 15);
     if (!seenTitles.has(titleKey)) {
       seenTitles.add(titleKey);
-      allNews.push(news);
+      if (news.region === 'world') {
+        worldNews.push(news);
+      } else {
+        japanNews.push(news);
+      }
     }
   }
   
+  // 日本ニュース45件 + 海外ニュース5件（最大50件）
+  const allNews: NewsItem[] = [
+    ...japanNews.slice(0, 45),
+    ...worldNews.slice(0, 5)
+  ];
+  
   const data = {
-    news: allNews.slice(0, 50),
+    news: allNews,
     lastUpdated: new Date().toISOString(),
-    updateCount: allNews.length
+    updateCount: japanNews.length + worldNews.length
   };
 
   console.log(`\n📰 Final news count: ${data.news.length}`);
