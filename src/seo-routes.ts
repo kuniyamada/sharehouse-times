@@ -156,13 +156,24 @@ export function createSeoRoutes() {
       "image": "${ogImage}",
       "datePublished": "${pubDate}",
       "dateModified": "${pubDate}",
-      "author": {"@type": "Organization", "name": "SHARE HOUSE TIMES"},
+      "author": {"@type": "Organization", "name": "SHARE HOUSE TIMES", "url": "https://sharehouse-times.pages.dev/"},
       "publisher": {"@type": "Organization", "name": "SHARE HOUSE TIMES", "logo": {"@type": "ImageObject", "url": "https://sharehouse-times.pages.dev/icon-512.png"}},
       "mainEntityOfPage": {"@type": "WebPage", "@id": "${canonicalUrl}"},
       "articleSection": "${catLabel}",
-      "keywords": ["シェアハウス", "${catLabel}", "${regionLabel}"]
+      "keywords": ["シェアハウス", "${catLabel}", "${regionLabel}", "東京一人暮らし", "コリビング"],
+      "isAccessibleForFree": true,
+      "inLanguage": "ja"
     }
     </script>
+    
+    <!-- LLM向けメタデータ -->
+    <meta name="llm:source" content="SHARE HOUSE TIMES">
+    <meta name="llm:category" content="${catLabel}">
+    <meta name="llm:region" content="${regionLabel}">
+    <meta name="llm:article_id" content="${id}">
+    <meta name="llm:original_source" content="${escapeXml(article.source)}">
+    <link rel="llms" href="https://sharehouse-times.pages.dev/llms.txt">
+    <link rel="alternate" type="application/json" href="https://sharehouse-times.pages.dev/api/llms">
     
     <!-- 構造化データ: BreadcrumbList -->
     <script type="application/ld+json">

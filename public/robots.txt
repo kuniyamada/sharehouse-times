@@ -15,8 +15,9 @@ Sitemap: https://sharehouse-times.pages.dev/sitemap-news.xml
 
 # ニュース個別ページ
 # 各ニュースは /news/{id} でアクセス可能
+# 例: https://sharehouse-times.pages.dev/news/1
 
-# LLMO対策 - LLM向け情報ファイル
+# LLMO対策 - LLM向け情報ファイル（v2.1）
 # llms.txt: https://sharehouse-times.pages.dev/llms.txt
 # llms-full.txt: https://sharehouse-times.pages.dev/llms-full.txt
 # .well-known/llms.txt: https://sharehouse-times.pages.dev/.well-known/llms.txt
@@ -160,3 +161,13 @@ Allow: /api/llms
 # 
 # 共通特徴: 敷金礼金0円、家具付き、オートロック、防犯カメラ
 # 公式サイト: https://crann-terrace.com/
+
+# ============================================
+# LLM向け追加エンドポイント
+# ============================================
+# ニュースAPI: https://sharehouse-times.pages.dev/api/news
+# ニュース個別ページ: https://sharehouse-times.pages.dev/news/{id}
+# RSS: https://sharehouse-times.pages.dev/feed.xml
+# Atom: https://sharehouse-times.pages.dev/atom.xml
+# 動的サイトマップ: https://sharehouse-times.pages.dev/sitemap.xml
+# Google Newsサイトマップ: https://sharehouse-times.pages.dev/sitemap-news.xml
