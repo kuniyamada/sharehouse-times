@@ -2539,15 +2539,15 @@ app.post('/api/admin/login', async (c) => {
 // API: ニュースデータを取得
 app.get('/api/news', async (c) => {
   try {
-    let cachedNews = null
+    let cachedData: { news: any[], lastUpdated: string | null } | null = null
     if (c.env?.NEWS_KV) {
-      const cached = await c.env.NEWS_KV.get('news_data', 'json')
-      if (cached) cachedNews = cached.news
+      cachedData = await c.env.NEWS_KV.get('news_data', 'json')
     }
-    const news = cachedNews || generateDefaultNews()
-    return c.json({ success: true, news, total: news.length })
+    const news = cachedData?.news || generateDefaultNews()
+    const lastUpdated = cachedData?.lastUpdated || null
+    return c.json({ success: true, news, total: news.length, lastUpdated })
   } catch (error) {
-    return c.json({ success: false, news: generateDefaultNews(), total: 0 })
+    return c.json({ success: false, news: generateDefaultNews(), total: 0, lastUpdated: null })
   }
 })
 
