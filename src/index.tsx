@@ -996,14 +996,8 @@ app.get('/', (c) => {
                 <a href="#" class="side-menu-item" onclick="filterCategory('student'); return false;" data-cat="student">
                     <i class="fas fa-graduation-cap mr-2 text-indigo-400"></i>学生向け
                 </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('budget'); return false;" data-cat="budget">
-                    <i class="fas fa-yen-sign mr-2 text-yellow-500"></i>格安
-                </a>
                 <a href="#" class="side-menu-item" onclick="filterCategory('remote'); return false;" data-cat="remote">
                     <i class="fas fa-laptop-house mr-2 text-cyan-400"></i>リモートワーク
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('company_housing'); return false;" data-cat="company_housing">
-                    <i class="fas fa-briefcase mr-2 text-slate-500"></i>社宅
                 </a>
             </div>
             
@@ -1027,28 +1021,7 @@ app.get('/', (c) => {
                 </a>
             </div>
             
-            <!-- ライフスタイル・トレンド -->
-            <div class="side-menu-section">
-                <h2 class="side-menu-section-title">トレンド</h2>
-                <a href="#" class="side-menu-item" onclick="filterCategory('trend'); return false;" data-cat="trend">
-                    <i class="fas fa-chart-line mr-2 text-blue-400"></i>賃貸トレンド
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('tokyo_life'); return false;" data-cat="tokyo_life">
-                    <i class="fas fa-city mr-2 text-gray-400"></i>東京一人暮らし
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('coliving'); return false;" data-cat="coliving">
-                    <i class="fas fa-building-user mr-2 text-teal-400"></i>コリビング
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('rural'); return false;" data-cat="rural">
-                    <i class="fas fa-mountain-sun mr-2 text-green-400"></i>地方移住
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('investment'); return false;" data-cat="investment">
-                    <i class="fas fa-coins mr-2 text-yellow-400"></i>投資
-                </a>
-                <a href="#" class="side-menu-item" onclick="filterCategory('desk_tour'); return false;" data-cat="desk_tour">
-                    <i class="fas fa-desktop mr-2 text-purple-400"></i>デスクツアー
-                </a>
-            </div>
+
         </aside>
 
         <!-- 中央メインコンテンツ -->
@@ -1305,13 +1278,11 @@ app.get('/', (c) => {
                     <div class="flex flex-wrap gap-2">
                         <span class="px-3 py-1.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">女性専用</span>
                         <span class="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">ペット可</span>
-                        <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">格安</span>
                         <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">学生向け</span>
                         <span class="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">リモートワーク</span>
                         <span class="px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">東京</span>
                         <span class="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">大阪</span>
                         <span class="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">コリビング</span>
-                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">社宅</span>
                         <span class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">+9カテゴリー</span>
                     </div>
                 </div>
