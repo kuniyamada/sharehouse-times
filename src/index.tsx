@@ -47,6 +47,89 @@ const yahooStyles = `
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
             font-size: 14px;
             min-height: 100vh;
+            overscroll-behavior-y: contain;
+        }
+        
+        /* Pull to Refresh インジケーター */
+        .pull-indicator {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 0 0 20px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pull-indicator.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        .pull-indicator.refreshing {
+            transform: translateX(-50%) translateY(0);
+        }
+        .pull-indicator i {
+            transition: transform 0.3s ease;
+        }
+        .pull-indicator.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 更新ボタン */
+        .refresh-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+        .refresh-btn.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* 最終更新時刻 */
+        .last-updated {
+            font-size: 10px;
+            color: #64748b;
+            text-align: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.8);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        /* トーストアニメーション */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
         
         /* ヘッダー - グラスモーフィズム */
@@ -869,6 +952,12 @@ app.get('/', (c) => {
     </style>
 </head>
 <body itemscope itemtype="https://schema.org/WebPage">
+    <!-- Pull to Refresh インジケーター -->
+    <div id="pullIndicator" class="pull-indicator">
+        <i class="fas fa-arrow-down"></i>
+        <span>引っ張って更新</span>
+    </div>
+    
     <!-- スキップリンク（アクセシビリティ） -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-indigo-600 focus:text-white focus:p-4">
         メインコンテンツへスキップ
@@ -906,6 +995,10 @@ app.get('/', (c) => {
                     </div>
                 </a>
                 <div class="flex items-center gap-3">
+                    <!-- 手動更新ボタン -->
+                    <button onclick="refreshNews()" class="refresh-btn" id="refreshBtn" title="最新ニュースに更新">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
                     <!-- 更新時刻 -->
                     <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
                         <i class="fas fa-sync-alt text-indigo-500" aria-hidden="true"></i>
@@ -1766,18 +1859,152 @@ app.get('/', (c) => {
             displayNews(allNews);
         }
 
-        async function fetchNews() {
+        let lastFetchTime = 0;
+        let isRefreshing = false;
+        
+        async function fetchNews(showIndicator = false) {
+            if (isRefreshing) return;
+            isRefreshing = true;
+            
+            const btn = document.getElementById('refreshBtn');
+            const indicator = document.getElementById('pullIndicator');
+            
+            if (showIndicator && btn) {
+                btn.classList.add('refreshing');
+            }
+            
             try {
-                const response = await fetch('/api/news');
+                // キャッシュバスティング用のタイムスタンプを追加
+                const timestamp = Date.now();
+                const response = await fetch('/api/news?t=' + timestamp, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
                 const data = await response.json();
                 allNews = data.news || [];
+                lastFetchTime = timestamp;
+                
+                // 最終更新時刻を表示
+                if (data.lastUpdated) {
+                    const date = new Date(data.lastUpdated);
+                    const timeStr = date.toLocaleString('ja-JP', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    updateLastUpdatedDisplay(timeStr);
+                }
+                
                 displayNews(allNews);
+                
+                if (showIndicator) {
+                    showToast('最新ニュースを取得しました');
+                }
             } catch (err) {
                 console.error('Error:', err);
+                if (showIndicator) {
+                    showToast('更新に失敗しました', true);
+                }
+            } finally {
+                isRefreshing = false;
+                if (btn) btn.classList.remove('refreshing');
+                if (indicator) {
+                    indicator.classList.remove('visible', 'refreshing');
+                }
             }
         }
+        
+        function updateLastUpdatedDisplay(timeStr) {
+            let el = document.getElementById('lastUpdatedDisplay');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'lastUpdatedDisplay';
+                el.className = 'last-updated';
+                const header = document.querySelector('.yahoo-header');
+                if (header) header.after(el);
+            }
+            el.innerHTML = '<i class="fas fa-clock mr-1"></i>最終更新: ' + timeStr;
+        }
+        
+        function showToast(message, isError) {
+            const toast = document.createElement('div');
+            const bgColor = isError ? '#ef4444' : '#10b981';
+            toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:' + bgColor + ';color:white;padding:12px 24px;border-radius:100px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:fadeInUp 0.3s ease;';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                toast.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 2000);
+        }
+        
+        // 手動更新ボタン
+        function refreshNews() {
+            fetchNews(true);
+        }
+        
+        // アプリに戻った時に自動更新（5分以上経過している場合）
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                var now = Date.now();
+                var fiveMinutes = 5 * 60 * 1000;
+                if (now - lastFetchTime > fiveMinutes) {
+                    fetchNews(true);
+                }
+            }
+        });
+        
+        // Pull to Refresh
+        var touchStartY = 0;
+        var touchCurrentY = 0;
+        var isPulling = false;
+        
+        document.addEventListener('touchstart', function(e) {
+            if (window.scrollY === 0) {
+                touchStartY = e.touches[0].clientY;
+                isPulling = true;
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (!isPulling) return;
+            touchCurrentY = e.touches[0].clientY;
+            var pullDistance = touchCurrentY - touchStartY;
+            
+            if (pullDistance > 60 && window.scrollY === 0) {
+                var indicator = document.getElementById('pullIndicator');
+                if (indicator && !indicator.classList.contains('refreshing')) {
+                    indicator.classList.add('visible');
+                }
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function() {
+            if (!isPulling) return;
+            var pullDistance = touchCurrentY - touchStartY;
+            
+            if (pullDistance > 80 && window.scrollY === 0) {
+                var indicator = document.getElementById('pullIndicator');
+                if (indicator) {
+                    indicator.classList.add('refreshing');
+                    indicator.innerHTML = '<i class="fas fa-spinner"></i> 更新中...';
+                }
+                fetchNews(true);
+            } else {
+                var indicator = document.getElementById('pullIndicator');
+                if (indicator) indicator.classList.remove('visible');
+            }
+            
+            isPulling = false;
+            touchStartY = 0;
+            touchCurrentY = 0;
+        }, { passive: true });
 
-        document.addEventListener('DOMContentLoaded', fetchNews);
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchNews(false);
+            lastFetchTime = Date.now();
+        });
     </script>
 </body>
 </html>
