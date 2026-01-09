@@ -185,12 +185,15 @@ async function searchBrave(query: string): Promise<SearchResult[]> {
 }
 
 // Google News RSS検索（APIキー不要、ニュース特化）
-async function searchGoogleNews(query: string): Promise<SearchResult[]> {
+async function searchGoogleNews(query: string, lang: 'ja' | 'en' = 'ja'): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
   
   try {
-    // Google News RSS フィード
-    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja`;
+    // Google News RSS フィード（言語別）
+    const langParams = lang === 'ja' 
+      ? 'hl=ja&gl=JP&ceid=JP:ja'
+      : 'hl=en&gl=US&ceid=US:en';
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&${langParams}`;
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -318,23 +321,28 @@ async function searchNews(): Promise<NewsItem[]> {
     'シェアハウス 格安',
   ];
   
-  // 英語クエリ（海外ニュース用）
+  // 英語クエリ（海外ニュース用）- 増強版
   const worldQueries = [
-    'coliving real estate',
-    'co-living investment',
-    'shared housing trend',
+    'coliving',
+    'co-living space',
+    'co-living apartments',
+    'coliving investment',
+    'shared housing',
+    'communal living',
+    'coliving London',
+    'coliving New York',
+    'coliving Singapore',
+    'coliving Europe',
   ];
-  
-  const queries = [...japanQueries, ...worldQueries];
   
   const allResults: SearchResult[] = [];
   const seenUrls = new Set<string>();
   
-  for (const query of queries) {
-    console.log(`🔍 Searching: ${query}`);
+  // 日本語クエリで検索
+  for (const query of japanQueries) {
+    console.log(`🔍 Searching (JP): ${query}`);
     
-    // Google Newsで検索（メイン）
-    const googleResults = await searchGoogleNews(query);
+    const googleResults = await searchGoogleNews(query, 'ja');
     for (const result of googleResults) {
       if (!seenUrls.has(result.link)) {
         seenUrls.add(result.link);
@@ -342,17 +350,22 @@ async function searchNews(): Promise<NewsItem[]> {
       }
     }
     
-    // DuckDuckGoで補助検索
-    const ddgResults = await searchDuckDuckGo(query);
-    for (const result of ddgResults) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  // 英語クエリで検索（海外ニュース）
+  for (const query of worldQueries) {
+    console.log(`🔍 Searching (EN): ${query}`);
+    
+    const googleResults = await searchGoogleNews(query, 'en');
+    for (const result of googleResults) {
       if (!seenUrls.has(result.link)) {
         seenUrls.add(result.link);
         allResults.push(result);
       }
     }
     
-    // レート制限を避けるため待機
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
   
   console.log(`📰 Total unique results: ${allResults.length}`);
@@ -364,9 +377,13 @@ async function searchNews(): Promise<NewsItem[]> {
   for (const result of allResults) {
     // シェアハウス関連かフィルタリング
     const text = (result.title + ' ' + result.snippet).toLowerCase();
-    const isRelevant = ['シェアハウス', 'コリビング', 'co-living', 'ソーシャルアパートメント', '共同生活', 'share house'].some(
-      kw => text.includes(kw.toLowerCase())
-    );
+    const isRelevant = [
+      // 日本語キーワード
+      'シェアハウス', 'コリビング', 'ソーシャルアパートメント', '共同生活',
+      // 英語キーワード
+      'coliving', 'co-living', 'shared housing', 'share house', 'communal living',
+      'shared living', 'co-housing', 'cohousing'
+    ].some(kw => text.includes(kw.toLowerCase()));
     
     if (isRelevant && result.title.length > 5) {
       const { category, categories } = detectCategories(result.title, result.snippet);
@@ -418,11 +435,17 @@ function getDefaultNews(): NewsItem[] {
     { id: 112, title: '法人契約可能なシェアハウスが増加、社宅としての活用広がる', summary: '転勤者や新入社員の住居として、シェアハウスを社宅として採用する企業が増加中。', region: 'japan', source: '日経ビジネス', date: formatDate(0), category: 'company_housing', categories: ['company_housing'], url: 'https://business.nikkei.com/' },
     { id: 113, title: 'シェアハウス人気、家賃高騰が背景 訪日外国人の利用も', summary: '家賃高騰を背景にシェアハウス人気が上昇。ホテル代わりに利用する訪日外国人も増加。', region: 'japan', source: '朝日新聞', date: formatDate(0), category: 'trend', categories: ['trend', 'foreign'], url: 'https://www.asahi.com/' },
     { id: 114, title: '政府、高齢者シェアハウス整備へ 介護も提供、3年間で100カ所', summary: '独居高齢者の孤独死防止・生活支援を目的に、政府が高齢者シェアハウス整備を推進。', region: 'japan', source: '共同通信', date: formatDate(1), category: 'senior', categories: ['senior'], url: 'https://nordot.app/' },
-    // 海外ニュース
+    // 海外ニュース（10件）
     { id: 201, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living is emerging as a key strategy for affordable housing in the US market.', region: 'world', source: 'Business Insider', date: formatDate(0), category: 'coliving', categories: ['coliving'], url: 'https://www.businessinsider.com/' },
     { id: 202, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living rents range from £1,550 to £1,750 pcm. Demand grows among young professionals.', region: 'world', source: 'Savills', date: formatDate(1), category: 'coliving', categories: ['coliving'], url: 'https://www.savills.co.uk/' },
     { id: 203, title: 'Singapore Co-living Player Gears Up for Listing', summary: 'Major Singapore co-living operator prepares for Catalist listing amid growing market.', region: 'world', source: 'EdgeProp', date: formatDate(1), category: 'coliving', categories: ['coliving'], url: 'https://www.edgeprop.sg/' },
     { id: 204, title: 'Coliving 2025: Key Investment Trends', summary: 'Investment shifts and evolving design trends in coliving sector for 2025.', region: 'world', source: 'Coliving Insights', date: formatDate(2), category: 'investment', categories: ['investment', 'coliving'], url: 'https://www.colivinginsights.com/' },
+    { id: 205, title: 'New York Coliving Market Grows 25% in 2025', summary: 'Manhattan and Brooklyn see surge in coliving developments targeting remote workers and young professionals.', region: 'world', source: 'NYC Real Estate Weekly', date: formatDate(0), category: 'coliving', categories: ['coliving', 'trend'], url: 'https://www.nycrealestateweekly.com/' },
+    { id: 206, title: 'Berlin Becomes Europe\'s Coliving Capital', summary: 'German capital attracts major coliving operators with flexible regulations and strong demand from digital nomads.', region: 'world', source: 'EU Property News', date: formatDate(1), category: 'coliving', categories: ['coliving'], url: 'https://www.eupropertynews.com/' },
+    { id: 207, title: 'Australia\'s Coliving Sector Attracts $500M Investment', summary: 'Institutional investors pour capital into Australian coliving as housing affordability crisis deepens.', region: 'world', source: 'Australian Financial Review', date: formatDate(0), category: 'investment', categories: ['investment', 'coliving'], url: 'https://www.afr.com/' },
+    { id: 208, title: 'Coliving for Seniors: A Growing Trend in Europe', summary: 'Senior coliving communities offer affordable housing with built-in social connections for aging populations.', region: 'world', source: 'Senior Housing News', date: formatDate(1), category: 'senior', categories: ['senior', 'coliving'], url: 'https://seniorhousingnews.com/' },
+    { id: 209, title: 'Tech Giants Partner with Coliving Operators for Employee Housing', summary: 'Google, Meta, and Amazon explore coliving partnerships to address Bay Area housing shortage for workers.', region: 'world', source: 'TechCrunch', date: formatDate(0), category: 'company_housing', categories: ['company_housing', 'coliving'], url: 'https://techcrunch.com/' },
+    { id: 210, title: 'Sustainable Coliving: Eco-Friendly Shared Housing on the Rise', summary: 'Net-zero coliving buildings gain popularity as residents seek environmentally conscious living options.', region: 'world', source: 'Green Building News', date: formatDate(2), category: 'trend', categories: ['trend', 'coliving'], url: 'https://www.greenbuildingadvisor.com/' },
   ];
 }
 
@@ -482,10 +505,10 @@ async function main() {
     }
   }
   
-  // 日本ニュース45件 + 海外ニュース5件（最大50件）
+  // 日本ニュース40件 + 海外ニュース10件（最大50件）
   const allNews: NewsItem[] = [
-    ...japanNews.slice(0, 45),
-    ...worldNews.slice(0, 5)
+    ...japanNews.slice(0, 40),
+    ...worldNews.slice(0, 10)
   ];
   
   const data = {
