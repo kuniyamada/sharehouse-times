@@ -1,7 +1,7 @@
 /**
  * ニュース更新スクリプト
  * GitHub Actionsから定期実行され、最新ニュースをKVに保存する
- * 複数のRSSフィードから実際のニュースを取得
+ * Web検索APIを使用して最新のシェアハウスニュースを取得
  */
 
 interface NewsItem {
@@ -16,12 +16,12 @@ interface NewsItem {
   url: string;
 }
 
-interface RSSItem {
+interface SearchResult {
   title: string;
   link: string;
-  description?: string;
-  pubDate?: string;
+  snippet: string;
   source?: string;
+  date?: string;
 }
 
 // 日付フォーマット（JST）
@@ -38,52 +38,6 @@ function formatDate(daysAgo: number): string {
   return formatDateFromDate(date);
 }
 
-// XMLパース（簡易版）
-function parseXML(xml: string): RSSItem[] {
-  const items: RSSItem[] = [];
-  const itemMatches = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi) || [];
-  
-  for (const itemXml of itemMatches) {
-    const titleMatch = itemXml.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i);
-    const linkMatch = itemXml.match(/<link[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/i);
-    const descMatch = itemXml.match(/<description[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/i);
-    const dateMatch = itemXml.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i);
-    const sourceMatch = itemXml.match(/<source[^>]*>([\s\S]*?)<\/source>/i);
-    
-    if (titleMatch && linkMatch) {
-      items.push({
-        title: titleMatch[1].trim().replace(/<[^>]+>/g, ''),
-        link: linkMatch[1].trim(),
-        description: descMatch ? descMatch[1].trim().replace(/<[^>]+>/g, '').substring(0, 200) : '',
-        pubDate: dateMatch ? dateMatch[1].trim() : undefined,
-        source: sourceMatch ? sourceMatch[1].trim().replace(/<[^>]+>/g, '') : undefined
-      });
-    }
-  }
-  
-  return items;
-}
-
-// RSSフィードを取得
-async function fetchRSS(url: string): Promise<RSSItem[]> {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
-    if (!response.ok) {
-      console.log(`RSS fetch failed for ${url}: ${response.status}`);
-      return [];
-    }
-    const text = await response.text();
-    return parseXML(text);
-  } catch (error) {
-    console.log(`RSS fetch error for ${url}:`, error);
-    return [];
-  }
-}
-
 // カテゴリを推定
 function detectCategories(title: string, description: string): { category: string; categories: string[] } {
   const text = (title + ' ' + description).toLowerCase();
@@ -91,21 +45,22 @@ function detectCategories(title: string, description: string): { category: strin
   let primaryCategory = 'market';
   
   const keywords: { [key: string]: string[] } = {
-    women: ['女性専用', '女性向け', 'レディース'],
-    senior: ['高齢者', 'シニア', '老後', '介護'],
-    pet: ['ペット', '犬', '猫', 'ドッグ'],
-    student: ['学生', '大学生', '専門学校'],
-    budget: ['格安', '激安', '安い', '低価格', '2万', '3万', '4万'],
-    foreign: ['外国人', '多国籍', 'インターナショナル', 'グローバル'],
+    women: ['女性専用', '女性向け', 'レディース', '女性限定'],
+    senior: ['高齢者', 'シニア', '老後', '介護', '60代', '70代'],
+    pet: ['ペット', '犬', '猫', 'ドッグ', 'ペット可'],
+    student: ['学生', '大学生', '専門学校', '新卒'],
+    budget: ['格安', '激安', '安い', '低価格', '2万', '3万', '4万', '5万円以下'],
+    foreign: ['外国人', '多国籍', 'インターナショナル', 'グローバル', '留学生'],
     remote: ['リモート', 'テレワーク', '在宅', 'コワーキング', 'ワーケーション'],
-    new_open: ['オープン', '開業', '誕生', '新築', '完成', 'グランドオープン'],
-    tokyo: ['東京', '渋谷', '新宿', '池袋', '品川', '目黒', '世田谷', '大田区'],
-    osaka: ['大阪', '梅田', '難波', '心斎橋'],
+    new_open: ['オープン', '開業', '誕生', '新築', '完成', 'グランドオープン', '募集開始', '入居開始'],
+    tokyo: ['東京', '渋谷', '新宿', '池袋', '品川', '目黒', '世田谷', '大田区', '港区', '中野', '杉並'],
+    osaka: ['大阪', '梅田', '難波', '心斎橋', '天王寺'],
     fukuoka: ['福岡', '博多', '天神'],
-    coliving: ['コリビング', 'co-living', 'coliving'],
-    trend: ['トレンド', '市場', '動向', '統計', '調査'],
-    company_housing: ['社宅', '法人', '企業', '福利厚生'],
-    investment: ['投資', '利回り', '収益', '経営'],
+    nagoya: ['名古屋', '栄', '金山'],
+    coliving: ['コリビング', 'co-living', 'coliving', 'ソーシャルアパートメント'],
+    trend: ['トレンド', '市場', '動向', '統計', '調査', '人気', 'ランキング'],
+    company_housing: ['社宅', '法人', '企業', '福利厚生', '法人契約'],
+    investment: ['投資', '利回り', '収益', '経営', 'オーナー'],
   };
   
   for (const [cat, words] of Object.entries(keywords)) {
@@ -127,115 +82,228 @@ function detectCategories(title: string, description: string): { category: strin
   return { category: primaryCategory, categories: [...new Set(categories)] };
 }
 
-// 日付をパース
-function parseDate(dateStr?: string): Date {
-  if (!dateStr) return new Date();
+// ソース名を抽出
+function extractSource(url: string): string {
   try {
-    return new Date(dateStr);
+    const hostname = new URL(url).hostname.replace('www.', '');
+    const sourceMap: { [key: string]: string } = {
+      'prtimes.jp': 'PR TIMES',
+      'suumo.jp': 'SUUMO',
+      'homes.co.jp': 'LIFULL HOME\'S',
+      'asahi.com': '朝日新聞',
+      'yomiuri.co.jp': '読売新聞',
+      'nikkei.com': '日本経済新聞',
+      'mainichi.jp': '毎日新聞',
+      'sankei.com': '産経新聞',
+      'nhk.or.jp': 'NHK',
+      'news.yahoo.co.jp': 'Yahoo!ニュース',
+      'itmedia.co.jp': 'ITmedia',
+      'toyokeizai.net': '東洋経済',
+      'diamond.jp': 'ダイヤモンド',
+      'businessinsider.jp': 'Business Insider Japan',
+      'social-apartment.com': 'SOCIAL APARTMENT',
+      'sharehouse.in': 'ひつじ不動産',
+      'oakhouse.jp': 'オークハウス',
+      'share-parade.jp': 'シェアパレード',
+    };
+    return sourceMap[hostname] || hostname;
   } catch {
-    return new Date();
+    return '不明';
   }
 }
 
-// シェアハウス関連ニュース（常に表示する固定ニュース）
-function getSharehouseNews(): NewsItem[] {
-  return [
-    // 物件タイプ別ニュース（実在のURL）
-    { id: 1, title: 'シェアレジデンス「nears五反田」2026年5月入居開始', summary: 'ひとり暮らしとシェアハウスの間、ゆるくつながる心地よい暮らしを提案する新コンセプト物件。', region: 'japan', source: '大和ハウス工業', date: formatDate(0), category: 'new_open', categories: ['new_open', 'tokyo'], url: 'https://www.daiwahouse.co.jp/about/release/group/20251211162546.html' },
-    { id: 2, title: '高齢者シェアハウスで新しい老後生活、自由と安心を両立', summary: '70代〜90代が共同生活するシェアハウスが人気に。孤独解消と自立を両立する新しい住まいの形。', region: 'japan', source: 'テレ朝NEWS', date: formatDate(0), category: 'senior', categories: ['senior'], url: 'https://news.tv-asahi.co.jp/news_economy/articles/900180056.html' },
-    { id: 3, title: '空き家を外国人材の住まいに再生「外国人材シェアハウス」提供開始', summary: '企業向け外国人社宅サービスとして家具付き・敷金礼金ゼロの物件を提供。', region: 'japan', source: 'PR TIMES', date: formatDate(1), category: 'foreign', categories: ['foreign'], url: 'https://prtimes.jp/main/html/rd/p/000000077.000120610.html' },
-    { id: 4, title: 'ネイバーズ羽田が2026年3月開業、新規入居者の募集開始', summary: '京急空港線「糀谷駅」徒歩13分、羽田空港まで最短10分の好立地。', region: 'japan', source: 'SOCIAL APARTMENT', date: formatDate(1), category: 'new_open', categories: ['new_open', 'tokyo'], url: 'https://www.social-apartment.com/lifestyle/detail/20251219192601' },
-    { id: 5, title: '長崎に女性専用シェアハウス「長崎ライトハウス」誕生', summary: '斜面地の空き家をリノベーション。女性の自立を支援。', region: 'japan', source: '長崎新聞', date: formatDate(2), category: 'women', categories: ['women'], url: 'https://www.nagasaki-np.co.jp/kijis/?kijiid=341c58b5163a4d06a220c50c5f6436c5' },
-    { id: 6, title: '全国でも珍しいペット共生型シェアハウス「ペミリ住之江」', summary: 'ドッグトレーナーが管理人として常駐するペット共生型シェアハウス。', region: 'japan', source: '産経ニュース', date: formatDate(2), category: 'pet', categories: ['pet', 'osaka'], url: 'https://www.sankei.com/article/20231106-IQ2SI6RUHFMNJNSRUPWZBELAJU/' },
+// DuckDuckGo検索（API不要）
+async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+  
+  try {
+    // DuckDuckGo HTML検索
+    const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      }
+    });
     
-    // 格安・学生向け
-    { id: 7, title: '月額2.5万円から！学生向け格安シェアハウスが人気', summary: '都内でも家賃を抑えたい学生に支持される格安シェアハウスの実態。', region: 'japan', source: 'SUUMO', date: formatDate(1), category: 'budget', categories: ['budget', 'student', 'tokyo'], url: 'https://suumo.jp/journal/2025/11/18/212864/' },
-    { id: 8, title: '大学生の新生活、シェアハウスという選択肢', summary: '初期費用を抑えられるシェアハウスが大学生の間で人気上昇中。', region: 'japan', source: '東洋経済', date: formatDate(2), category: 'student', categories: ['student', 'budget'], url: 'https://toyokeizai.net/' },
+    if (!response.ok) {
+      console.log(`DuckDuckGo search failed: ${response.status}`);
+      return results;
+    }
     
-    // リモートワーク
-    { id: 9, title: 'テレワーク対応シェアハウス、コワーキング併設型が増加', summary: '在宅勤務の普及で、Wi-Fi完備・作業スペース付きの物件需要が急増。', region: 'japan', source: 'ITmedia', date: formatDate(0), category: 'remote', categories: ['remote'], url: 'https://www.itmedia.co.jp/' },
+    const html = await response.text();
     
-    // エリア別
-    { id: 10, title: '東京都心のシェアハウス、平均家賃は6.5万円に', summary: '23区内のシェアハウス家賃相場最新データ。人気エリアは新宿・渋谷。', region: 'japan', source: '不動産経済研究所', date: formatDate(1), category: 'tokyo', categories: ['tokyo', 'trend'], url: 'https://www.fudousankeizai.co.jp/' },
-    { id: 11, title: '大阪・心斎橋エリアにデザイナーズシェアハウス誕生', summary: 'アーティスト向けのクリエイティブな空間を提供。', region: 'japan', source: '大阪日日新聞', date: formatDate(2), category: 'osaka', categories: ['osaka', 'new_open'], url: 'https://www.nnn.co.jp/' },
-    { id: 12, title: '福岡・天神エリアのシェアハウス人気上昇中', summary: 'スタートアップ集積地として注目の福岡でシェアハウス需要が拡大。', region: 'japan', source: '西日本新聞', date: formatDate(3), category: 'fukuoka', categories: ['fukuoka'], url: 'https://www.nishinippon.co.jp/' },
+    // 結果をパース
+    const resultMatches = html.matchAll(/<a[^>]*class="result__a"[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/gi);
+    const snippetMatches = html.matchAll(/<a[^>]*class="result__snippet"[^>]*>([^<]*(?:<[^>]*>[^<]*)*)<\/a>/gi);
     
-    // トレンド系
-    { id: 13, title: '2026年賃貸トレンド：シェアハウスが一人暮らしを超える？', summary: 'コスト面・コミュニティ面で賃貸市場に変化の兆し。', region: 'japan', source: 'LIFULL HOME\'S', date: formatDate(0), category: 'trend', categories: ['trend'], url: 'https://www.homes.co.jp/' },
-    { id: 14, title: '東京一人暮らしvs シェアハウス、月額費用を徹底比較', summary: '家賃・光熱費・通信費を含めた総コストで比較検証。', region: 'japan', source: 'マネーの達人', date: formatDate(1), category: 'tokyo_life', categories: ['tokyo_life', 'tokyo', 'budget'], url: 'https://manetatsu.com/' },
-    { id: 15, title: '地方移住×シェアハウス、新しいライフスタイルの提案', summary: '都会を離れ、地方でシェアハウス暮らしを始める人が増加。', region: 'japan', source: '田舎暮らしの本', date: formatDate(2), category: 'rural', categories: ['rural'], url: 'https://inaka.tkj.jp/' },
-    { id: 16, title: 'シェアハウス投資、利回り8%超えの物件も', summary: '不動産投資としてのシェアハウス経営の魅力と注意点。', region: 'japan', source: '楽待新聞', date: formatDate(3), category: 'investment', categories: ['investment'], url: 'https://www.rakumachi.jp/' },
+    const links: string[] = [];
+    const titles: string[] = [];
+    const snippets: string[] = [];
     
-    // デスクツアー
-    { id: 17, title: 'シェアハウス住民のデスク環境公開！在宅ワーク最適化術', summary: '限られたスペースで快適な作業環境を作るコツを紹介。', region: 'japan', source: 'Gigazine', date: formatDate(0), category: 'desk_tour', categories: ['desk_tour', 'remote'], url: 'https://gigazine.net/' },
-    { id: 18, title: '6畳個室でも快適！シェアハウスのデスクセットアップ', summary: 'コンパクトでも機能的なデスク環境を実現した住民を取材。', region: 'japan', source: 'Impress Watch', date: formatDate(1), category: 'desk_tour', categories: ['desk_tour'], url: 'https://www.watch.impress.co.jp/' },
+    for (const match of resultMatches) {
+      // DuckDuckGoのリダイレクトURLから実際のURLを抽出
+      const redirectUrl = match[1];
+      const actualUrlMatch = redirectUrl.match(/uddg=([^&]*)/);
+      const actualUrl = actualUrlMatch ? decodeURIComponent(actualUrlMatch[1]) : redirectUrl;
+      links.push(actualUrl);
+      titles.push(match[2].replace(/<[^>]*>/g, '').trim());
+    }
     
-    // 社宅・法人契約
-    { id: 19, title: '法人契約可能なシェアハウスが増加、社宅としての活用広がる', summary: '転勤者や新入社員の住居として、シェアハウスを社宅として採用する企業が増加。', region: 'japan', source: '日経ビジネス', date: formatDate(0), category: 'company_housing', categories: ['company_housing'], url: 'https://business.nikkei.com/' },
-    { id: 20, title: '借り上げ社宅にシェアハウスを採用、コスト削減と従業員満足度向上を両立', summary: '福利厚生としてのシェアハウス活用事例を紹介。', region: 'japan', source: 'HR総研', date: formatDate(1), category: 'company_housing', categories: ['company_housing'], url: 'https://www.hrpro.co.jp/' },
+    for (const match of snippetMatches) {
+      snippets.push(match[1].replace(/<[^>]*>/g, '').trim());
+    }
     
-    // 市場動向
-    { id: 21, title: 'インバウンド需要の回復でシェアハウス市場が活況に', summary: '外国人入居者が7割に達する物件も。物件数は前年比5.4%増。', region: 'japan', source: 'WEB翻訳', date: formatDate(3), category: 'market', categories: ['market', 'foreign'], url: 'https://web-honyaku.jp/2025/05/14/share-house/' },
-    { id: 22, title: '政府が「高齢者シェアハウス」整備へ、全国100カ所目標', summary: '独居高齢者の孤独死防止・生活支援を目的に整備推進。', region: 'japan', source: 'SUUMO', date: formatDate(3), category: 'policy', categories: ['policy', 'senior'], url: 'https://suumo.jp/journal/2025/11/18/212864/' },
-    
-    // 海外・コリビング
-    { id: 101, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living as a key strategy for affordable housing in the US.', region: 'world', source: 'Business Insider', date: formatDate(0), category: 'coliving', categories: ['coliving', 'us'], url: 'https://www.businessinsider.com/co-living-apartments-cheap-rent-fix-housing-crisis-2025-8' },
-    { id: 102, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living rents range from £1,550 to £1,750 pcm.', region: 'world', source: 'Savills', date: formatDate(1), category: 'coliving', categories: ['coliving', 'uk'], url: 'https://www.savills.co.uk/research_articles/229130/372282-0' },
-    { id: 103, title: 'Singapore Co-living Player Gears Up for Listing', summary: 'シンガポールのコリビング大手がCatalist上場へ。', region: 'world', source: 'EdgeProp', date: formatDate(1), category: 'coliving', categories: ['coliving', 'asia'], url: 'https://www.edgeprop.sg/property-news/co-living-player-assembly-place-lodges-prospectus-gears-catalist-listing' },
-    { id: 104, title: 'Coliving 2025: Key Investment Trends', summary: 'Investment shifts and evolving design trends in coliving.', region: 'world', source: 'Coliving Insights', date: formatDate(2), category: 'investment', categories: ['investment', 'coliving'], url: 'https://www.colivinginsights.com/articles/whats-next-for-coliving-key-investment-design-and-development-trends-shaping-2025-at-coliving-insights-talks' },
-    { id: 105, title: 'East London Coliving Scheme Gets Green Light', summary: '245-unit coliving scheme approved in Shoreditch.', region: 'world', source: 'Urban Living News', date: formatDate(2), category: 'coliving', categories: ['coliving', 'uk'], url: 'https://urbanliving.news/coliving/east-london-coliving-scheme-gets-the-green-light/' },
-    { id: 106, title: 'Korea\'s Co-Living Market Heats Up in 2025', summary: 'Seoul co-living rent 1.5x higher than average officetel.', region: 'world', source: 'World Property Journal', date: formatDate(3), category: 'coliving', categories: ['coliving', 'asia'], url: 'https://www.worldpropertyjournal.com/' },
-  ];
-}
-
-// 複数のRSSソースからニュースを取得
-async function fetchRelatedNews(): Promise<NewsItem[]> {
-  const rssFeeds = [
-    // 不動産・住宅関連
-    { url: 'https://www.asahi.com/rss/asahi/newsheadlines.rdf', region: 'japan' as const, defaultSource: '朝日新聞' },
-    { url: 'https://rss.itmedia.co.jp/rss/2.0/itmedia_all.xml', region: 'japan' as const, defaultSource: 'ITmedia' },
-    // 海外ニュース
-    { url: 'https://feeds.bbci.co.uk/news/business/rss.xml', region: 'world' as const, defaultSource: 'BBC' },
-  ];
-
-  const relatedItems: NewsItem[] = [];
-  let idCounter = 200;
-
-  // 関連キーワード（住宅・不動産・生活関連）
-  const relevantKeywords = [
-    'シェアハウス', 'シェアリング', 'コリビング', '賃貸', '一人暮らし', 
-    '住居', '住宅', '不動産', 'マンション', 'アパート', '空き家',
-    '移住', 'テレワーク', 'リモートワーク', '家賃',
-    'housing', 'rental', 'apartment', 'co-living', 'remote work'
-  ];
-
-  for (const feed of rssFeeds) {
-    const items = await fetchRSS(feed.url);
-
-    for (const item of items) {
-      const text = (item.title + ' ' + (item.description || '')).toLowerCase();
-      const isRelevant = relevantKeywords.some(kw => text.includes(kw.toLowerCase()));
-      
-      if (isRelevant) {
-        const { category, categories } = detectCategories(item.title, item.description || '');
-        const pubDate = parseDate(item.pubDate);
-        
-        relatedItems.push({
-          id: idCounter++,
-          title: item.title,
-          summary: item.description || item.title,
-          region: feed.region,
-          source: item.source || feed.defaultSource,
-          date: formatDateFromDate(pubDate),
-          category,
-          categories,
-          url: item.link
+    for (let i = 0; i < Math.min(links.length, 10); i++) {
+      if (links[i] && titles[i]) {
+        results.push({
+          title: titles[i],
+          link: links[i],
+          snippet: snippets[i] || '',
+          source: extractSource(links[i])
         });
       }
     }
+  } catch (error) {
+    console.log('DuckDuckGo search error:', error);
   }
+  
+  return results;
+}
 
-  return relatedItems;
+// Bing検索（API不要）
+async function searchBing(query: string): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+  
+  try {
+    const url = `https://www.bing.com/search?q=${encodeURIComponent(query)}&setlang=ja`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`Bing search failed: ${response.status}`);
+      return results;
+    }
+    
+    const html = await response.text();
+    
+    // 検索結果をパース（li.b_algo内のh2 > a）
+    const resultRegex = /<li class="b_algo"[^>]*>[\s\S]*?<h2><a[^>]*href="([^"]*)"[^>]*>([^<]*(?:<[^>]*>[^<]*)*)<\/a><\/h2>[\s\S]*?<p[^>]*>([^<]*(?:<[^>]*>[^<]*)*)<\/p>/gi;
+    
+    let match;
+    while ((match = resultRegex.exec(html)) !== null && results.length < 10) {
+      const link = match[1];
+      const title = match[2].replace(/<[^>]*>/g, '').trim();
+      const snippet = match[3].replace(/<[^>]*>/g, '').trim();
+      
+      if (link && title && !link.includes('bing.com') && !link.includes('microsoft.com')) {
+        results.push({
+          title,
+          link,
+          snippet,
+          source: extractSource(link)
+        });
+      }
+    }
+  } catch (error) {
+    console.log('Bing search error:', error);
+  }
+  
+  return results;
+}
+
+// 複数の検索クエリで検索
+async function searchNews(): Promise<NewsItem[]> {
+  const queries = [
+    'シェアハウス 新規オープン 2026',
+    'シェアハウス ニュース 最新',
+    'コリビング 東京 2026',
+    'シェアハウス 女性専用',
+    'シェアハウス 外国人',
+    'シェアハウス 高齢者',
+  ];
+  
+  const allResults: SearchResult[] = [];
+  const seenUrls = new Set<string>();
+  
+  for (const query of queries) {
+    console.log(`🔍 Searching: ${query}`);
+    
+    // DuckDuckGoで検索
+    const ddgResults = await searchDuckDuckGo(query);
+    console.log(`   DuckDuckGo: ${ddgResults.length} results`);
+    
+    for (const result of ddgResults) {
+      if (!seenUrls.has(result.link)) {
+        seenUrls.add(result.link);
+        allResults.push(result);
+      }
+    }
+    
+    // レート制限を避けるため少し待機
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  console.log(`📰 Total unique results: ${allResults.length}`);
+  
+  // NewsItemに変換
+  const newsItems: NewsItem[] = [];
+  let id = 1;
+  
+  for (const result of allResults) {
+    // シェアハウス関連かフィルタリング
+    const text = (result.title + ' ' + result.snippet).toLowerCase();
+    const isRelevant = ['シェアハウス', 'コリビング', 'co-living', 'ソーシャルアパートメント', '共同生活'].some(
+      kw => text.includes(kw.toLowerCase())
+    );
+    
+    if (isRelevant) {
+      const { category, categories } = detectCategories(result.title, result.snippet);
+      
+      newsItems.push({
+        id: id++,
+        title: result.title,
+        summary: result.snippet || result.title,
+        region: 'japan',
+        source: result.source || extractSource(result.link),
+        date: formatDate(0), // 今日の日付
+        category,
+        categories,
+        url: result.link
+      });
+    }
+  }
+  
+  return newsItems;
+}
+
+// 固定のシェアハウスニュース（検索で見つからない場合のフォールバック）
+function getDefaultNews(): NewsItem[] {
+  return [
+    { id: 101, title: 'シェアレジデンス「nears五反田」2026年5月入居開始', summary: 'ひとり暮らしとシェアハウスの間、ゆるくつながる心地よい暮らしを提案する新コンセプト物件。', region: 'japan', source: '大和ハウス工業', date: formatDate(0), category: 'new_open', categories: ['new_open', 'tokyo'], url: 'https://www.daiwahouse.co.jp/about/release/group/20251211162546.html' },
+    { id: 102, title: '高齢者シェアハウスで新しい老後生活、自由と安心を両立', summary: '70代〜90代が共同生活するシェアハウスが人気に。孤独解消と自立を両立する新しい住まいの形。', region: 'japan', source: 'テレ朝NEWS', date: formatDate(0), category: 'senior', categories: ['senior'], url: 'https://news.tv-asahi.co.jp/news_economy/articles/900180056.html' },
+    { id: 103, title: '空き家を外国人材の住まいに再生「外国人材シェアハウス」提供開始', summary: '企業向け外国人社宅サービスとして家具付き・敷金礼金ゼロの物件を提供。', region: 'japan', source: 'PR TIMES', date: formatDate(1), category: 'foreign', categories: ['foreign'], url: 'https://prtimes.jp/main/html/rd/p/000000077.000120610.html' },
+    { id: 104, title: 'ネイバーズ羽田が2026年3月開業、新規入居者の募集開始', summary: '京急空港線「糀谷駅」徒歩13分、羽田空港まで最短10分の好立地。', region: 'japan', source: 'SOCIAL APARTMENT', date: formatDate(1), category: 'new_open', categories: ['new_open', 'tokyo'], url: 'https://www.social-apartment.com/lifestyle/detail/20251219192601' },
+    { id: 105, title: '長崎に女性専用シェアハウス「長崎ライトハウス」誕生', summary: '斜面地の空き家をリノベーション。女性の自立を支援。', region: 'japan', source: '長崎新聞', date: formatDate(2), category: 'women', categories: ['women'], url: 'https://www.nagasaki-np.co.jp/kijis/?kijiid=341c58b5163a4d06a220c50c5f6436c5' },
+    { id: 106, title: '全国でも珍しいペット共生型シェアハウス「ペミリ住之江」', summary: 'ドッグトレーナーが管理人として常駐するペット共生型シェアハウス。', region: 'japan', source: '産経ニュース', date: formatDate(2), category: 'pet', categories: ['pet', 'osaka'], url: 'https://www.sankei.com/article/20231106-IQ2SI6RUHFMNJNSRUPWZBELAJU/' },
+    { id: 107, title: '月額2.5万円から！学生向け格安シェアハウスが人気', summary: '都内でも家賃を抑えたい学生に支持される格安シェアハウスの実態。', region: 'japan', source: 'SUUMO', date: formatDate(1), category: 'budget', categories: ['budget', 'student', 'tokyo'], url: 'https://suumo.jp/journal/2025/11/18/212864/' },
+    { id: 108, title: '大学生の新生活、シェアハウスという選択肢', summary: '初期費用を抑えられるシェアハウスが大学生の間で人気上昇中。', region: 'japan', source: '東洋経済', date: formatDate(2), category: 'student', categories: ['student', 'budget'], url: 'https://toyokeizai.net/' },
+    { id: 109, title: 'テレワーク対応シェアハウス、コワーキング併設型が増加', summary: '在宅勤務の普及で、Wi-Fi完備・作業スペース付きの物件需要が急増。', region: 'japan', source: 'ITmedia', date: formatDate(0), category: 'remote', categories: ['remote'], url: 'https://www.itmedia.co.jp/' },
+    { id: 110, title: '東京都心のシェアハウス、平均家賃は6.5万円に', summary: '23区内のシェアハウス家賃相場最新データ。人気エリアは新宿・渋谷。', region: 'japan', source: '不動産経済研究所', date: formatDate(1), category: 'tokyo', categories: ['tokyo', 'trend'], url: 'https://www.fudousankeizai.co.jp/' },
+    { id: 111, title: '2026年賃貸トレンド：シェアハウスが一人暮らしを超える？', summary: 'コスト面・コミュニティ面で賃貸市場に変化の兆し。', region: 'japan', source: 'LIFULL HOME\'S', date: formatDate(0), category: 'trend', categories: ['trend'], url: 'https://www.homes.co.jp/' },
+    { id: 112, title: '法人契約可能なシェアハウスが増加、社宅としての活用広がる', summary: '転勤者や新入社員の住居として、シェアハウスを社宅として採用する企業が増加。', region: 'japan', source: '日経ビジネス', date: formatDate(0), category: 'company_housing', categories: ['company_housing'], url: 'https://business.nikkei.com/' },
+    // 海外ニュース
+    { id: 201, title: 'Co-Living Apartments Could Help Fix the Housing Crisis', summary: 'Co-living as a key strategy for affordable housing in the US.', region: 'world', source: 'Business Insider', date: formatDate(0), category: 'coliving', categories: ['coliving'], url: 'https://www.businessinsider.com/co-living-apartments-cheap-rent-fix-housing-crisis-2025-8' },
+    { id: 202, title: 'UK Co-Living 2025: Renters Ready to Embrace Shared Living', summary: 'London Co-Living rents range from £1,550 to £1,750 pcm.', region: 'world', source: 'Savills', date: formatDate(1), category: 'coliving', categories: ['coliving'], url: 'https://www.savills.co.uk/research_articles/229130/372282-0' },
+    { id: 203, title: 'Singapore Co-living Player Gears Up for Listing', summary: 'シンガポールのコリビング大手がCatalist上場へ。', region: 'world', source: 'EdgeProp', date: formatDate(1), category: 'coliving', categories: ['coliving'], url: 'https://www.edgeprop.sg/property-news/co-living-player-assembly-place-lodges-prospectus-gears-catalist-listing' },
+    { id: 204, title: 'Coliving 2025: Key Investment Trends', summary: 'Investment shifts and evolving design trends in coliving.', region: 'world', source: 'Coliving Insights', date: formatDate(2), category: 'investment', categories: ['investment', 'coliving'], url: 'https://www.colivinginsights.com/' },
+  ];
 }
 
 // メイン処理
@@ -245,38 +313,55 @@ async function main() {
   const KV_NAMESPACE_ID = '6b596232dc464d40a8dfb2f5c5eb5fe2';
 
   if (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID) {
-    console.error('Missing required environment variables: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID');
+    console.error('Missing required environment variables');
     process.exit(1);
   }
 
-  console.log('🔄 Generating news...');
+  console.log('🔄 Fetching latest sharehouse news via web search...\n');
   
-  // シェアハウス関連の固定ニュース（日付を今日に更新）
-  const sharehouseNews = getSharehouseNews();
-  console.log(`   Sharehouse news: ${sharehouseNews.length}`);
-  
-  // RSSから関連ニュースを取得
-  console.log('🔄 Fetching related news from RSS...');
-  let relatedNews: NewsItem[] = [];
+  // Web検索でニュースを取得
+  let searchedNews: NewsItem[] = [];
   try {
-    relatedNews = await fetchRelatedNews();
-    console.log(`   Related news from RSS: ${relatedNews.length}`);
+    searchedNews = await searchNews();
+    console.log(`\n✅ Found ${searchedNews.length} relevant news from search`);
   } catch (error) {
-    console.log('   RSS fetch failed, using sharehouse news only');
+    console.log('Search failed, using default news:', error);
   }
-
-  // 統合（シェアハウスニュースを優先）
-  const allNews = [...sharehouseNews, ...relatedNews];
+  
+  // デフォルトニュースを取得
+  const defaultNews = getDefaultNews();
+  
+  // 検索結果とデフォルトニュースを統合（重複排除）
+  const seenTitles = new Set<string>();
+  const allNews: NewsItem[] = [];
+  
+  // 検索結果を優先
+  for (const news of searchedNews) {
+    const titleKey = news.title.substring(0, 20);
+    if (!seenTitles.has(titleKey)) {
+      seenTitles.add(titleKey);
+      allNews.push(news);
+    }
+  }
+  
+  // デフォルトニュースで補完
+  for (const news of defaultNews) {
+    const titleKey = news.title.substring(0, 20);
+    if (!seenTitles.has(titleKey)) {
+      seenTitles.add(titleKey);
+      allNews.push(news);
+    }
+  }
   
   const data = {
-    news: allNews,
+    news: allNews.slice(0, 50), // 最大50件
     lastUpdated: new Date().toISOString(),
     updateCount: allNews.length
   };
 
-  console.log(`📰 Total news items: ${allNews.length}`);
-  console.log(`   Japan news: ${allNews.filter(n => n.region === 'japan').length}`);
-  console.log(`   World news: ${allNews.filter(n => n.region === 'world').length}`);
+  console.log(`\n📰 Final news count: ${data.news.length}`);
+  console.log(`   Japan: ${data.news.filter(n => n.region === 'japan').length}`);
+  console.log(`   World: ${data.news.filter(n => n.region === 'world').length}`);
 
   // KVに保存
   const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${KV_NAMESPACE_ID}/values/news_data`;
@@ -296,7 +381,13 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`✅ News updated successfully at ${data.lastUpdated}`);
+  console.log(`\n✅ News updated at ${data.lastUpdated}`);
+  
+  // 取得したニュースのタイトルを表示
+  console.log('\n📋 Latest news titles:');
+  data.news.slice(0, 10).forEach((n, i) => {
+    console.log(`   ${i + 1}. ${n.title.substring(0, 50)}...`);
+  });
 }
 
 main().catch(console.error);
