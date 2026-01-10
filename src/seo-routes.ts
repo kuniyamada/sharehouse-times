@@ -264,11 +264,19 @@ export function createSeoRoutes() {
                 <!-- 元記事リンク -->
                 <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-6">
                     <p class="text-sm text-gray-600 mb-3">この記事の詳細は元記事をご覧ください：</p>
-                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" 
-                       class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
-                        <i class="fas fa-external-link-alt"></i>
-                        元記事を読む（${escapeXml(article.source)}）
-                    </a>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://www.google.com/search?q=${encodeURIComponent(article.title)}" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                            元記事を検索
+                        </a>
+                        <a href="${article.originalUrl || '#'}" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-2 bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-external-link-alt"></i>
+                            Google News経由
+                        </a>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3">※「元記事を検索」で ${escapeXml(article.source)} の記事が見つかります</p>
                 </div>
                 
                 <!-- シェアボタン -->
