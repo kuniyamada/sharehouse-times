@@ -10,6 +10,7 @@ interface NewsItem {
   originalUrl: string
   source: string
   date: string
+  pubTimestamp?: number  // ソート用タイムスタンプ
   region: 'japan' | 'world'
   category: string
   categories: string[]
@@ -22,9 +23,10 @@ interface FetchResult {
   source: string
 }
 
-// Google News RSS URLを生成
+// Google News RSS URLを生成　
 function getGoogleNewsRssUrl(query: string, lang: string = 'ja', region: string = 'JP'): string {
-  const encodedQuery = encodeURIComponent(query)
+  // when:7d で過去7日間のニュースに限定
+  const encodedQuery = encodeURIComponent(`${query} when:7d`)
   return `https://news.google.com/rss/search?q=${encodedQuery}&hl=${lang}&gl=${region}&ceid=${region}:${lang}`
 }
 
@@ -60,11 +62,13 @@ function isRelevantNews(title: string, summary: string): boolean {
     'テラスハウス', 'あいのり', '恋愛', 'bl', 'ボーイズラブ',
     // アニメ・漫画・ゲーム
     'アニメ', '漫画', 'マンガ', 'ゲーム', 'キャラクター', 'グッズ',
-    'くじ', 'エニマイ', 'カリスマ',
+    'くじ', 'エニマイ', 'カリスマ', '白猫', 'gamewith', 'ゲームウィズ',
+    '評価とおすすめ', '武器', 'ガチャ', '攻略',
     // 芸能
     'アイドル', 'タレント', '俳優', '女優', 'youtuber',
+    'ファンクラブ', 'オフィシャルファンクラブ', 'skiyaki',
     // その他
-    '映画', '小説', 'ライトノベル'
+    '映画', '小説', 'ライトノベル', '神様', 'ニート'
   ]
   
   // 除外キーワードが含まれている場合は除外
@@ -151,16 +155,32 @@ function determineRegion(title: string, summary: string): 'japan' | 'world' {
   return 'japan'
 }
 
-// 日付をフォーマット
+// 日付をパースしてタイムスタンプを取得
+function parseDate(dateStr: string): number {
+  try {
+    // RFC 2822形式（Google News RSS）: "Fri, 10 Jan 2026 07:30:00 GMT"
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) {
+      return Date.now()
+    }
+    return date.getTime()
+  } catch {
+    return Date.now()
+  }
+}
+
+// 日付をフォーマット（日本時間）
 function formatDate(dateStr: string): string {
   try {
     const date = new Date(dateStr)
     if (isNaN(date.getTime())) {
       return formatCurrentDate()
     }
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]
+    // 日本時間に変換（UTC+9）
+    const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+    const month = jstDate.getUTCMonth() + 1
+    const day = jstDate.getUTCDate()
+    const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][jstDate.getUTCDay()]
     return `${month}/${day}(${dayOfWeek})`
   } catch {
     return formatCurrentDate()
@@ -222,11 +242,14 @@ function parseRssXml(xml: string): Array<{ title: string, link: string, pubDate:
 
 // Google Newsからニュースを取得
 export async function fetchGoogleNews(): Promise<FetchResult> {
+  // 検索クエリを増やしてより多くのニュースを取得
   const searchQueries = [
-    'シェアハウス 賃貸',
-    'シェアハウス オープン',
-    'コリビング 物件',
+    'シェアハウス',
+    'コリビング 賃貸',
+    'シェアハウス 新規',
     'シェアハウス 入居',
+    'シェアハウス 東京',
+    'ソーシャルアパートメント',
   ]
   
   const allNews: NewsItem[] = []
@@ -278,6 +301,7 @@ export async function fetchGoogleNews(): Promise<FetchResult> {
           originalUrl: item.link,
           source,
           date: formatDate(item.pubDate),
+          pubTimestamp: parseDate(item.pubDate), // ソート用
           region,
           category,
           categories,
@@ -300,6 +324,15 @@ export async function fetchGoogleNews(): Promise<FetchResult> {
       source: 'google-news-empty'
     }
   }
+  
+  // 日付順にソート（新しい順）
+  allNews.sort((a, b) => (b.pubTimestamp || 0) - (a.pubTimestamp || 0))
+  
+  // IDを振り直し
+  allNews.forEach((item, index) => {
+    item.id = index + 1
+    item.url = `/news/${index + 1}`
+  })
   
   return {
     news: allNews,
