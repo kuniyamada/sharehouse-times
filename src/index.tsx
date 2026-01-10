@@ -2489,18 +2489,53 @@ app.post('/api/admin/login', async (c) => {
   return c.json({ success: false, error: 'Invalid password' }, 401)
 })
 
-// API: ニュースデータを取得
+// Cron WorkerのURL
+const CRON_WORKER_URL = 'https://sharehouse-times-cron.kunihiro72.workers.dev'
+
+// API: ニュースデータを取得（Cron Workerから取得）
 app.get('/api/news', async (c) => {
   try {
+    // まずCron Workerから最新データを取得
+    const cronResponse = await fetch(`${CRON_WORKER_URL}/api/news`, {
+      headers: { 'Cache-Control': 'no-cache' }
+    })
+    
+    if (cronResponse.ok) {
+      const cronData = await cronResponse.json() as { news: any[], lastUpdated: string | null }
+      if (cronData.news && cronData.news.length > 0) {
+        return c.json({ 
+          success: true, 
+          news: cronData.news, 
+          total: cronData.news.length, 
+          lastUpdated: cronData.lastUpdated,
+          source: 'cron-worker'
+        })
+      }
+    }
+    
+    // Cron Workerから取得できない場合はKVを確認
     let cachedData: { news: any[], lastUpdated: string | null } | null = null
     if (c.env?.NEWS_KV) {
       cachedData = await c.env.NEWS_KV.get('news_data', 'json')
     }
-    const news = cachedData?.news || generateDefaultNews()
-    const lastUpdated = cachedData?.lastUpdated || null
-    return c.json({ success: true, news, total: news.length, lastUpdated })
+    
+    if (cachedData?.news && cachedData.news.length > 0) {
+      return c.json({ 
+        success: true, 
+        news: cachedData.news, 
+        total: cachedData.news.length, 
+        lastUpdated: cachedData.lastUpdated,
+        source: 'kv-cache'
+      })
+    }
+    
+    // どちらも取得できない場合はデフォルトニュース
+    const news = generateDefaultNews()
+    return c.json({ success: true, news, total: news.length, lastUpdated: null, source: 'default' })
   } catch (error) {
-    return c.json({ success: false, news: generateDefaultNews(), total: 0, lastUpdated: null })
+    console.error('News fetch error:', error)
+    const news = generateDefaultNews()
+    return c.json({ success: false, news, total: news.length, lastUpdated: null, source: 'error-fallback' })
   }
 })
 
