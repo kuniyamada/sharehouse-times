@@ -342,12 +342,8 @@ export function createSeoRoutes() {
     const lastModDate = lastUpdated.split('T')[0]
     const baseUrl = 'https://sharehouse-times.pages.dev'
     
-    const categories = [
-      'women', 'pet', 'budget', 'tokyo', 'osaka', 'coliving', 'tokyo_life',
-      'student', 'remote', 'senior', 'trend', 'company_housing', 'new_open',
-      'foreign', 'fukuoka', 'nagoya', 'kyoto', 'rural', 'investment', 'desk_tour'
-    ]
-    
+    // サイトマップにはフラグメント識別子(#)を含むURLは使用不可
+    // Googleはアンカーリンクを無視するため、実際のページURLのみを含める
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -356,12 +352,6 @@ export function createSeoRoutes() {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-${categories.map(cat => `  <url>
-    <loc>${baseUrl}/#${cat}</loc>
-    <lastmod>${lastModDate}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>`).join('\n')}
 ${allNews.map((n: any) => `  <url>
     <loc>${baseUrl}/news/${n.id}</loc>
     <lastmod>${lastModDate}</lastmod>
