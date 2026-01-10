@@ -1595,6 +1595,8 @@ app.get('/', (c) => {
             const newBadge = isNew ? '<span class="badge-new">NEW</span>' : '';
             const cat = categoryConfig[article.category] || { icon: 'fa-newspaper', color: 'bg-gray-400', label: 'ニュース' };
             const highlightClass = 'cat-highlight-' + article.category;
+            // 元記事URLを使用（Google検索経由で確実にアクセス可能）
+            const articleLink = 'https://www.google.com/search?q=' + encodeURIComponent(article.title);
             
             return \`
                 <div class="headline-item \${highlightClass}">
@@ -1602,7 +1604,7 @@ app.get('/', (c) => {
                         <i class="fas \${cat.icon}"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <a href="\${article.url}" target="_blank" rel="noopener noreferrer" class="headline-link">
+                        <a href="\${articleLink}" target="_blank" rel="noopener noreferrer" class="headline-link">
                             \${article.title}\${newBadge}
                         </a>
                         <div class="source-info">
@@ -1619,10 +1621,11 @@ app.get('/', (c) => {
 
         function createRankingItem(article, rank) {
             const rankClass = rank <= 3 ? \`rank-\${rank}\` : 'rank-other';
+            const articleLink = 'https://www.google.com/search?q=' + encodeURIComponent(article.title);
             return \`
                 <div class="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 items-start">
                     <span class="ranking-num \${rankClass}">\${rank}</span>
-                    <a href="\${article.url}" target="_blank" rel="noopener noreferrer" 
+                    <a href="\${articleLink}" target="_blank" rel="noopener noreferrer" 
                        class="flex-1 text-sm text-gray-700 hover:text-[#e94560] leading-snug font-medium">
                         \${article.title}
                     </a>
