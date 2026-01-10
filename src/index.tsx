@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { createSeoRoutes } from './seo-routes'
 import { createLlmoRoutes } from './llmo-routes'
+import { fetchGoogleNews, shouldUpdateNews } from './news-fetcher'
 
 // Cloudflare Bindings型定義
 type Bindings = {
@@ -2489,47 +2490,63 @@ app.post('/api/admin/login', async (c) => {
   return c.json({ success: false, error: 'Invalid password' }, 401)
 })
 
-// Cron WorkerのURL
-const CRON_WORKER_URL = 'https://sharehouse-times-cron.kunihiro72.workers.dev'
-
-// API: ニュースデータを取得（Cron Workerから取得）
+// API: ニュースデータを取得（Google Newsから直接取得、KVキャッシュ付き）
 app.get('/api/news', async (c) => {
   try {
-    // まずCron Workerから最新データを取得
-    const cronResponse = await fetch(`${CRON_WORKER_URL}/api/news`, {
-      headers: { 'Cache-Control': 'no-cache' }
-    })
+    const forceRefresh = c.req.query('refresh') === 'true'
     
-    if (cronResponse.ok) {
-      const cronData = await cronResponse.json() as { news: any[], lastUpdated: string | null }
-      if (cronData.news && cronData.news.length > 0) {
-        return c.json({ 
-          success: true, 
-          news: cronData.news, 
-          total: cronData.news.length, 
-          lastUpdated: cronData.lastUpdated,
-          source: 'cron-worker'
-        })
-      }
-    }
-    
-    // Cron Workerから取得できない場合はKVを確認
-    let cachedData: { news: any[], lastUpdated: string | null } | null = null
+    // 1. KVからキャッシュを取得
+    let cachedData: { news: any[], lastUpdated: string } | null = null
     if (c.env?.NEWS_KV) {
       cachedData = await c.env.NEWS_KV.get('news_data', 'json')
     }
     
+    // 2. キャッシュが有効で強制更新でなければキャッシュを返す
+    if (cachedData?.news && cachedData.news.length > 0 && !forceRefresh) {
+      if (!shouldUpdateNews(cachedData.lastUpdated)) {
+        return c.json({ 
+          success: true, 
+          news: cachedData.news, 
+          total: cachedData.news.length, 
+          lastUpdated: cachedData.lastUpdated,
+          source: 'kv-cache'
+        })
+      }
+    }
+    
+    // 3. Google Newsから最新ニュースを取得
+    const result = await fetchGoogleNews()
+    
+    if (result.news.length > 0) {
+      // 4. KVにキャッシュを保存
+      if (c.env?.NEWS_KV) {
+        await c.env.NEWS_KV.put('news_data', JSON.stringify({
+          news: result.news,
+          lastUpdated: result.lastUpdated
+        }), { expirationTtl: 86400 }) // 24時間有効
+      }
+      
+      return c.json({ 
+        success: true, 
+        news: result.news, 
+        total: result.news.length, 
+        lastUpdated: result.lastUpdated,
+        source: result.source
+      })
+    }
+    
+    // 5. 取得失敗時はキャッシュがあればそれを返す
     if (cachedData?.news && cachedData.news.length > 0) {
       return c.json({ 
         success: true, 
         news: cachedData.news, 
         total: cachedData.news.length, 
         lastUpdated: cachedData.lastUpdated,
-        source: 'kv-cache'
+        source: 'kv-cache-fallback'
       })
     }
     
-    // どちらも取得できない場合はデフォルトニュース
+    // 6. それでもダメならデフォルトニュース
     const news = generateDefaultNews()
     return c.json({ success: true, news, total: news.length, lastUpdated: null, source: 'default' })
   } catch (error) {
@@ -2539,13 +2556,49 @@ app.get('/api/news', async (c) => {
   }
 })
 
-// Cron Trigger
+// API: ニュースを手動で強制更新
+app.post('/api/news/refresh', async (c) => {
+  try {
+    const result = await fetchGoogleNews()
+    
+    if (result.news.length > 0 && c.env?.NEWS_KV) {
+      await c.env.NEWS_KV.put('news_data', JSON.stringify({
+        news: result.news,
+        lastUpdated: result.lastUpdated
+      }), { expirationTtl: 86400 })
+      
+      return c.json({ 
+        success: true, 
+        message: 'News refreshed successfully',
+        count: result.news.length,
+        lastUpdated: result.lastUpdated
+      })
+    }
+    
+    return c.json({ success: false, message: 'Failed to fetch news' }, 500)
+  } catch (error) {
+    console.error('News refresh error:', error)
+    return c.json({ success: false, message: 'Error refreshing news' }, 500)
+  }
+})
+
+// Cron Trigger - Google Newsから最新ニュースを取得してKVに保存
 export default {
   fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: { NEWS_KV: KVNamespace }, ctx: ExecutionContext) {
     try {
-      const news = generateDefaultNews()
-      await env.NEWS_KV.put('news_data', JSON.stringify({ news, lastUpdated: new Date().toISOString() }))
+      console.log('Cron job started: Fetching news from Google News...')
+      const result = await fetchGoogleNews()
+      
+      if (result.news.length > 0) {
+        await env.NEWS_KV.put('news_data', JSON.stringify({ 
+          news: result.news, 
+          lastUpdated: result.lastUpdated 
+        }), { expirationTtl: 86400 })
+        console.log(`Cron job completed: ${result.news.length} news items saved`)
+      } else {
+        console.log('Cron job: No news fetched, keeping existing data')
+      }
     } catch (error) {
       console.error('Cron job failed:', error)
     }

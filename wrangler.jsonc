@@ -13,9 +13,9 @@
       "id": "6b596232dc464d40a8dfb2f5c5eb5fe2"
     }
   ],
-  // 更新スケジュール（GitHub Actionsで実行）
-  // JST 07:00 と JST 18:00 の1日2回更新
+  // 自動更新: リクエスト時に6時間以上経過していれば自動更新
+  // 手動更新: /api/news/refresh (POST) で強制更新
   "vars": {
-    "UPDATE_SCHEDULE": "07:00 JST, 18:00 JST"
+    "UPDATE_INTERVAL_HOURS": "6"
   }
 }
