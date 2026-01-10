@@ -205,6 +205,80 @@ function extractSource(title: string): { cleanTitle: string, source: string } {
   return { cleanTitle: title, source: 'ニュース' }
 }
 
+// タイトルを正規化して重複検出用のキーを生成
+function normalizeTitle(title: string): string {
+  // ソース名を除去
+  const { cleanTitle } = extractSource(title)
+  
+  return cleanTitle
+    // 全角を半角に変換
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+    // 記号を除去
+    .replace(/[「」『』【】（）\(\)、。！？!?,.\s　]/g, '')
+    // プレスリリースなどの接頭辞を除去
+    .replace(/^(プレスリリース|PR|速報|号外)/i, '')
+    // 小文字化
+    .toLowerCase()
+}
+
+// キーワードを抽出（重要な単語のみ）
+function extractKeywords(title: string): string[] {
+  const { cleanTitle } = extractSource(title)
+  // 重要そうな固有名詞やキーワードを抽出
+  const keywords: string[] = []
+  
+  // 物件名・施設名のパターン（「〇〇」で囲まれた名前）
+  const nameMatches = cleanTitle.match(/[「『]([^」』]+)[」』]/g)
+  if (nameMatches) {
+    nameMatches.forEach(m => {
+      const name = m.replace(/[「」『』]/g, '')
+      if (name.length >= 2) keywords.push(name.toLowerCase())
+    })
+  }
+  
+  // 地名のパターン
+  const locationPatterns = [
+    '東京', '大阪', '名古屋', '福岡', '京都', '横浜', '神戸', '札幌',
+    '渋谷', '新宿', '池袋', '品川', '初台', '五反田', '田端'
+  ]
+  locationPatterns.forEach(loc => {
+    if (cleanTitle.includes(loc)) keywords.push(loc)
+  })
+  
+  return keywords
+}
+
+// 類似度チェック（強化版）
+function isSimilarTitle(title1: string, title2: string): boolean {
+  const norm1 = normalizeTitle(title1)
+  const norm2 = normalizeTitle(title2)
+  
+  // 完全一致
+  if (norm1 === norm2) return true
+  
+  // 正規化後の先頭25文字が一致
+  if (norm1.substring(0, 25) === norm2.substring(0, 25) && norm1.length > 20) return true
+  
+  // キーワードベースの類似度チェック
+  const kw1 = extractKeywords(title1)
+  const kw2 = extractKeywords(title2)
+  
+  // 物件名などの重要キーワードが一致する場合
+  if (kw1.length > 0 && kw2.length > 0) {
+    const commonKeywords = kw1.filter(k => kw2.includes(k))
+    // 重要キーワードが2つ以上一致、または物件名が一致
+    if (commonKeywords.length >= 2) return true
+    if (commonKeywords.some(k => k.length >= 4)) return true // 長い固有名詞が一致
+  }
+  
+  // 一方が他方を含む（短い方が15文字以上の場合）
+  const shorter = norm1.length < norm2.length ? norm1 : norm2
+  const longer = norm1.length < norm2.length ? norm2 : norm1
+  if (shorter.length >= 15 && longer.includes(shorter)) return true
+  
+  return false
+}
+
 // XMLをパース（簡易実装）
 function parseRssXml(xml: string): Array<{ title: string, link: string, pubDate: string, description?: string }> {
   const items: Array<{ title: string, link: string, pubDate: string, description?: string }> = []
@@ -272,16 +346,20 @@ export async function fetchGoogleNews(): Promise<FetchResult> {
       const items = parseRssXml(xml)
       
       for (const item of items) {
-        // 重複チェック
-        const titleKey = item.title.substring(0, 50)
-        if (seenTitles.has(titleKey)) continue
-        
         // 関連性チェック（ドラマ、バラエティなどを除外）
         if (!isRelevantNews(item.title, item.description || '')) {
           continue
         }
         
-        seenTitles.add(titleKey)
+        // 重複チェック（正規化したタイトルで比較）
+        const normalizedKey = normalizeTitle(item.title)
+        if (seenTitles.has(normalizedKey)) continue
+        
+        // 既存のニュースと類似していないかチェック
+        const isDuplicate = allNews.some(existing => isSimilarTitle(existing.title, item.title))
+        if (isDuplicate) continue
+        
+        seenTitles.add(normalizedKey)
         
         const { cleanTitle, source } = extractSource(item.title)
         const { category, categories } = categorizeNews(item.title, item.description || '')
