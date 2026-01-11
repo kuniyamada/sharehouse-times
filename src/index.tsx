@@ -24,6 +24,52 @@ app.get('/googlec63dbc50a2bf04c5.html', (c) => {
   return c.text('google-site-verification: googlec63dbc50a2bf04c5.html')
 })
 
+// robots.txt（動的生成）
+app.get('/robots.txt', (c) => {
+  const robotsTxt = `# SHARE HOUSE TIMES - robots.txt
+# シェアハウス・コリビング・東京一人暮らし情報サイト
+# URL: https://sharehouse-times.pages.dev/
+
+User-agent: *
+Allow: /
+
+# サイトマップ
+Sitemap: https://sharehouse-times.pages.dev/sitemap.xml
+Sitemap: https://sharehouse-times.pages.dev/sitemap-news.xml
+
+# ニュース個別ページ
+# 各ニュースは /news/{id} でアクセス可能
+# 例: https://sharehouse-times.pages.dev/news/1
+
+# 検索エンジン向け設定
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# LLMクローラー向け設定
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+`
+  return c.text(robotsTxt, 200, { 'Content-Type': 'text/plain; charset=utf-8' })
+})
+
 
 
 // クランテラスの画像URL（物件別）

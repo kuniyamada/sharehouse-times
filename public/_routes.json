@@ -6,7 +6,6 @@
     "/images/*",
     "/llms.txt",
     "/llms-full.txt",
-    "/robots.txt",
     "/manifest.json",
     "/favicon.ico",
     "/favicon-16.png",
@@ -14,7 +13,6 @@
     "/apple-touch-icon.png",
     "/icon.jpg",
     "/icon-192.png",
-    "/icon-512.png",
-    "/googlec63dbc50a2bf04c5.html"
+    "/icon-512.png"
   ]
 }
