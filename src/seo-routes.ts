@@ -37,6 +37,18 @@ async function getNewsData(env: { NEWS_KV?: KVNamespace }) {
   }
 }
 
+// ブログデータを取得するヘルパー
+async function getBlogData(env: { NEWS_KV?: KVNamespace }) {
+  let blogData: { posts: any[], lastUpdated: string | null } | null = null
+  if (env?.NEWS_KV) {
+    blogData = await env.NEWS_KV.get('blog_data', 'json')
+  }
+  return {
+    posts: blogData?.posts?.filter((p: any) => p.status === 'published') || [],
+    lastUpdated: blogData?.lastUpdated || new Date().toISOString()
+  }
+}
+
 // XMLエスケープ
 function escapeXml(str: string): string {
   return str
@@ -347,6 +359,7 @@ export function createSeoRoutes() {
   // ========================================
   seo.get('/sitemap.xml', async (c) => {
     const { news: allNews, lastUpdated } = await getNewsData(c.env)
+    const { posts: blogPosts } = await getBlogData(c.env)
     const lastModDate = lastUpdated.split('T')[0]
     const baseUrl = 'https://sharehouse-times.pages.dev'
     
@@ -360,6 +373,18 @@ export function createSeoRoutes() {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${baseUrl}/blog</loc>
+    <lastmod>${lastModDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+${blogPosts.map((p: any) => `  <url>
+    <loc>${baseUrl}/blog/${escapeXml(p.slug)}</loc>
+    <lastmod>${p.updatedAt?.split('T')[0] || lastModDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n')}
 ${allNews.map((n: any) => `  <url>
     <loc>${baseUrl}/news/${n.id}</loc>
     <lastmod>${lastModDate}</lastmod>

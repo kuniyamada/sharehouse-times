@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { createSeoRoutes } from './seo-routes'
 import { createLlmoRoutes } from './llmo-routes'
+import { createBlogRoutes } from './blog-routes'
 import { fetchGoogleNews, shouldUpdateNews } from './news-fetcher'
 
 // Cloudflare Bindings型定義
@@ -18,6 +19,9 @@ app.route('/', createSeoRoutes())
 
 // LLMO対策ルートを追加（/llms.txt, /api/llms, /.well-known/llms.txt）
 app.route('/', createLlmoRoutes())
+
+// ブログ機能を追加（/blog, /admin/blog, /api/blog）
+app.route('/', createBlogRoutes())
 
 // Google Search Console 確認用
 app.get('/googlec63dbc50a2bf04c5.html', (c) => {
