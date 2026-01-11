@@ -340,6 +340,14 @@ const yahooStyles = `
             box-shadow: 0 4px 24px rgba(0,0,0,0.06);
             overflow: hidden;
         }
+        
+        /* line-clamp utility */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         @media (max-width: 767px) {
             .topics-box {
                 border-radius: 0;
@@ -1237,6 +1245,21 @@ app.get('/', (c) => {
                 <div id="worldNewsList" class="divide-y divide-gray-100" role="feed" aria-label="海外ニュース一覧"></div>
             </section>
 
+            <!-- ブログ記事セクション -->
+            <section class="topics-box m-3 md:m-3" aria-labelledby="blog-heading" id="blogSection">
+                <header class="topics-header" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                    <h2 id="blog-heading" class="m-0 text-base font-bold text-white flex items-center justify-between w-full">
+                        <span><i class="fas fa-blog mr-2"></i>シェアハウスコラム</span>
+                        <a href="/blog" class="text-xs font-normal text-white/80 hover:text-white">もっと見る →</a>
+                    </h2>
+                </header>
+                <div id="blogList" class="p-3">
+                    <div class="text-center text-gray-400 py-4" id="blogLoading">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>読み込み中...
+                    </div>
+                </div>
+            </section>
+
             <!-- モバイル用ランキング -->
             <section class="topics-box section-ranking m-3 md:hidden" aria-labelledby="mobile-ranking-heading">
                 <header class="topics-header">
@@ -2058,7 +2081,46 @@ app.get('/', (c) => {
         document.addEventListener('DOMContentLoaded', function() {
             fetchNews(false);
             lastFetchTime = Date.now();
+            fetchBlogPosts();
         });
+
+        // ブログ記事を取得して表示
+        async function fetchBlogPosts() {
+            try {
+                const res = await fetch('/api/blog');
+                const data = await res.json();
+                const blogList = document.getElementById('blogList');
+                
+                if (data.posts && data.posts.length > 0) {
+                    const posts = data.posts.slice(0, 4); // 最新4件を表示
+                    blogList.innerHTML = posts.map(post => \`
+                        <a href="/blog/\${post.slug}" class="block p-3 hover:bg-gray-50 rounded-lg mb-2 border border-gray-100 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <span class="flex-shrink-0 bg-indigo-100 text-indigo-600 text-xs px-2 py-1 rounded">\${post.category}</span>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="font-bold text-gray-800 text-sm line-clamp-2 mb-1">\${post.title}</h3>
+                                    <p class="text-xs text-gray-500 line-clamp-2">\${post.excerpt}</p>
+                                    <div class="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                                        <span>\${new Date(post.publishedAt).toLocaleDateString('ja-JP')}</span>
+                                        <span>•</span>
+                                        <span>\${post.author}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    \`).join('');
+                } else {
+                    blogList.innerHTML = \`
+                        <div class="text-center py-6">
+                            <p class="text-gray-400 text-sm mb-3">📝 まだ記事がありません</p>
+                            <a href="/admin/blog" class="text-indigo-500 text-xs hover:underline">最初の記事を投稿する →</a>
+                        </div>
+                    \`;
+                }
+            } catch (e) {
+                document.getElementById('blogList').innerHTML = '<p class="text-center text-gray-400 text-sm py-4">読み込みに失敗しました</p>';
+            }
+        }
     </script>
 </body>
 </html>
