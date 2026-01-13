@@ -1581,33 +1581,21 @@ app.get('/', (c) => {
     <!-- フッター -->
     <footer class="yahoo-footer py-8 mt-4" role="contentinfo" itemscope itemtype="https://schema.org/WPFooter">
         <div class="max-w-6xl mx-auto px-4 text-center">
-            <!-- 内部リンク（SEO強化） -->
-            <nav class="mb-6" aria-label="カテゴリーリンク">
-                <h3 class="text-xs text-slate-400 mb-3">シェアハウスカテゴリー</h3>
-                <div class="flex flex-wrap justify-center gap-3 text-xs">
-                    <a href="#women" onclick="filterCategory('women'); return false;" class="footer-link hover:text-indigo-600">女性専用シェアハウス</a>
-                    <a href="#pet" onclick="filterCategory('pet'); return false;" class="footer-link hover:text-indigo-600">ペット可シェアハウス</a>
-                    <a href="#budget" onclick="filterCategory('budget'); return false;" class="footer-link hover:text-indigo-600">格安シェアハウス</a>
-                    <a href="#tokyo" onclick="filterCategory('tokyo'); return false;" class="footer-link hover:text-indigo-600">東京のシェアハウス</a>
-                    <a href="#osaka" onclick="filterCategory('osaka'); return false;" class="footer-link hover:text-indigo-600">大阪のシェアハウス</a>
-                    <a href="#coliving" onclick="filterCategory('coliving'); return false;" class="footer-link hover:text-indigo-600">コリビング</a>
-                    <a href="#tokyo_life" onclick="filterCategory('tokyo_life'); return false;" class="footer-link hover:text-indigo-600">東京一人暮らし</a>
-                    <a href="#student" onclick="filterCategory('student'); return false;" class="footer-link hover:text-indigo-600">学生向けシェアハウス</a>
-                    <a href="#company_housing" onclick="filterCategory('company_housing'); return false;" class="footer-link hover:text-indigo-600">社宅・法人契約</a>
+            <!-- サイトナビゲーション -->
+            <nav class="mb-6" aria-label="サイトナビゲーション">
+                <div class="flex flex-wrap justify-center gap-4 text-xs mb-4">
+                    <a href="/" class="footer-link hover:text-indigo-600">ホーム</a>
+                    <a href="/blog" class="footer-link hover:text-indigo-600">ブログ</a>
+                    <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer sponsored" class="footer-link hover:text-indigo-600">クランテラス公式</a>
                 </div>
             </nav>
-            
-            <!-- 外部リンク -->
-            <div class="flex flex-wrap justify-center gap-4 mb-4 text-xs">
-                <a href="https://crann-terrace.com/" target="_blank" rel="noopener noreferrer sponsored" class="footer-link">クランテラス公式サイト</a>
-            </div>
             
             <div class="flex items-center justify-center gap-2 mb-3">
                 <i class="fas fa-shield-halved text-indigo-400" aria-hidden="true"></i>
                 <span class="text-xs text-slate-400">東京ディフェンス株式会社 提供</span>
             </div>
             <p class="text-xs text-slate-500">
-                <small>&copy; 2026 SHARE HOUSE TIMES - シェアハウス・東京一人暮らし情報サイト</small>
+                <small>&copy; 2026 SHARE HOUSE TIMES</small>
             </p>
         </div>
     </footer>
