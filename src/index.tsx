@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { createSeoRoutes } from './seo-routes'
 import { createLlmoRoutes } from './llmo-routes'
 import { createBlogRoutes } from './blog-routes'
+import { createBackupRoutes } from './backup-routes'
 import { fetchGoogleNews, shouldUpdateNews } from './news-fetcher'
 
 // Cloudflare Bindings型定義
@@ -22,6 +23,9 @@ app.route('/', createLlmoRoutes())
 
 // ブログ機能を追加（/blog, /admin/blog, /api/blog）
 app.route('/', createBlogRoutes())
+
+// バックアップ管理機能を追加（/admin/backup）
+app.route('/', createBackupRoutes())
 
 // Google Search Console 確認用
 app.get('/googlec63dbc50a2bf04c5.html', (c) => {
