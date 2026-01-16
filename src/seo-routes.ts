@@ -380,7 +380,7 @@ export function createSeoRoutes() {
     <priority>0.9</priority>
   </url>
 ${blogPosts.map((p: any) => `  <url>
-    <loc>${baseUrl}/blog/${escapeXml(p.slug)}</loc>
+    <loc>${baseUrl}/blog/${encodeURIComponent(p.slug)}</loc>
     <lastmod>${p.updatedAt?.split('T')[0] || lastModDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
