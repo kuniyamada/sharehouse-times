@@ -1,34 +1,70 @@
-# シェアハウスニュース
+# SHARE HOUSE TIMES
 
-全国のシェアハウスに関する最新ニュース・トレンド・生活情報を毎朝自動更新でお届けするWebアプリケーションです。
+シェアハウス・コリビング・東京一人暮らしに関する最新ニュースとコラムを毎日自動更新でお届けするWebアプリケーションです。
 
-## 機能
+## 本番URL
 
-### 完成済み機能
-- 📰 **ニュース表示**: カテゴリ別（ニュース・トレンド・生活ガイド・物件情報・インタビュー）
-- 🖼️ **写真付き記事**: アイキャッチ画像で視覚的に分かりやすく
-- 🔍 **カテゴリフィルター**: ワンクリックでカテゴリ絞り込み
-- 📅 **日本時間表示**: すべての日時がJST（日本標準時）で表示
-- ⏰ **毎朝10時自動更新**: Cloudflare Cron Triggersで定期実行
-- 💾 **KVキャッシュ**: ニュースデータをCloudflare KVに保存
-- 🔥 **人気記事ランキング**: サイドセクションに表示
+- **メインサイト**: https://sharehouse-times.pages.dev/
+- **ブログ一覧**: https://sharehouse-times.pages.dev/blog
+- **サイトマップ**: https://sharehouse-times.pages.dev/sitemap.xml
 
-### 自動更新の仕組み
-- **Cron Schedule**: `0 1 * * *` (UTC) = 毎朝10:00 (JST)
-- **データ保存**: Cloudflare KV Namespace
-- **フォールバック**: KVが利用できない場合はデフォルトデータを表示
+## 管理画面
 
-## URL
+| ページ | URL | パスワード |
+|--------|-----|------------|
+| 管理メニュー | /admin | sharehouse2026 |
+| ブログ管理 | /admin/blog | sharehouse2026 |
+| バックアップ管理 | /admin/backup | sharehouse2026 |
 
-### 開発環境
-- **ローカル**: http://localhost:3000
+## 機能一覧
 
-### API エンドポイント
+### ニュース機能
+- 📰 **ニュース自動取得**: Google News RSSから最新ニュースを自動取得（過去7日間）
+- 🔍 **カテゴリフィルター**: 女性専用、ペット可、外国人向け、学生向け、リモートワーク向け、エリア別など
+- 📅 **日付順表示**: 最新ニュースが上に表示
+- 🔗 **元記事リンク**: ニュースをクリックで元記事に直接遷移
+- 🗑️ **重複除去**: 同じニュースが異なるソースから配信されても重複表示しない
+
+### ブログ機能
+- 📝 **手動投稿**: Markdown対応のブログ記事投稿
+- 🏷️ **カテゴリ・タグ**: 記事の分類と検索性向上
+- 👤 **著者名**: 記事ごとに著者を設定可能
+- 📊 **閲覧数カウント**: 記事の人気度を把握
+- 🖼️ **アイキャッチ画像**: 記事にサムネイル画像を設定可能
+- ✏️ **下書き保存**: 公開前に記事を保存
+- 📱 **トップページ表示**: 最新4件がトップページに表示
+
+### バックアップ機能
+- 💾 **バックアップ作成**: ニュース・ブログデータの手動バックアップ
+- 👀 **プレビュー機能**: バックアップ内容を復元前に確認
+- 📋 **詳細表示**: ニュース件数、ブログ記事一覧、更新日時などを表示
+- 🔄 **復元機能**: バックアップからデータを復元
+- 🗑️ **削除機能**: 不要なバックアップを削除
+
+### SEO対策
+- 🔎 **メタタグ最適化**: title, description, keywords設定済み
+- 📍 **構造化データ**: JSON-LD（WebSite, NewsArticle, FAQPage）
+- 🗺️ **サイトマップ**: 動的生成（sitemap.xml, sitemap-news.xml）
+- 📡 **RSS/Atomフィード**: feed.xml, atom.xml
+- 🤖 **robots.txt**: カスタム設定
+- 🔗 **canonical URL**: 重複コンテンツ対策
+
+### LLMO対策
+- 📄 **llms.txt**: AIボット向け情報ファイル
+- 🔌 **API**: /api/llms でサイト情報をJSON形式で提供
+
+## APIエンドポイント
+
 | パス | メソッド | 説明 |
 |------|----------|------|
-| `/` | GET | メインページ（HTML） |
+| `/` | GET | トップページ（HTML） |
 | `/api/news` | GET | ニュース一覧（JSON） |
-| `/api/news/refresh` | POST | 手動でニュース更新 |
+| `/api/news/refresh` | POST | ニュース手動更新 |
+| `/api/blog` | GET | ブログ記事一覧 |
+| `/api/blog/:slug` | GET | ブログ記事詳細 |
+| `/api/backups` | GET | バックアップ一覧 |
+| `/sitemap.xml` | GET | サイトマップ |
+| `/feed.xml` | GET | RSSフィード |
 
 ## 技術スタック
 
@@ -44,31 +80,17 @@
 ```
 webapp/
 ├── src/
-│   └── index.tsx      # メインアプリケーション（API + HTML）
-├── public/            # 静的ファイル
-├── dist/              # ビルド出力
+│   ├── index.tsx        # メインアプリケーション
+│   ├── seo-routes.ts    # SEO関連ルート（サイトマップ、RSS等）
+│   ├── llmo-routes.ts   # LLMO対策ルート
+│   ├── blog-routes.ts   # ブログ機能
+│   ├── backup-routes.ts # バックアップ機能
+│   └── news-fetcher.ts  # ニュース取得ロジック
+├── public/              # 静的ファイル
+├── dist/                # ビルド出力
+├── wrangler.jsonc       # Cloudflare設定
 ├── ecosystem.config.cjs # PM2設定
-├── wrangler.jsonc     # Cloudflare設定（KV, Cron）
-├── package.json
-└── README.md
-```
-
-## 設定ファイル
-
-### wrangler.jsonc
-```jsonc
-{
-  "name": "sharehouse-news",
-  "kv_namespaces": [
-    {
-      "binding": "NEWS_KV",
-      "id": "sharehouse-news-kv"
-    }
-  ],
-  "triggers": {
-    "crons": ["0 1 * * *"]  // UTC 01:00 = JST 10:00
-  }
-}
+└── package.json
 ```
 
 ## 開発コマンド
@@ -81,24 +103,11 @@ pm2 start ecosystem.config.cjs
 # ビルド
 npm run build
 
-# デプロイ（Cloudflare Pages）
+# デプロイ
 npm run deploy
-```
 
-## デプロイ手順
-
-### 1. KV Namespaceの作成
-```bash
-npx wrangler kv:namespace create NEWS_KV
-```
-
-### 2. wrangler.jsoncにIDを設定
-作成されたIDをwrangler.jsoncの`kv_namespaces`に設定
-
-### 3. デプロイ
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name sharehouse-news
+# ニュース手動更新
+curl -X POST https://sharehouse-times.pages.dev/api/news/refresh
 ```
 
 ## データモデル
@@ -107,14 +116,33 @@ npx wrangler pages deploy dist --project-name sharehouse-news
 ```typescript
 {
   id: number;
-  title: string;      // 記事タイトル
-  summary: string;    // 要約
-  category: 'news' | 'trend' | 'guide' | 'property' | 'interview';
-  source: string;     // 情報源
-  date: string;       // 日付（日本語形式）
-  image: string;      // アイキャッチ画像URL
-  url: string;        // 記事リンク
-  isPopular: boolean; // 人気記事フラグ
+  title: string;       // 記事タイトル
+  summary: string;     // 要約
+  category: string;    // カテゴリ
+  source: string;      // ニュースソース
+  date: string;        // 日付
+  pubDate: string;     // 公開日時（ISO形式）
+  originalUrl: string; // 元記事URL
+}
+```
+
+### BlogPost
+```typescript
+{
+  id: string;
+  slug: string;           // URLスラッグ
+  title: string;          // 記事タイトル
+  content: string;        // 本文（Markdown）
+  excerpt: string;        // 抜粋
+  category: string;       // カテゴリ
+  tags: string[];         // タグ
+  author: string;         // 著者
+  status: 'draft' | 'published';
+  featuredImage: string;  // アイキャッチ画像URL
+  views: number;          // 閲覧数
+  createdAt: string;      // 作成日時
+  updatedAt: string;      // 更新日時
+  publishedAt: string;    // 公開日時
 }
 ```
 
