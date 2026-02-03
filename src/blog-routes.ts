@@ -662,6 +662,7 @@ export function createBlogRoutes() {
     
     blogData.posts[postIndex] = {
       ...existingPost,
+      slug: body.slug || existingPost.slug,
       title: body.title || existingPost.title,
       content: body.content || existingPost.content,
       excerpt: body.excerpt || existingPost.excerpt,
