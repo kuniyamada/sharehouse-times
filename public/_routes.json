@@ -4,6 +4,7 @@
   "exclude": [
     "/static/*",
     "/images/*",
+    "/sitemap.xml",
     "/llms.txt",
     "/llms-full.txt",
     "/manifest.json",
