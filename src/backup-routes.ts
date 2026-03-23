@@ -517,6 +517,15 @@ export function createBackupRoutes() {
           if (sessionStorage.getItem('backupAuth') === 'true') {
             showDashboard();
           }
+          
+          // グローバル関数として公開
+          window.previewBackup = previewBackup;
+          window.restoreBackup = restoreBackup;
+          window.deleteBackup = deleteBackup;
+          window.showTab = showTab;
+          window.showCreateModal = showCreateModal;
+          window.closeModal = closeModal;
+          window.logout = logout;
         </script>
       </body>
       </html>
