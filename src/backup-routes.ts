@@ -402,10 +402,10 @@ export function createBackupRoutes() {
             
             html += '<div class="tab-container">';
             if (backup.data.news) {
-              html += '<button class="tab-btn active" onclick="showTab(\'news\')">ニュース (' + (backup.data.news.news?.length || 0) + '件)</button>';
+              html += '<button class="tab-btn active" onclick="showTab(&quot;news&quot;)">ニュース (' + (backup.data.news.news?.length || 0) + '件)</button>';
             }
             if (backup.data.blog) {
-              html += '<button class="tab-btn' + (!backup.data.news ? ' active' : '') + '" onclick="showTab(\'blog\')">ブログ (' + (backup.data.blog.posts?.length || 0) + '件)</button>';
+              html += '<button class="tab-btn' + (!backup.data.news ? ' active' : '') + '" onclick="showTab(&quot;blog&quot;)">ブログ (' + (backup.data.blog.posts?.length || 0) + '件)</button>';
             }
             html += '</div>';
             
